@@ -1,13 +1,16 @@
-import EmployeeListApp from "@/components/src/EmployeeListApp";
 import FormBox2App from "@/components/src/FormBox2App";
 import FormBoxApp from "@/components/src/FormBoxApp";
-import { View, StyleSheet } from "react-native";
+import { StatusBar } from "expo-status-bar";
+import { StyleSheet, useColorScheme, View } from "react-native";
 import Swiper from "react-native-swiper";
 
 function StaffLayout() {
+  const colorScheme = useColorScheme();
+
   return (
     <Swiper style={StaffStyle.wrapper} loop={false} showsPagination={false}>
       <View style={StaffStyle.slide}>
+        <StatusBar style={(colors = [colorScheme ?? "light"].text)} />
         <FormBoxApp />
       </View>
       <View style={StaffStyle.slide}>

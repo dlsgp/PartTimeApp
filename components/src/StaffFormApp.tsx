@@ -12,7 +12,7 @@ import {
 import { TextInput } from "react-native-paper";
 import BouncyCheckbox from "react-native-bouncy-checkbox";
 
-const StaffForm = () => {
+const StaffFormApp = () => {
   const [text, setText] = useState("");
   // const [formData, setFormData] = useState({
   //   selectedDate: null,
@@ -256,4 +256,4 @@ const RegFormStyle = StyleSheet.create({
     marginTop: 30,
   },
 });
-export default StaffForm;
+export default StaffFormApp;
