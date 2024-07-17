@@ -1,3 +1,4 @@
+import * as React from "react";
 import { Dimensions, View, StyleSheet } from "react-native";
 import Swiper from "react-native-swiper";
 
