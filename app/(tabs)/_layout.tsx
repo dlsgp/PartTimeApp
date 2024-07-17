@@ -54,6 +54,13 @@ export default function TabLayout() {
           title: "Tab Two",
           tabBarIcon: ({ color }) => <TabBarIcon name="code" color={color} />,
         }}
+      />{" "}
+      <Tabs.Screen
+        name="StaffFormApp"
+        options={{
+          title: "직원관리",
+          tabBarIcon: ({ color }) => <TabBarIcon name="code" color={color} />,
+        }}
       />
     </Tabs>
   );

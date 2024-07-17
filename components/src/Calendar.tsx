@@ -1,3 +1,4 @@
+import * as React from "react";
 import { StatusBar } from "expo-status-bar";
 import DatePicker from "react-native-modern-datepicker";
 import { useState } from "react";
@@ -29,7 +30,7 @@ export default function TabOneScreen() {
             <DatePicker
               mode="calendar"
               selected={date || ""}
-              onDateChanged={handleChange}
+              onDateChange={handleChange}
             />
 
             <TouchableOpacity onPress={handleOnPress}>
