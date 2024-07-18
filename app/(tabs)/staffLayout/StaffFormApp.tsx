@@ -38,7 +38,7 @@ const StaffFormApp = () => {
             }}
           >
             <Image
-              source={require("../../assets/images/profile.jpg")}
+              source={require("../../../assets/images/profile.jpg")}
               style={{ width: 100, height: 100 }}
             />
           </View>

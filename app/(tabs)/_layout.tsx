@@ -28,7 +28,7 @@ export default function TabLayout() {
       }}
     >
       <Tabs.Screen
-        name="staffLayoutApp"
+        name="staffLayout"
         options={{
           title: "직원관리",
           tabBarIcon: ({ color }) => (
