@@ -1,7 +1,14 @@
 {
   "extends": "expo/tsconfig.base",
   "compilerOptions": {
-    "jsx": "react",
+    "jsx": "react-native",
+    "lib": ["es6", "dom"],
+    "allowJs": true,
+    "skipLibCheck": true,
+    "noEmit": true,
+    "esModuleInterop": true,
+    "resolveJsonModule": true,
+    "isolatedModules": true,
     "strict": true,
     "paths": {
       "@/*": [
