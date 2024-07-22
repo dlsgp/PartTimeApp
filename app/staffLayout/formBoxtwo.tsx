@@ -1,27 +1,12 @@
 import React from "react";
-import { Alert, Button, Image, StyleSheet, Text, View } from "react-native";
+import { Image, Platform, StyleSheet, Text, View } from "react-native";
 import FontAwesome from "@expo/vector-icons/FontAwesome";
 import { Checkbox } from "react-native-paper";
-import { useNavigation } from "@react-navigation/native";
-import StaffFormApp from "./StaffFormApp";
 
-function FormBoxApp() {
+function FormBoxtwo() {
   const [checked, setChecked] = React.useState(false);
-  const navigation = useNavigation();
-
   return (
     <View style={FormBoxStyle.mobileContainer}>
-      <View style={FormBoxStyle.titleContainer}>
-        <Text style={FormBoxStyle.title}>직원관리</Text>
-      </View>
-      <View style={FormBoxStyle.buttonContainer}>
-        <Button
-          title="작성하기"
-          onPress={() => {
-            navigation.navigate({ name: "StaffFormApp" });
-          }}
-        />
-      </View>
       <View
         style={{
           alignItems: "center",
@@ -33,9 +18,9 @@ function FormBoxApp() {
           style={FormBoxStyle.mobilePhoto}
           source={require("../../assets/images/profile.jpg")}
         />
-        <Text style={FormBoxStyle.mobileText}>홍길동</Text>
-        <Text style={FormBoxStyle.mobileText2}>2024.07.10 입사</Text>
-        <Text style={FormBoxStyle.mobileText3}>~ 2024.10.09</Text>
+        <Text style={FormBoxStyle.mobileText}>김철수</Text>
+        <Text style={FormBoxStyle.mobileText2}>2024.07.14 입사</Text>
+        <Text style={FormBoxStyle.mobileText3}>~ 2024.10.13</Text>
       </View>
       <View style={FormBoxStyle.iconText}>
         <View
@@ -112,30 +97,6 @@ const FormBoxStyle = StyleSheet.create({
     width: "100%",
     height: "100%",
   },
-  titleContainer: {
-    alignSelf: "flex-start",
-    backgroundColor: "#2E294E",
-    paddingRight: "2%",
-  },
-  title: {
-    fontSize: 22,
-    fontWeight: "700",
-    marginLeft: "12%",
-    color: "white",
-  },
-  buttonContainer: {
-    alignSelf: "flex-end",
-    backgroundColor: "white",
-    shadowColor: "#eee",
-    shadowOpacity: 0.8,
-    shadowOffset: {
-      width: 0,
-      height: 4,
-    },
-    borderRadius: 30,
-    paddingHorizontal: "2%",
-    marginRight: "4%",
-  },
   mobileCheckbox1: {
     marginLeft: "16%",
     paddingRight: "12%",
@@ -182,4 +143,4 @@ const FormBoxStyle = StyleSheet.create({
   },
 });
 
-export default FormBoxApp;
+export default FormBoxtwo;
