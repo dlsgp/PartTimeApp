@@ -13,7 +13,7 @@ import { Image } from "react-native-elements";
 import { useNavigation } from "@react-navigation/native";
 import { Link, router } from "expo-router";
 
-// const { width, height } = Dimensions.get("window");
+const { width, height } = Dimensions.get("window");
 
 
 const SignInApp = () => {
@@ -108,10 +108,10 @@ const styles = StyleSheet.create({
     fontSize: 70,
     marginBottom: 150,
   },
-  
+
   input: {
-    width: 500,
-    height: 40,
+    width: width * 0.8,
+    height: height * 0.06,
     borderColor: "#ccc",
     borderWidth: 1,
     borderRadius: 5,
@@ -136,8 +136,8 @@ const styles = StyleSheet.create({
     color: "#FFBD00",
   },
   loginButton: {
-    width: 500,
-    height: 50,
+    width: width * 0.8,
+    height: height * 0.06,
     backgroundColor: "#2E294E",
     justifyContent: "center",
     alignItems: "center",

@@ -11,7 +11,7 @@ function TabBarIcon(props: {
   return <FontAwesome size={28} style={{ marginBottom: -3 }} {...props} />;
 }
 
-function formBox() {
+function FormBox() {
   const [checked, setChecked] = React.useState(false);
   const navigation = useNavigation();
 
@@ -183,4 +183,4 @@ const FormBoxStyle = StyleSheet.create({
   },
 });
 
-export default formBox;
+export default FormBox;

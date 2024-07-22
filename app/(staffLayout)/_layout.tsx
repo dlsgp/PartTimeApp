@@ -10,6 +10,9 @@ export default function staffLayout() {
           headerShown: false,
         }}
       />
+      <Stack.Screen name="FormBox"/>
+      <Stack.Screen name="FormBoxtwo"/>
+
     </Stack>
   );
 }
