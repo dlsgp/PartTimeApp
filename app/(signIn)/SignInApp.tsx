@@ -1,5 +1,6 @@
 import React from "react";
 import {
+  Dimensions,
   SafeAreaView,
   StyleSheet,
   Text,
@@ -10,7 +11,9 @@ import {
 import { Checkbox } from "react-native-paper";
 import { Image } from "react-native-elements";
 import { useNavigation } from "@react-navigation/native";
-import { router } from "expo-router";
+import { Link, router } from "expo-router";
+
+// const { width, height } = Dimensions.get("window");
 
 
 const SignInApp = () => {
@@ -19,18 +22,11 @@ const SignInApp = () => {
 
   const HorizonLine = ({ text }) => {
     return (
-      <div
-        style={{
-          width: 500,
-          textAlign: "center",
-          borderBottom: "1px solid #aaa",
-          lineHeight: "0.1em",
-          margin: "10px 0 20px",
-          marginBottom: 40,
-        }}
-      >
-        <span style={{ background: "#fff", padding: "0 10px" }}>{text}</span>
-      </div>
+      <View style={styles.horizonLine}>
+        <View style={styles.line} />
+        <Text style={styles.horizonLineText}>{text}</Text>
+        <View style={styles.line} />
+      </View>
     );
   };
 
@@ -62,9 +58,13 @@ const SignInApp = () => {
             <Text style={styles.autoLoginText}>자동로그인</Text>
           </TouchableOpacity>
         </View>
+        
+        <Link href="FindPasswordApp">
         <TouchableOpacity>
           <Text style={styles.forgotPassword}>비밀번호를 잊으셨나요?</Text>
         </TouchableOpacity>
+        </Link>
+
       </View>
 
       <TouchableOpacity style={styles.loginButton}>
@@ -162,6 +162,22 @@ const styles = StyleSheet.create({
   socialButton: {
     width: 40,
     height: 40,
+  },
+  horizonLine: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginVertical: 20,
+  },
+  line: {
+    flex: 1,
+    height: 1,
+    backgroundColor: '#aaa',
+  },
+  horizonLineText: {
+    marginHorizontal: 10,
+    backgroundColor: '#fff',
+    paddingHorizontal: 5,
+    color: '#aaa',
   },
 });
 

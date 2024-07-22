@@ -1,3 +1,4 @@
+import { Link } from "expo-router";
 import React from "react";
 import {
   SafeAreaView,
@@ -95,9 +96,11 @@ const PersonalSignUpApp: React.FC = () => {
         <Text style={styles.label}>[필수] 개인정보 수집 및 이용 동의</Text>
       </View>
 
+      <Link href="SignInApp">
       <TouchableOpacity style={styles.signupButton}>
         <Text style={styles.signupButtonText}>회원가입</Text>
       </TouchableOpacity>
+      </Link>
     </SafeAreaView>
   );
 };

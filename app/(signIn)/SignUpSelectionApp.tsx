@@ -3,9 +3,10 @@ import Ionicons from '@expo/vector-icons/Ionicons';
 import { FontAwesome } from '@expo/vector-icons';
 import { Image } from "react-native-elements";
 import React from "react";
+import { Link, router } from "expo-router";
 
 
-const SignUpSelectionApp: React.FC = ({ navigation }) => {
+const SignUpSelectionApp: React.FC = () => {
   
 
 
@@ -14,10 +15,12 @@ const SignUpSelectionApp: React.FC = ({ navigation }) => {
     <SafeAreaView style={styles.container}>
       <Text style={styles.title}>PartTime 회원가입을 환영합니다</Text>
 
-      <TouchableOpacity style={styles.card} onPress={() => navigation.navigate('PersonalSignUpApp')}>
+      <Link href="PersonalSignUpApp">
+      <TouchableOpacity style={styles.card}>
       <Ionicons name="people" size={80} color="black" />
       <Text style={styles.cardText1}>개인회원가입</Text>
       </TouchableOpacity>
+      </Link>
 
       <View style={styles.socialLogin}>
       <TouchableOpacity style={styles.socialcard1}>
@@ -36,7 +39,8 @@ const SignUpSelectionApp: React.FC = ({ navigation }) => {
         </TouchableOpacity>
       </View>
 
-      <TouchableOpacity style={styles.card} onPress={() => navigation.navigate('BusinessSignUpApp')}>
+      {/* <Link href="BusinessSignUpApp"> */}
+      <TouchableOpacity style={styles.card} onPress={() => router.push('/BusinessSignUpApp')}>
       <FontAwesome name="building" size={70} color="black" />
       <Text style={styles.cardText2}>사업자회원가입</Text>
       </TouchableOpacity>
