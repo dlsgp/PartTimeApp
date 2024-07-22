@@ -16,7 +16,7 @@ export default function TabOneScreen() {
     setDate(propDate);
   }
 
-  return (
+  return ( 
     <View style={styles.container}>
       <Text>App color</Text>
 
