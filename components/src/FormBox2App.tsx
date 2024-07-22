@@ -1,5 +1,5 @@
 import React from "react";
-import { Image, Platform, StyleSheet, Text, View } from "react-native";
+import { Image, Platform, StyleSheet, Text, TouchableOpacity, View } from "react-native";
 import FontAwesome from "@expo/vector-icons/FontAwesome";
 import { Checkbox } from "react-native-paper";
 
@@ -14,6 +14,7 @@ function FormBox2App() {
           justifyContent: "center",
         }}
       >
+        <TouchableOpacity></TouchableOpacity>
         <Image
           style={FormBoxStyle.mobilePhoto}
           source={require("../../assets/images/profile.jpg")}
