@@ -49,7 +49,7 @@ export default function TabLayout() {
         }}
       />
       <Tabs.Screen
-        name="payManagement"
+        name="two"
         options={{
           title: "급여관리",
           tabBarIcon: ({ color }) => <TabBarIcon name="dollar" color={color} />,
