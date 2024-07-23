@@ -15,12 +15,12 @@ function FormBoxApp() {
         <Text style={FormBoxStyle.title}>직원관리</Text>
       </View>
       <View style={FormBoxStyle.buttonContainer}>
-        <Button
+        {/* <Button
           title="작성하기"
           onPress={() => {
             navigation.navigate({ name: "StaffFormApp" });
           }}
-        />
+        /> */}
       </View>
       <View
         style={{

@@ -16,12 +16,10 @@ export default function TabOneScreen() {
     setDate(propDate);
   }
 
-  return ( 
+  return (
     <View style={styles.container}>
-      <Text>App color</Text>
-
       <TouchableOpacity onPress={handleOnPress}>
-        <Text>Open</Text>
+        <Text>날짜 선택</Text>
       </TouchableOpacity>
 
       <Modal animationType="slide" transparent={true} visible={open}>

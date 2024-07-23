@@ -43,7 +43,7 @@ const StaffFormApp = () => {
               color: "#2E294E",
             }}
           >
-            상세보기
+            직원등록
           </Text>
         </View>
         <View style={{ flexDirection: "row" }}>
@@ -247,7 +247,7 @@ const StaffFormApp = () => {
             <View style={RegFormStyle.buttonD}>
               <Button
                 color={"#ffffff"}
-                title="수정하기"
+                title="등록하기"
                 onPress={() => console.log("저장 버튼 클릭")}
               />
             </View>
