@@ -5,17 +5,33 @@ import {
   Text,
   Image,
   StyleSheet,
-  ScrollView,
   Button,
+  KeyboardAvoidingView,
+  Platform,
+  TouchableOpacity,
 } from "react-native";
-import { TextInput } from "react-native-paper";
+import { TextInput, useTheme } from "react-native-paper";
 import BouncyCheckbox from "react-native-bouncy-checkbox";
+import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scrollview";
+import FontAwesome from "@expo/vector-icons/FontAwesome";
+import DatePicker from "@/components/src/Calendar";
 
 const StaffFormApp = () => {
   const [text, setText] = useState("");
+  const { colors } = useTheme();
+  const [date, setDate] = useState<string | null>(null); // date variable
+  const [showDatePicker, setShowDatePicker] = useState(false);
 
+  function handleChange(propDate: string) {
+    setDate(propDate);
+    setText(propDate);
+  }
+
+  function toggleDatePicker() {
+    setShowDatePicker((prevState) => !prevState);
+  }
   return (
-    <ScrollView style={RegFormStyle.maincontainer}>
+    <KeyboardAwareScrollView style={RegFormStyle.maincontainer}>
       <View>
         <View style={RegFormStyle.container}>
           <Text
@@ -23,6 +39,8 @@ const StaffFormApp = () => {
               fontSize: 32,
               fontFamily: "MangoDdobak-R",
               fontWeight: "bold",
+              marginTop: "10%",
+              color: "#2E294E",
             }}
           >
             직원등록
@@ -35,6 +53,7 @@ const StaffFormApp = () => {
               height: 100,
               alignItems: "center",
               marginRight: 20,
+              marginTop: 10,
             }}
           >
             <Image
@@ -43,78 +62,158 @@ const StaffFormApp = () => {
             />
           </View>
 
-          <View style={{}}>
+          <KeyboardAvoidingView
+            behavior={Platform.OS === "ios" ? "padding" : undefined}
+            style={RegFormStyle.keyboardcontainer}
+          >
             <TextInput
               style={RegFormStyle.formcontainer}
               label="이름"
               onChangeText={(text) => setText(text)}
               mode="outlined"
+              outlineColor="lightgray"
             />
             <TextInput
               style={RegFormStyle.formcontainer}
               label="사원번호"
               onChangeText={(text) => setText(text)}
               mode="outlined"
+              outlineColor="lightgray"
             />
             <TextInput
               style={RegFormStyle.formcontainer}
               label="직급"
               onChangeText={(text) => setText(text)}
               mode="outlined"
+              outlineColor="lightgray"
             />
             <TextInput
               style={RegFormStyle.formcontainer}
               label="전화번호"
               onChangeText={(text) => setText(text)}
               mode="outlined"
+              outlineColor="lightgray"
             />
             <TextInput
               style={RegFormStyle.formcontainer}
               label="이메일"
               onChangeText={(text) => setText(text)}
               mode="outlined"
+              outlineColor="lightgray"
             />
             <TextInput
               style={RegFormStyle.formcontainer}
               label="주소"
               onChangeText={(text) => setText(text)}
               mode="outlined"
+              outlineColor="lightgray"
             />
             <TextInput
               style={RegFormStyle.formcontainer}
               label="시급"
               onChangeText={(text) => setText(text)}
               mode="outlined"
+              outlineColor="lightgray"
             />
-            <TextInput
-              style={RegFormStyle.formcontainer}
-              label="입사일"
-              onChangeText={(text) => setText(text)}
-              mode="outlined"
-            />
-            <TextInput
-              style={RegFormStyle.formcontainer}
-              label="수습기간"
-              onChangeText={(text) => setText(text)}
-              mode="outlined"
-            />
-            <View style={RegFormStyle.checkyesorno}>
-              <Text
-                style={{
-                  fontSize: 18,
-                  borderWidth: 1,
-                  borderRadius: 5,
-                  textAlign: "center",
-                  marginRight: 3,
-                }}
+            <View style={RegFormStyle.searchSelection}>
+              <TextInput
+                style={RegFormStyle.formcontainerIcon}
+                label=""
+                value={date || ""}
+                placeholder="입사일"
+                onChangeText={(text) => setText(text)}
+                mode="outlined"
+              ></TextInput>
+              <TouchableOpacity
+                style={{ padding: 5 }}
+                onPress={toggleDatePicker}
               >
-                4대보험유무{" "}
+                <FontAwesome name="calendar-o" size={24} color="e5e5e5" />
+                {showDatePicker && (
+                  <DatePicker
+                    mode="calendar"
+                    selected={date || ""}
+                    onDateChange={handleChange}
+                    visible={showDatePicker}
+                  />
+                )}
+              </TouchableOpacity>
+            </View>
+
+            <View style={RegFormStyle.searchSelection}>
+              <TextInput
+                style={RegFormStyle.formcontainerIconE}
+                label=""
+                value={date || ""}
+                placeholder="수습기간"
+                onChangeText={(text) => setText(text)}
+                mode="outlined"
+              ></TextInput>
+              <TouchableOpacity style={{ padding: 5 }}>
+                <FontAwesome name="calendar-o" size={24} color="e5e5e5" />
+                {showDatePicker && (
+                  <DatePicker
+                    mode="calendar"
+                    selected={date || ""}
+                    onDateChange={handleChange}
+                    visible={showDatePicker}
+                  />
+                )}
+              </TouchableOpacity>
+              <Text style={{ paddingLeft: 15, paddingTop: 10, flex: 0.5 }}>
+                ~
               </Text>
+              <TextInput
+                style={RegFormStyle.formcontainerIconE}
+                label=""
+                value={date || ""}
+                placeholder="수습기간"
+                onChangeText={(text) => setText(text)}
+                mode="outlined"
+              ></TextInput>
+              <TouchableOpacity style={{ padding: 5 }}>
+                <FontAwesome name="calendar-o" size={24} color="e5e5e5" />
+                {showDatePicker && (
+                  <DatePicker
+                    mode="calendar"
+                    selected={date || ""}
+                    onDateChange={handleChange}
+                    visible={showDatePicker}
+                  />
+                )}
+              </TouchableOpacity>
+            </View>
+
+            <View
+              style={{
+                flexDirection: "row",
+                display: "flex",
+                padding: 2,
+                marginRight: 5,
+              }}
+            >
+              <TextInput
+                style={{
+                  alignSelf: "flex-start",
+                  textAlign: "auto",
+                  height: 30,
+                  width: 100,
+                  color: "#ffffff", // 글씨 색 변경
+                  backgroundColor: "#ffffff", // 폼 내부 색 변경
+                }}
+                label=""
+                value=""
+                placeholder="4대보험유무"
+                onChangeText={(text) => setText(text)}
+                mode="flat"
+                disabled="false"
+              />
+
               <View
                 style={{
+                  alignSelf: "auto",
                   flexDirection: "row",
-                  marginRight: 10,
-                  backgroundColor: "green",
+                  paddingLeft: 15,
                 }}
               >
                 <BouncyCheckbox
@@ -127,7 +226,12 @@ const StaffFormApp = () => {
                 />
                 <Text style={RegFormStyle.checkyestext}>예</Text>
               </View>
-              <View style={{ flexDirection: "row", backgroundColor: "pink" }}>
+              <View
+                style={{
+                  flexDirection: "row",
+                  alignSelf: "auto",
+                }}
+              >
                 <BouncyCheckbox
                   size={25}
                   fillColor="#2e2e2e"
@@ -142,15 +246,15 @@ const StaffFormApp = () => {
 
             <View style={RegFormStyle.buttonD}>
               <Button
-                color={"#2E294E"}
+                color={"#ffffff"}
                 title="등록하기"
                 onPress={() => console.log("저장 버튼 클릭")}
               />
             </View>
-          </View>
+          </KeyboardAvoidingView>
         </View>
       </View>
-    </ScrollView>
+    </KeyboardAwareScrollView>
   );
 };
 
@@ -161,38 +265,59 @@ const RegFormStyle = StyleSheet.create({
   container: {
     flexDirection: "row",
     flex: 1,
-    padding: "3%",
+    paddingRight: "2%",
+    alignSelf: "flex-start",
+    marginTop: "2%",
+    paddingVertical: "auto",
   },
-  formcontainer: {
-    width: 250,
-    height: 30,
-    marginBottom: 15,
+  keyboardcontainer: {
+    flex: 1,
   },
+
   checkyesorno: {
-    alignSelf: "flex-end",
-    flexDirection: "row",
+    alignItems: "center",
   },
   checkyestext: {
     fontSize: 18,
     fontFamily: "GmarketSansTTFBold",
     fontWeight: "700",
-    alignItems: "center",
-    marginLeft: 10,
+    margin: "auto",
   },
   checknotext: {
     fontSize: 18,
     fontFamily: "GmarketSansTTFBold",
     fontWeight: "700",
-    alignItems: "center",
-    marginLeft: 10,
+    margin: "auto",
   },
   buttonD: {
     borderWidth: 1,
     borderRadius: 30,
     paddingHorizontal: 5,
-    flexDirection: "row",
-    justifyContent: "flex-end",
+    alignSelf: "flex-end",
+    backgroundColor: "#2E294E",
     marginTop: 30,
+  },
+  formcontainer: {
+    width: 250,
+    height: 30,
+    marginTop: 5,
+    marginBottom: 20,
+  },
+  searchSelection: {
+    flexDirection: "row",
+    borderColor: "#000",
+  },
+  formcontainerIcon: {
+    width: 220,
+    height: 30,
+    marginTop: 5,
+    marginBottom: 20,
+  },
+  formcontainerIconE: {
+    width: 80,
+    height: 30,
+    marginTop: 5,
+    marginBottom: 20,
   },
 });
 export default StaffFormApp;
