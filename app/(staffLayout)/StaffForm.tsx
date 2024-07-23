@@ -131,7 +131,6 @@ const StaffForm = () => {
                 outlineColor="#E5E5E5"
               />
 
-              {/* DatePicker 1 */}
               <View style={RegFormStyle.searchSelection}>
                 <View style={RegFormStyle.TextIcon}>
                   <TextInput
@@ -161,22 +160,11 @@ const StaffForm = () => {
                 </View>
               </View>
 
-              {/* DatePicker 2 */}
-              <View
-                style={{
-                  flexDirection: "row",
-                  justifyContent: "space-between",
-                }}
-              >
-                <View
-                  style={[
-                    RegFormStyle.searchSelection,
-                    { alignSelf: "flex-start" },
-                  ]}
-                >
+              <View>
+                <View style={[RegFormStyle.searchSelection]}>
                   <View style={RegFormStyle.TextIconE}>
                     <TextInput
-                      style={RegFormStyle.formcontainerIconE}
+                      style={RegFormStyle.formcontainerIcon}
                       label=""
                       value={date2 || ""}
                       placeholder="수습기간"
@@ -209,12 +197,14 @@ const StaffForm = () => {
                 <View
                   style={[
                     RegFormStyle.searchSelection,
-                    { alignSelf: "flex-start" },
+                    {
+                      alignSelf: "flex-start",
+                    },
                   ]}
                 >
                   <View style={RegFormStyle.TextIconE}>
                     <TextInput
-                      style={RegFormStyle.formcontainerIconE}
+                      style={RegFormStyle.formcontainerIcon}
                       label=""
                       value={date3 || ""}
                       placeholder="수습기간"
@@ -360,11 +350,8 @@ const RegFormStyle = StyleSheet.create({
     justifyContent: "space-between",
   },
   dateText: {
-    fontSize: 24,
+    fontSize: 18,
     textAlign: "center",
-    display: "flex",
-    justifyContent: "center",
-    marginVertical: "6%",
   },
   TextIconE: {
     flexDirection: "row",
@@ -378,10 +365,6 @@ const RegFormStyle = StyleSheet.create({
     width: 220,
     height: 34,
     textAlign: "left",
-  },
-  formcontainerIconE: {
-    width: 80,
-    height: 34,
   },
 });
 export default StaffForm;
