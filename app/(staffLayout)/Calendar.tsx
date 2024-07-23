@@ -1,12 +1,17 @@
 import * as React from "react";
 import { StatusBar } from "expo-status-bar";
 import DatePicker from "react-native-modern-datepicker";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { StyleSheet, View, Text, TouchableOpacity, Modal } from "react-native";
 
-export default function TabOneScreen() {
-  const [open, setOpen] = useState(false); // open and closes the modal
-  const [date, setDate] = useState<string | null>(null); // date variable
+export default function TabOneScreen({onDateChange}) {
+  const [open, setOpen] = useState(false);
+  const [date, setDate] = useState<string | null>(null);
+  const [select, setSelect] = useState(false);
+
+  useEffect(() => {
+    setOpen(true);
+  }, []);
 
   function handleOnPress() {
     setOpen(!open);
@@ -14,14 +19,13 @@ export default function TabOneScreen() {
 
   function handleChange(propDate: string) {
     setDate(propDate);
+    onDateChange(propDate);
   }
 
-  return (
-    <View style={styles.container}>
-      <TouchableOpacity onPress={handleOnPress}>
-        <Text>날짜 선택</Text>
-      </TouchableOpacity>
 
+
+  return (
+    <View style={styles.Calendarcontainer}>
       <Modal animationType="slide" transparent={true} visible={open}>
         <View style={styles.centeredView}>
           <View style={styles.modalView}>
@@ -43,7 +47,7 @@ export default function TabOneScreen() {
 }
 
 const styles = StyleSheet.create({
-  container: {
+  Calendarcontainer: {
     flex: 1,
     backgroundColor: "#fff",
     alignItems: "center",
