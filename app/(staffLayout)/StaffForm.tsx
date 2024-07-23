@@ -28,6 +28,7 @@ const StaffForm = () => {
   const [showDatePicker1, setShowDatePicker1] = useState(false);
   const [showDatePicker2, setShowDatePicker2] = useState(false);
   const [showDatePicker3, setShowDatePicker3] = useState(false);
+  
 
   function handleChange1(propDate: string) {
     setDate1(propDate);
@@ -87,6 +88,8 @@ const StaffForm = () => {
                 onChangeText={(text) => setText(text)}
                 mode="outlined"
                 outlineColor="#E5E5E5"
+                activeOutlineColor="#219BDA"
+                theme={{ colors: { background: "white" } }}
               />
               <TextInput
                 style={RegFormStyle.formcontainer}
@@ -94,6 +97,8 @@ const StaffForm = () => {
                 onChangeText={(text) => setText(text)}
                 mode="outlined"
                 outlineColor="#E5E5E5"
+                activeOutlineColor="#219BDA"
+                theme={{ colors: { background: "white" } }}
               />
               <TextInput
                 style={RegFormStyle.formcontainer}
@@ -101,6 +106,8 @@ const StaffForm = () => {
                 onChangeText={(text) => setText(text)}
                 mode="outlined"
                 outlineColor="#E5E5E5"
+                activeOutlineColor="#219BDA"
+                theme={{ colors: { background: "white" } }}
               />
               <TextInput
                 style={RegFormStyle.formcontainer}
@@ -108,6 +115,8 @@ const StaffForm = () => {
                 onChangeText={(text) => setText(text)}
                 mode="outlined"
                 outlineColor="#E5E5E5"
+                activeOutlineColor="#219BDA"
+                theme={{ colors: { background: "white" } }}
               />
               <TextInput
                 style={RegFormStyle.formcontainer}
@@ -115,6 +124,8 @@ const StaffForm = () => {
                 onChangeText={(text) => setText(text)}
                 mode="outlined"
                 outlineColor="#E5E5E5"
+                activeOutlineColor="#219BDA"
+                theme={{ colors: { background: "white" } }}
               />
               <TextInput
                 style={RegFormStyle.formcontainer}
@@ -122,6 +133,8 @@ const StaffForm = () => {
                 onChangeText={(text) => setText(text)}
                 mode="outlined"
                 outlineColor="#E5E5E5"
+                activeOutlineColor="#219BDA"
+                theme={{ colors: { background: "white" } }}
               />
               <TextInput
                 style={RegFormStyle.formcontainer}
@@ -129,6 +142,8 @@ const StaffForm = () => {
                 onChangeText={(text) => setText(text)}
                 mode="outlined"
                 outlineColor="#E5E5E5"
+                activeOutlineColor="#219BDA"
+                theme={{ colors: { background: "white" } }}
               />
 
               <View style={RegFormStyle.searchSelection}>
@@ -140,6 +155,9 @@ const StaffForm = () => {
                     placeholder="입사일"
                     onChangeText={(text) => setDate1(text)}
                     mode="outlined"
+                    outlineColor="#E5E5E5"
+                    activeOutlineColor="#219BDA"
+                    theme={{ colors: { background: "white" } }}
                   ></TextInput>
                   <View style={RegFormStyle.icon}>
                     <TouchableOpacity
@@ -170,6 +188,9 @@ const StaffForm = () => {
                       placeholder="수습기간"
                       onChangeText={(text) => setDate2(text)}
                       mode="outlined"
+                      outlineColor="#E5E5E5"
+                      activeOutlineColor="#219BDA"
+                      theme={{ colors: { background: "white" } }}
                     ></TextInput>
                     <View style={RegFormStyle.icon}>
                       <TouchableOpacity
@@ -210,6 +231,9 @@ const StaffForm = () => {
                       placeholder="수습기간"
                       onChangeText={(text) => setDate3(text)}
                       mode="outlined"
+                      outlineColor="#E5E5E5"
+                      activeOutlineColor="#219BDA"
+                      theme={{ colors: { background: "white" } }}
                     ></TextInput>
                     <View style={RegFormStyle.icon}>
                       <TouchableOpacity
@@ -256,7 +280,7 @@ const StaffForm = () => {
                   value=""
                   placeholder="4대보험유무"
                   onChangeText={(text) => setText(text)}
-                  mode="flat"
+                  mode="outlined"
                   disabled="false"
                 />
 
@@ -303,7 +327,7 @@ const StaffForm = () => {
 const RegFormStyle = StyleSheet.create({
   maincontainer: {
     flex: 1,
-    backgroundColor: "#fff",
+    backgroundColor: "#fff",    
   },
   container: {
     marginHorizontal: "4%",
