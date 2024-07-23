@@ -65,7 +65,13 @@ export default function TabLayout() {
         name="StaffFormApp"
         options={{
           title: "직원등록",
-          tabBarIcon: ({ color }) => <TabBarIcon name="code" color={color} />,
+          tabBarIcon: ({ color }) => (
+            <FontAwesome
+              name="user-plus"
+              size={25}
+              color={Colors[colorScheme ?? "light"].text}
+            />
+          ),
         }}
       />
     </Tabs>
