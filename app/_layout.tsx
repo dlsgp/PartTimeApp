@@ -52,8 +52,24 @@ function RootLayoutNav() {
     <ThemeProvider value={colorScheme === 'dark' ? DarkTheme : DefaultTheme}>
       <Stack>
         <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
+<<<<<<< Updated upstream
         <Stack.Screen name="modal" options={{ presentation: 'modal' }} />
         <Stack.Screen name="(signIn)"/>
+=======
+        <Stack.Screen name="modal" options={{ presentation: "modal" }} />
+        <Stack.Screen name="(signIn)" options={{ headerShown: false }} />
+        <Stack.Screen name="(staffLayout)" options={{ headerShown: false }} />
+        <Stack.Screen name="(signIn)/SignInApp" options={{ headerShown: false }} />
+        <Stack.Screen name="(signIn)/SignUpSelectionApp" options={{ headerShown: false }} />
+        <Stack.Screen name="(signIn)/BusinessSignUpApp" options={{ headerShown: false }} />
+        <Stack.Screen name="(signIn)/FindPasswordApp" options={{ headerShown: false }} />
+        <Stack.Screen name="(signIn)/PersonalSignUpApp" options={{ headerShown: false }} />
+        <Stack.Screen name="(staffLayout)/index" options={{ headerShown: false }} />
+        <Stack.Screen name="(staffLayout)/FormBox" options={{ headerShown: false }} />
+        <Stack.Screen name="(staffLayout)/FormBoxtwo" options={{ headerShown: false }} />
+        <Stack.Screen name="(tabs)/index" options={{ headerShown: false }} />
+        <Stack.Screen name="(tabs)/two" options={{ headerShown: false }} />
+>>>>>>> Stashed changes
       </Stack>
     </ThemeProvider>
   );

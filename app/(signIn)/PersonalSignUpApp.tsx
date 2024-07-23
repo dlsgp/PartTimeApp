@@ -7,8 +7,11 @@ import {
   TextInput,
   TouchableOpacity,
   StyleSheet,
+  Dimensions,
 } from "react-native";
 import { Checkbox } from "react-native-paper";
+
+const { width, height } = Dimensions.get("window");
 
 const PersonalSignUpApp: React.FC = () => {
   const [checked0, setChecked0] = React.useState(false);
@@ -120,13 +123,13 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
   },
   input: {
-    height: 40,
     borderColor: "#ccc",
     borderWidth: 1,
     borderRadius: 5,
     marginBottom: 10,
     paddingHorizontal: 10,
-    width: 500,
+    width: width * 0.8,
+    height: height * 0.055,
   },
   checkButton: {
     color: "#f0a500",
@@ -146,7 +149,8 @@ const styles = StyleSheet.create({
     padding: 15,
     borderRadius: 5,
     alignItems: "center",
-    width: 500,
+    width: width * 0.8,
+    height: height * 0.055,
   },
   signupButtonText: {
     color: "#fff",

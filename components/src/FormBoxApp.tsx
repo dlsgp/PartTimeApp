@@ -1,5 +1,13 @@
 import React from "react";
-import { Alert, Button, Image, StyleSheet, Text, View } from "react-native";
+import {
+  Alert,
+  Button,
+  Image,
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+  View,
+} from "react-native";
 import FontAwesome from "@expo/vector-icons/FontAwesome";
 import { Checkbox } from "react-native-paper";
 import { useNavigation } from "@react-navigation/native";
@@ -15,13 +23,20 @@ function FormBoxApp() {
         <Text style={FormBoxStyle.title}>직원관리</Text>
       </View>
       <View style={FormBoxStyle.buttonContainer}>
+<<<<<<< Updated upstream:components/src/FormBoxApp.tsx
         <Button
           title="작성하기"
           onPress={() => {
             navigation.navigate({ name: "StaffFormApp" });
           }}
         />
+=======
+        <TouchableOpacity onPress={() => {}}>
+          <Text>작성하기</Text>
+        </TouchableOpacity>
+>>>>>>> Stashed changes:app/(staffLayout)/FormBox.tsx
       </View>
+
       <View
         style={{
           alignItems: "center",
