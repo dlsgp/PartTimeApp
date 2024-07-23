@@ -5,7 +5,7 @@ import FormBoxtwo from "./FormBoxtwo";
 import EmployeeList from "./EmployeeList";
 import { StatusBar } from "expo-status-bar";
 
-function StaffLayout() {
+function Staffindex() {
   const colorScheme = useColorScheme();
   return (
     <View style={StaffStyle.container}>
@@ -43,4 +43,4 @@ const StaffStyle = StyleSheet.create({
   },
 });
 
-export default StaffLayout;
+export default Staffindex;
