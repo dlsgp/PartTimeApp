@@ -4,14 +4,9 @@ import { Button, Text } from "react-native";
 import { View } from "react-native";
 
 const MainPage = () => {
-  const navigation = useNavigation();
   return (
     <View>
       <Text>Main</Text>
-      <Button
-        title="tabs"
-        onPress={() => navigation.dispatch(StackActions.push("(tabs)"))}
-      />
     </View>
   );
 };

@@ -20,7 +20,7 @@ const StaffFormApp = () => {
         <View style={RegFormStyle.container}>
           <Text
             style={{
-              fontSize: 32,
+              fontSize: 22,
               fontFamily: "MangoDdobak-R",
               fontWeight: "bold",
             }}
@@ -38,8 +38,8 @@ const StaffFormApp = () => {
             }}
           >
             <Image
-              source={require("../../../assets/images/profile.jpg")}
-              style={{ width: 100, height: 100 }}
+              source={require("../../assets/images/profile.jpg")}
+              style={{ width: 80, height: 80 }}
             />
           </View>
 
@@ -108,7 +108,7 @@ const StaffFormApp = () => {
                   marginRight: 3,
                 }}
               >
-                4대보험유무{" "}
+                4대보험유무
               </Text>
               <View
                 style={{
@@ -125,7 +125,7 @@ const StaffFormApp = () => {
                   }}
                   onPress={(isChecked: boolean) => {}}
                 />
-                <Text style={RegFormStyle.checkyestext}>예</Text>
+                <Text style={RegFormStyle.checktext}>예</Text>
               </View>
               <View style={{ flexDirection: "row", backgroundColor: "pink" }}>
                 <BouncyCheckbox
@@ -136,7 +136,7 @@ const StaffFormApp = () => {
                   }}
                   onPress={(isChecked: boolean) => {}}
                 />
-                <Text style={RegFormStyle.checknotext}>아니요</Text>
+                <Text style={RegFormStyle.checktext}>아니요</Text>
               </View>
             </View>
 
@@ -169,22 +169,14 @@ const RegFormStyle = StyleSheet.create({
     marginBottom: 15,
   },
   checkyesorno: {
-    alignSelf: "flex-end",
-    flexDirection: "row",
+    // flexDirection: "row",
   },
-  checkyestext: {
+  checktext: {
     fontSize: 18,
     fontFamily: "GmarketSansTTFBold",
     fontWeight: "700",
-    alignItems: "center",
-    marginLeft: 10,
-  },
-  checknotext: {
-    fontSize: 18,
-    fontFamily: "GmarketSansTTFBold",
-    fontWeight: "700",
-    alignItems: "center",
-    marginLeft: 10,
+    marginLeft: "2%",
+    justifyContent: "space-between",
   },
   buttonD: {
     borderWidth: 1,

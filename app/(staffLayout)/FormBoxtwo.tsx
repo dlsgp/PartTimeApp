@@ -1,25 +1,49 @@
-import * as React from "react";
-import { Button, Image, StyleSheet, Text, View } from "react-native";
+import React from "react";
+import {
+  Alert,
+  Button,
+  Image,
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+  View,
+} from "react-native";
 import FontAwesome from "@expo/vector-icons/FontAwesome";
 import { Checkbox } from "react-native-paper";
-import { StackActions } from "@react-navigation/native";
-import { useNavigation } from "expo-router";
+import { useNavigation } from "@react-navigation/native";
+import { router } from "expo-router";
 
-function FormBoxApp() {
+function TabBarIcon(props: {
+  name: React.ComponentProps<typeof FontAwesome>["name"];
+  color: string;
+}) {
+  return <FontAwesome size={28} style={{ marginBottom: -3 }} {...props} />;
+}
+
+function FormBox() {
   const [checked, setChecked] = React.useState(false);
-  const pushAction = StackActions.push("Profile", { user: "Wojtek" });
   const navigation = useNavigation();
 
   return (
     <View style={FormBoxStyle.mobileContainer}>
-      <View style={FormBoxStyle.titleContainer}>
-        <Text style={FormBoxStyle.title}>직원관리</Text>
-      </View>
       <View style={FormBoxStyle.buttonContainer}>
-        <Button
-          title="작성하기"
-          onPress={() => navigation.dispatch(StackActions.push(""))}
-        />
+        <TouchableOpacity
+          activeOpacity={0.8}
+          style={[
+            FormBoxStyle.button,
+            {
+              flexDirection: "row",
+              alignItems: "center",
+              justifyContent: "center",
+            },
+          ]}
+          onPress={() => router.push("/StaffFormApp")}
+        >
+          <Text style={FormBoxStyle.buttonText}>작성하기</Text>
+          <View>
+            <FontAwesome name="pencil" size={14} color="#fff" />
+          </View>
+        </TouchableOpacity>
       </View>
       <View
         style={{
@@ -30,7 +54,7 @@ function FormBoxApp() {
       >
         <Image
           style={FormBoxStyle.mobilePhoto}
-          source={require("../../../assets/images/profile.jpg")}
+          source={require("../../assets/images/profile.jpg")}
         />
         <Text style={FormBoxStyle.mobileText}>홍길동</Text>
         <Text style={FormBoxStyle.mobileText2}>2024.07.10 입사</Text>
@@ -110,31 +134,33 @@ const FormBoxStyle = StyleSheet.create({
     backgroundColor: "white",
     width: "100%",
     height: "100%",
+    paddingTop: "16%",
   },
-  titleContainer: {
-    alignSelf: "flex-start",
-    backgroundColor: "#2E294E",
-    paddingRight: "2%",
+  subcontainer: {
+    flex: 1,
   },
   title: {
-    fontSize: 22,
+    fontSize: 18,
     fontWeight: "700",
     marginLeft: "12%",
     color: "white",
   },
   buttonContainer: {
     alignSelf: "flex-end",
-    backgroundColor: "white",
-    shadowColor: "#eee",
-    shadowOpacity: 0.8,
-    shadowOffset: {
-      width: 0,
-      height: 4,
-    },
-    borderRadius: 30,
-    paddingHorizontal: "2%",
     marginRight: "4%",
   },
+  button: {
+    width: 110,
+    height: 34,
+    borderRadius: 30,
+    backgroundColor: "#2E294E",
+  },
+  buttonText: {
+    color: "#fff",
+    fontWeight: "700",
+    marginRight: "6%",
+  },
+
   mobileCheckbox1: {
     marginLeft: "16%",
     paddingRight: "12%",
@@ -142,7 +168,7 @@ const FormBoxStyle = StyleSheet.create({
     fontSize: 14,
   },
   mobilePhoto: {
-    marginTop: "18%",
+    marginTop: "12%",
     width: 124,
     height: 124,
     borderRadius: 80,
@@ -175,10 +201,7 @@ const FormBoxStyle = StyleSheet.create({
   mobileIconStyle: {
     paddingLeft: 70,
     fontSize: 18,
-    // ...(Platform.OS === "web" && {
-    //   paddingLeft: "100%",
-    // }),
   },
 });
 
-export default FormBoxApp;
+export default FormBox;

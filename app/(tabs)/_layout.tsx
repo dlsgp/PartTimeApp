@@ -28,22 +28,16 @@ export default function TabLayout() {
       }}
     >
       <Tabs.Screen
-        name="staffLayout"
+        name="index" //파일
         options={{
           title: "직원관리",
-          tabBarIcon: ({ color }) => (
-            <FontAwesome
-              name="user-o"
-              size={24}
-              color={Colors[colorScheme ?? "light"].text}
-            />
-          ),
+          tabBarIcon: ({ color }) => <TabBarIcon name="user-o" color={color} />,
           headerRight: () => (
             <Link href="/modal" asChild>
               <Pressable>
                 {({ pressed }) => (
                   <FontAwesome
-                    icon="fa-solid fa-user"
+                    name="info-circle"
                     size={25}
                     color={Colors[colorScheme ?? "light"].text}
                     style={{ marginRight: 15, opacity: pressed ? 0.5 : 1 }}
@@ -55,16 +49,25 @@ export default function TabLayout() {
         }}
       />
       <Tabs.Screen
-        name="two"
+        name="payManagement"
         options={{
-          title: "Tab Two",
-          tabBarIcon: ({ color }) => <TabBarIcon name="code" color={color} />,
+          title: "급여관리",
+          tabBarIcon: ({ color }) => <TabBarIcon name="dollar" color={color} />,
         }}
-      />{" "}
+      />
       <Tabs.Screen
-        name="StaffFormApp"
+        name="scheduleManagement"
         options={{
-          title: "직원등록",
+          title: "스케줄관리",
+          tabBarIcon: ({ color }) => (
+            <TabBarIcon name="check-square-o" color={color} />
+          ),
+        }}
+      />
+      <Tabs.Screen
+        name="registerManagement"
+        options={{
+          title: "가입관리",
           tabBarIcon: ({ color }) => <TabBarIcon name="code" color={color} />,
         }}
       />
