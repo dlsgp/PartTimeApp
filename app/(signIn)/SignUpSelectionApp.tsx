@@ -1,10 +1,11 @@
-import { SafeAreaView, StyleSheet, Text, TouchableOpacity, View } from "react-native";
+import { Dimensions, SafeAreaView, StyleSheet, Text, TouchableOpacity, View } from "react-native";
 import Ionicons from '@expo/vector-icons/Ionicons';
 import { FontAwesome } from '@expo/vector-icons';
 import { Image } from "react-native-elements";
 import React from "react";
 import { Link, router } from "expo-router";
 
+const { width, height } = Dimensions.get("window");
 
 const SignUpSelectionApp: React.FC = () => {
   
@@ -15,12 +16,12 @@ const SignUpSelectionApp: React.FC = () => {
     <SafeAreaView style={styles.container}>
       <Text style={styles.title}>PartTime 회원가입을 환영합니다</Text>
 
-      <Link href="PersonalSignUpApp">
-      <TouchableOpacity style={styles.card}>
+      {/* <Link href="PersonalSignUpApp"> */}
+      <TouchableOpacity style={styles.card1} onPress={() => router.push('/PersonalSignUpApp')}>
       <Ionicons name="people" size={80} color="black" />
       <Text style={styles.cardText1}>개인회원가입</Text>
       </TouchableOpacity>
-      </Link>
+      
 
       <View style={styles.socialLogin}>
       <TouchableOpacity style={styles.socialcard1}>
@@ -40,7 +41,7 @@ const SignUpSelectionApp: React.FC = () => {
       </View>
 
       {/* <Link href="BusinessSignUpApp"> */}
-      <TouchableOpacity style={styles.card} onPress={() => router.push('/BusinessSignUpApp')}>
+      <TouchableOpacity style={styles.card2} onPress={() => router.push('/BusinessSignUpApp')}>
       <FontAwesome name="building" size={70} color="black" />
       <Text style={styles.cardText2}>사업자회원가입</Text>
       </TouchableOpacity>
@@ -56,20 +57,30 @@ const styles = StyleSheet.create({
     flex: 1,
     alignItems: 'center',
     justifyContent: 'center',
+    backgroundColor: "#fff",
   },
   title: {
     fontSize: 30,
     marginBottom: 50,
     fontWeight: "bold",
   },
-  card: {
-    width: 500,
+  card1: {
+    width: width * 0.8,
     padding: 20,
     borderWidth: 1,
+    borderBottomWidth: 0,
     borderTopLeftRadius: 5,
     borderTopRightRadius: 5,
     borderColor: '#ccc',
-    marginBottom: -1,
+    alignItems: 'center',
+  },
+  card2: {
+    width: width * 0.8,
+    padding: 20,
+    borderWidth: 1,
+    borderRadius: 5,
+    borderColor: '#ccc',
+    // marginBottom: -1,
     alignItems: 'center',
   },
   icon: {
@@ -99,7 +110,7 @@ const styles = StyleSheet.create({
     height: 40,
   },
   socialcard1: {
-    width: 250,
+    width: width * 0.4,
     height: 100,
     padding: 20,
     borderWidth: 1,
@@ -110,7 +121,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   socialcard2: {
-    width: 250,
+    width: width * 0.4,
     height: 100,
     padding: 20,
     borderWidth: 1,

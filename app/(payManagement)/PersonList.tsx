@@ -1,5 +1,5 @@
 import { router } from "expo-router";
-import React from "react";
+import React, { useState } from "react";
 import {
   ScrollView,
   StyleSheet,
@@ -14,7 +14,9 @@ import {
   PaperProvider,
   Portal,
   Searchbar,
+  TextInput,
 } from "react-native-paper";
+import SalaryForm from "./SalaryForm";
 
 function PersonList() {
   const [searchQuery, setSearchQuery] = React.useState("");
@@ -23,6 +25,12 @@ function PersonList() {
   const showModal = () => setVisible(true);
   const hideModal = () => setVisible(false);
   const containerStyle = { backgroundColor: "white", padding: 20 };
+
+  const [showForm1, setShowForm1] = useState(false);
+
+  function modalSalaryForm1() {
+    setShowForm1((prevState) => !prevState);
+  }
 
   return (
     <ScrollView style={style.viewContainer}>
@@ -35,10 +43,7 @@ function PersonList() {
         />
         <View style={style.container}>
           <View style={style.image}>
-            <TouchableOpacity
-              activeOpacity={0.8}
-              onPress={() => router.push("/SalaryForm")}
-            >
+            <TouchableOpacity activeOpacity={0.8} onPress={modalSalaryForm1}>
               <Avatar.Image
                 size={120}
                 source={require("../../assets/images/profile.jpg")}
