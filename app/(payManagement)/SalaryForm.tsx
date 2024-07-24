@@ -2,9 +2,10 @@ import EditScreenInfo from "@/components/EditScreenInfo";
 import { FontAwesome } from "@expo/vector-icons";
 import { StatusBar } from "expo-status-bar";
 import React, { useState } from "react";
-import { Platform, StyleSheet, Text, View } from "react-native";
-import { Checkbox, TextInput } from "react-native-paper";
+import { Platform, ScrollView, StyleSheet, Text, View } from "react-native";
+import { Dialog, Portal, Checkbox, TextInput } from "react-native-paper";
 import DropDownPicker from "react-native-dropdown-picker";
+import { KeyboardAvoidingView } from "react-native";
 
 export default function SalaryForm() {
   const [text, setText] = React.useState("");
@@ -32,15 +33,28 @@ export default function SalaryForm() {
   return (
     <View style={styles.container}>
       <StatusBar style={Platform.OS === "ios" ? "light" : "auto"} />
-      <View style={styles.subContainer}>
-        <View style={styles.barContainer}>
-          <View style={[styles.icon, { marginTop: "20%" }]}>
-            <FontAwesome name="chevron-circle-up" size={32} color="#FFBD00" />
-          </View>
-          <View style={styles.icon}>
-            <FontAwesome name="chevron-circle-down" size={32} color="#FFBD00" />
-          </View>
-        </View>
+      <KeyboardAvoidingView
+        behavior={Platform.OS === "ios" ? "padding" : undefined}
+        style={{ flex: 1 }}
+      >
+        <ScrollView>
+          <View style={styles.subContainer}>
+            <View style={styles.barContainer}>
+              <View style={[styles.icon, { marginTop: "20%" }]}>
+                <FontAwesome
+                  name="chevron-circle-up"
+                  size={32}
+                  color="#FFBD00"
+                />
+              </View>
+              <View style={styles.icon}>
+                <FontAwesome
+                  name="chevron-circle-down"
+                  size={32}
+                  color="#FFBD00"
+                />
+              </View>
+            </View>
 
         <View style={styles.containContainer}>
           <View style={styles.containSub}>
@@ -139,8 +153,8 @@ const styles = StyleSheet.create({
     backgroundColor: "white",
   },
   subContainer: {
-    width: "86%",
-    height: "86%",
+    width: "100%",
+    height: "100%",
     borderTopRightRadius: 30,
     borderBottomEndRadius: 30,
     flexDirection: "row",
@@ -217,5 +231,15 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     marginHorizontal: "6%",
     width: "80%",
+  },
+  timeInput: {
+    backgroundColor: "#fff",
+    width: "92%",
+    marginHorizontal: "6%",
+    marginVertical: "8%",
+  },
+  timeText: {
+    fontSize: 18,
+    textAlign: "center",
   },
 });
