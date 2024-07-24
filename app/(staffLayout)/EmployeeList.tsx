@@ -49,7 +49,7 @@ const EmployeeList = () => {
   ];
 
   return (
-    <ScrollView style={styles.container}>
+    <ScrollView style={styles.container} showsVerticalScrollIndicator={false}>
       {data.map((row) => (
         <View key={row.num} style={styles.card}>
           <View style={styles.cardRow}>
