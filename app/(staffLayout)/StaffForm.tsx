@@ -28,7 +28,6 @@ const StaffForm = () => {
   const [showDatePicker1, setShowDatePicker1] = useState(false);
   const [showDatePicker2, setShowDatePicker2] = useState(false);
   const [showDatePicker3, setShowDatePicker3] = useState(false);
-  
 
   function handleChange1(propDate: string) {
     setDate1(propDate);
@@ -327,7 +326,7 @@ const StaffForm = () => {
 const RegFormStyle = StyleSheet.create({
   maincontainer: {
     flex: 1,
-    backgroundColor: "#fff",    
+    backgroundColor: "#fff",
   },
   container: {
     marginHorizontal: "4%",
