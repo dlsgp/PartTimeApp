@@ -2,9 +2,10 @@ import EditScreenInfo from "@/components/EditScreenInfo";
 import { FontAwesome } from "@expo/vector-icons";
 import { StatusBar } from "expo-status-bar";
 import React, { useState } from "react";
-import { Platform, StyleSheet, Text, View } from "react-native";
-import { Checkbox, TextInput } from "react-native-paper";
+import { Platform, ScrollView, StyleSheet, Text, View } from "react-native";
+import { Dialog, Portal, Checkbox, TextInput } from "react-native-paper";
 import DropDownPicker from "react-native-dropdown-picker";
+import { KeyboardAvoidingView } from "react-native";
 
 export default function SalaryForm() {
   const [text, setText] = React.useState("");
@@ -24,101 +25,150 @@ export default function SalaryForm() {
   return (
     <View style={styles.container}>
       <StatusBar style={Platform.OS === "ios" ? "light" : "auto"} />
-      <View style={styles.subContainer}>
-        <View style={styles.barContainer}>
-          <View style={[styles.icon, { marginTop: "20%" }]}>
-            <FontAwesome name="chevron-circle-up" size={32} color="#FFBD00" />
-          </View>
-          <View style={styles.icon}>
-            <FontAwesome name="chevron-circle-down" size={32} color="#FFBD00" />
-          </View>
-        </View>
-
-        <View style={styles.containContainer}>
-          <View style={styles.containSub}>
-            <View>
-              <Text style={styles.title}>급여관리</Text>
-            </View>
-            <View style={styles.inputContainer}>
-              <TextInput
-                label="이름"
-                value={text}
-                onChangeText={(text) => setText(text)}
-                style={styles.input}
-              />
-              <TextInput
-                label="직급"
-                value={text}
-                onChangeText={(text) => setText(text)}
-                style={styles.input}
-              />
-              <TextInput
-                label="시급"
-                value={text}
-                onChangeText={(text) => setText(text)}
-                style={styles.input}
-              />
-              <View style={styles.checkContainer}>
-                <Text style={styles.checkText}>4대보험유무</Text>
-                <View
-                  style={{ flexDirection: "row", marginLeft: 16, marginTop: 4 }}
-                >
-                  <View style={styles.answerContainer}>
-                    <Text style={styles.answer}>예</Text>
-                    <Checkbox
-                      status={checked1 ? "checked" : "unchecked"}
-                      onPress={() => {
-                        setChecked1(!checked1);
-                      }}
-                    />
-                  </View>
-                  <View style={styles.answerContainer}>
-                    <Text style={styles.answer}>아니오</Text>
-                    <Checkbox
-                      status={checked2 ? "checked" : "unchecked"}
-                      onPress={() => {
-                        setChecked2(!checked2);
-                      }}
-                    />
-                  </View>
-                </View>
+      <KeyboardAvoidingView
+        behavior={Platform.OS === "ios" ? "padding" : undefined}
+        style={{ flex: 1 }}
+      >
+        <ScrollView>
+          <View style={styles.subContainer}>
+            <View style={styles.barContainer}>
+              <View style={[styles.icon, { marginTop: "20%" }]}>
+                <FontAwesome
+                  name="chevron-circle-up"
+                  size={32}
+                  color="#FFBD00"
+                />
               </View>
-
-              <TextInput
-                label="주휴수당"
-                value={text}
-                onChangeText={(text) => setText(text)}
-                style={styles.input}
-              />
-              <TextInput
-                label="기타수당"
-                value={text}
-                onChangeText={(text) => setText(text)}
-                style={styles.input}
-              />
-              <View style={styles.checkContainer}>
-                <View style={styles.timeContainer}>
-                  <View style={{ justifyContent: "center" }}>
-                    <Text style={styles.time}>근무시간</Text>
-                  </View>
-                  <View>
-                    <DropDownPicker
-                      open={open}
-                      value={value}
-                      items={items}
-                      setOpen={setOpen}
-                      setValue={setValue}
-                      setItems={setItems}
-                      placeholder="주 선택"
-                      style={styles.dropdown}
-                    />
-                  </View>
-                </View>
+              <View style={styles.icon}>
+                <FontAwesome
+                  name="chevron-circle-down"
+                  size={32}
+                  color="#FFBD00"
+                />
               </View>
             </View>
+
+            <View style={styles.containContainer}>
+              <View style={styles.containSub}>
+                <View>
+                  <Text style={styles.title}>급여관리</Text>
+                </View>
+                <View style={styles.inputContainer}>
+                  <TextInput
+                    label="이름"
+                    value={text}
+                    onChangeText={(text) => setText(text)}
+                    style={styles.input}
+                  />
+                  <TextInput
+                    label="직급"
+                    value={text}
+                    onChangeText={(text) => setText(text)}
+                    style={styles.input}
+                  />
+                  <TextInput
+                    label="시급"
+                    value={text}
+                    onChangeText={(text) => setText(text)}
+                    style={styles.input}
+                  />
+                  <View style={styles.checkContainer}>
+                    <Text style={styles.checkText}>4대보험유무</Text>
+                    <View
+                      style={{
+                        flexDirection: "row",
+                        marginLeft: 16,
+                        marginTop: 4,
+                      }}
+                    >
+                      <View style={styles.answerContainer}>
+                        <Text style={styles.answer}>예</Text>
+                        <Checkbox
+                          status={checked1 ? "checked" : "unchecked"}
+                          onPress={() => {
+                            setChecked1(!checked1);
+                          }}
+                        />
+                      </View>
+                      <View style={styles.answerContainer}>
+                        <Text style={styles.answer}>아니오</Text>
+                        <Checkbox
+                          status={checked2 ? "checked" : "unchecked"}
+                          onPress={() => {
+                            setChecked2(!checked2);
+                          }}
+                        />
+                      </View>
+                    </View>
+                  </View>
+
+                  <TextInput
+                    label="주휴수당"
+                    value={text}
+                    onChangeText={(text) => setText(text)}
+                    style={styles.input}
+                  />
+                  <TextInput
+                    label="기타수당"
+                    value={text}
+                    onChangeText={(text) => setText(text)}
+                    style={styles.input}
+                  />
+                  <View style={styles.checkContainer}>
+                    <View style={styles.timeContainer}>
+                      <View style={{ justifyContent: "center" }}>
+                        <Text style={styles.time}>근무시간</Text>
+                      </View>
+                      <View>
+                        <DropDownPicker
+                          open={open}
+                          value={value}
+                          items={items}
+                          setOpen={setOpen}
+                          setValue={setValue}
+                          setItems={setItems}
+                          placeholder="주 선택"
+                          style={styles.dropdown}
+                        />
+                      </View>
+                    </View>
+                  </View>
+
+                  <TextInput
+                    label=""
+                    value="09:05"
+                    onChangeText={(text) => setText(text)}
+                    mode="outlined"
+                    style={styles.timeInput}
+                    disabled={false}
+                  />
+                  <Text style={styles.timeText}>~</Text>
+                  <TextInput
+                    label=""
+                    value="12:25"
+                    onChangeText={(text) => setText(text)}
+                    mode="outlined"
+                    style={styles.timeInput}
+                    disabled={false}
+                  />
+                  <TextInput
+                    style={[styles.timeInput, { marginTop: 0 }]}
+                    mode="outlined"
+                    disabled="false"
+                  />
+
+                  <TextInput
+                    label="한 주 급여"
+                    value={text}
+                    onChangeText={(text) => setText(text)}
+                    style={styles.input}
+                  />
+                </View>
+              </View>
+            </View>
           </View>
-        </View>
-      </View>
+        </ScrollView>
+      </KeyboardAvoidingView>
     </View>
   );
 }
@@ -131,8 +181,8 @@ const styles = StyleSheet.create({
     backgroundColor: "white",
   },
   subContainer: {
-    width: "86%",
-    height: "86%",
+    width: "100%",
+    height: "100%",
     borderTopRightRadius: 30,
     borderBottomEndRadius: 30,
     flexDirection: "row",
@@ -209,5 +259,15 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     marginHorizontal: "6%",
     width: "80%",
+  },
+  timeInput: {
+    backgroundColor: "#fff",
+    width: "92%",
+    marginHorizontal: "6%",
+    marginVertical: "8%",
+  },
+  timeText: {
+    fontSize: 18,
+    textAlign: "center",
   },
 });
