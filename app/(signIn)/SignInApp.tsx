@@ -59,11 +59,11 @@ const SignInApp = () => {
           </TouchableOpacity>
         </View>
         
-        <Link href="FindPasswordApp">
-        <TouchableOpacity>
-          <Text style={styles.forgotPassword}>비밀번호를 잊으셨나요?</Text>
+        <View style={styles.forgotPasswordTouch}>
+        <TouchableOpacity onPress={() => router.push('/(signIn)/FindPasswordApp')}>
+          <Text style={styles.forgotPasswordText}>비밀번호를 잊으셨나요?</Text>
         </TouchableOpacity>
-        </Link>
+        </View>
 
       </View>
 
@@ -71,7 +71,7 @@ const SignInApp = () => {
         <Text style={styles.loginButtonText}>LOGIN</Text>
       </TouchableOpacity>
 
-      <TouchableOpacity onPress={() => router.push('/SignUpSelectionApp')}>
+      <TouchableOpacity onPress={() => router.push('/(signIn)/SignUpSelectionApp')}>
         <Text style={styles.registerText}>회원가입</Text>
       </TouchableOpacity>
         
@@ -108,10 +108,9 @@ const styles = StyleSheet.create({
     fontSize: 70,
     marginBottom: 150,
   },
-
   input: {
     width: width * 0.8,
-    height: height * 0.06,
+    height: height * 0.055,
     borderColor: "#ccc",
     borderWidth: 1,
     borderRadius: 5,
@@ -119,7 +118,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: 10,
   },
   options: {
-    width: 500,
+    width: width * 0.8,
     flexDirection: "row",
     justifyContent: "space-between",
     marginBottom: 20,
@@ -130,14 +129,19 @@ const styles = StyleSheet.create({
   },
   autoLoginText: {
     marginLeft: 5,
+    marginBottom: 2,
     color: "#FFBD00",
   },
-  forgotPassword: {
+  forgotPasswordText: {
     color: "#FFBD00",
+    marginBottom: 2,
+  },
+  forgotPasswordTouch: {
+    marginTop: 7,
   },
   loginButton: {
     width: width * 0.8,
-    height: height * 0.06,
+    height: height * 0.055,
     backgroundColor: "#2E294E",
     justifyContent: "center",
     alignItems: "center",
@@ -158,7 +162,7 @@ const styles = StyleSheet.create({
   socialLoginButtons: {
     flexDirection: "row",
     justifyContent: "space-between",
-    width: 150,
+    width: width * 0.5,
   },
   socialButton: {
     width: 40,
