@@ -8,6 +8,14 @@ import DropDownPicker from "react-native-dropdown-picker";
 
 export default function SalaryForm() {
   const [text, setText] = React.useState("");
+  // const [text1, setText1] = React.useState("");
+  // const [text2, setText2] = React.useState("");
+  // const [text3, setText3] = React.useState("");
+  // const [text4, setText4] = React.useState("");
+  const [position, setPosition] = React.useState("");
+  const [hourwage, setHourwage] = React.useState("");
+  const [bonuswage, setBonuswage] = React.useState("");
+  const [etcwage, setEtcwage] = React.useState("");
   const [checked1, setChecked1] = React.useState(false);
   const [checked2, setChecked2] = React.useState(false);
 
@@ -48,14 +56,14 @@ export default function SalaryForm() {
               />
               <TextInput
                 label="직급"
-                value={text}
-                onChangeText={(text) => setText(text)}
+                value={position}
+                onChangeText={(text) => setPosition(text)}
                 style={styles.input}
               />
               <TextInput
                 label="시급"
-                value={text}
-                onChangeText={(text) => setText(text)}
+                value={hourwage}
+                onChangeText={(text) => setHourwage(text)}
                 style={styles.input}
               />
               <View style={styles.checkContainer}>
@@ -86,14 +94,14 @@ export default function SalaryForm() {
 
               <TextInput
                 label="주휴수당"
-                value={text}
-                onChangeText={(text) => setText(text)}
+                value={bonuswage}
+                onChangeText={(text) => setBonuswage(text)}
                 style={styles.input}
               />
               <TextInput
                 label="기타수당"
-                value={text}
-                onChangeText={(text) => setText(text)}
+                value={etcwage}
+                onChangeText={(text) => setEtcwage(text)}
                 style={styles.input}
               />
               <View style={styles.checkContainer}>
