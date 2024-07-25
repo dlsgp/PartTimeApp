@@ -33,7 +33,7 @@ function PersonList() {
   }
 
   return (
-    <ScrollView style={style.viewContainer}>
+    <ScrollView style={style.viewContainer} showsVerticalScrollIndicator={false}>
       <View style={style.mainContainer}>
         <Searchbar
           placeholder="Search"
