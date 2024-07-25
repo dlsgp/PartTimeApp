@@ -129,6 +129,8 @@ function FormBox() {
                 style={{
                   borderWidth: 0,
                   backgroundColor: "white",
+                  paddingHorizontal: 0,
+                  paddingVertical: 0,
                 }}
               />
             ) : (
@@ -176,6 +178,8 @@ function FormBox() {
                 style={{
                   borderWidth: 0,
                   backgroundColor: "white",
+                  paddingHorizontal: 0,
+                  paddingVertical: 0,
                 }}
               />
             ) : (
@@ -222,6 +226,8 @@ function FormBox() {
                 style={{
                   borderWidth: 0,
                   backgroundColor: "white",
+                  paddingHorizontal: 0,
+                  paddingVertical: 0,
                 }}
               />
             ) : (

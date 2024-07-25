@@ -1,6 +1,13 @@
 import { FontAwesome } from "@expo/vector-icons";
 import React, { useState } from "react";
-import { View, StyleSheet, ScrollView, Text } from "react-native";
+import {
+  View,
+  StyleSheet,
+  ScrollView,
+  Text,
+  TouchableOpacity,
+} from "react-native";
+import { router } from "expo-router";
 
 const EmployeeList = () => {
   const data = [
@@ -49,7 +56,7 @@ const EmployeeList = () => {
   ];
 
   return (
-    <ScrollView style={styles.container}>
+    <ScrollView style={styles.container} showsVerticalScrollIndicator={false}>
       {data.map((row) => (
         <View key={row.num} style={styles.card}>
           <View style={styles.cardRow}>
@@ -61,109 +68,18 @@ const EmployeeList = () => {
           <View style={styles.iconRow}>
             <Text style={styles.cardText}>입사일: {row.joinDate}</Text>
             <View style={styles.cardIcon}>
-              <FontAwesome name="pencil" size={14} color="#000" />
+              <TouchableOpacity
+                activeOpacity={0.8}
+                onPress={() => router.push("/StaffFormDetailApp")}
+              >
+                <FontAwesome name="pencil" size={14} color="#000" />
+              </TouchableOpacity>
             </View>
           </View>
         </View>
       ))}
     </ScrollView>
   );
-
-  // <Provider>
-  //   //   <View style={styles.container}>
-  //   //     <View style={styles.headerRow}>
-  //   //       <View style={styles.pickerContainer}>
-  //   //         <RNPickerSelect
-  //   //           onValueChange={(value) => handleSort(value)}
-  //   //           items={[
-  //   //             { label: "오름차순", value: "asc" },
-  //   //             { label: "내림차순", value: "desc" },
-  //   //           ]}
-  //   //           value={selectedOrder}
-  //   //           style={pickerSelectStyles}
-  //   //           placeholder={{}}
-  //   //         />
-  //   //       </View>
-  //   //       <View style={styles.searchContainer}>
-  //   //         <TextInput
-  //   //           style={styles.searchBar}
-  //   //           placeholder="검색"
-  //   //           value={searchQuery}
-  //   //           onChangeText={(text) => setSearchQuery(text)}
-  //   //         />
-  //   //       </View>
-  //   //     </View>
-  //   //     <DataTable>
-  //   //       <DataTable.Header style={styles.header}>
-  //   //         <DataTable.Title style={styles.headerCell}>
-  //   //           <CheckBox containerStyle={styles.checkboxContainer} />
-  //   //         </DataTable.Title>
-  //   //         <DataTable.Title style={styles.headerCell}>
-  //   //           <Text style={styles.headerText}>번호</Text>
-  //   //         </DataTable.Title>
-  //   //         <DataTable.Title style={styles.headerCell}>
-  //   //           <Text style={styles.headerText}>사원 번호</Text>
-  //   //         </DataTable.Title>
-  //   //         <DataTable.Title style={styles.headerCell}>
-  //   //           <Text style={styles.headerText}>이름</Text>
-  //   //         </DataTable.Title>
-  //   //         <DataTable.Title style={styles.headerCell}>
-  //   //           <Text style={styles.headerText}>직급</Text>
-  //   //         </DataTable.Title>
-  //   //         <DataTable.Title style={styles.headerCell}>
-  //   //           <Text style={styles.headerText}>입사일</Text>
-  //   //         </DataTable.Title>
-  //   //         <DataTable.Title style={styles.headerCell}> </DataTable.Title>
-  //   //       </DataTable.Header>
-  //   //       {paginatedData.map((row) => (
-  //   //         <DataTable.Row key={row.num}>
-  //   //           <DataTable.Cell style={styles.cell}>
-  //   //             <CheckBox containerStyle={styles.checkboxContainer} />
-  //   //           </DataTable.Cell>
-  //   //           <DataTable.Cell style={styles.cell}>{row.num}</DataTable.Cell>
-  //   //           <DataTable.Cell style={styles.cell}>
-  //   //             {row.staffNum}
-  //   //           </DataTable.Cell>
-  //   //           <DataTable.Cell style={styles.cell}>{row.name}</DataTable.Cell>
-  //   //           <DataTable.Cell style={styles.cell}>{row.class}</DataTable.Cell>
-  //   //           <DataTable.Cell style={styles.cell}>
-  //   //             {row.joinDate}
-  //   //           </DataTable.Cell>
-  //   //           <DataTable.Cell style={styles.cell}>
-  //   //             <Icon name="edit" size={20} />
-  //   //           </DataTable.Cell>
-  //   //         </DataTable.Row>
-  //   //       ))}
-  //   //       <View style={styles.pagination}>
-  //   //         <TouchableOpacity
-  //   //           disabled={page === 0}
-  //   //           onPress={() => setPage(page - 1)}
-  //   //         >
-  //   //           <Text style={styles.paginationText}>{"<"}</Text>
-  //   //         </TouchableOpacity>
-  //   //         {[...Array(totalPages)].map((_, i) => (
-  //   //           <TouchableOpacity key={i} onPress={() => setPage(i)}>
-  //   //             <Text
-  //   //               style={[
-  //   //                 styles.paginationText,
-  //   //                 page === i && styles.activePage,
-  //   //               ]}
-  //   //             >
-  //   //               {i + 1}
-  //   //             </Text>
-  //   //           </TouchableOpacity>
-  //   //         ))}
-  //   //         <TouchableOpacity
-  //   //           disabled={page === totalPages - 1}
-  //   //           onPress={() => setPage(page + 1)}
-  //   //         >
-  //   //           <Text style={styles.paginationText}>{">"}</Text>
-  //   //         </TouchableOpacity>
-  //   //       </View>
-  //   //     </DataTable>
-  //   //   </View>
-  // </Provider>
-  // );
 };
 
 const styles = StyleSheet.create({
@@ -202,3 +118,99 @@ const styles = StyleSheet.create({
 });
 
 export default EmployeeList;
+
+// <Provider>
+//   //   <View style={styles.container}>
+//   //     <View style={styles.headerRow}>
+//   //       <View style={styles.pickerContainer}>
+//   //         <RNPickerSelect
+//   //           onValueChange={(value) => handleSort(value)}
+//   //           items={[
+//   //             { label: "오름차순", value: "asc" },
+//   //             { label: "내림차순", value: "desc" },
+//   //           ]}
+//   //           value={selectedOrder}
+//   //           style={pickerSelectStyles}
+//   //           placeholder={{}}
+//   //         />
+//   //       </View>
+//   //       <View style={styles.searchContainer}>
+//   //         <TextInput
+//   //           style={styles.searchBar}
+//   //           placeholder="검색"
+//   //           value={searchQuery}
+//   //           onChangeText={(text) => setSearchQuery(text)}
+//   //         />
+//   //       </View>
+//   //     </View>
+//   //     <DataTable>
+//   //       <DataTable.Header style={styles.header}>
+//   //         <DataTable.Title style={styles.headerCell}>
+//   //           <CheckBox containerStyle={styles.checkboxContainer} />
+//   //         </DataTable.Title>
+//   //         <DataTable.Title style={styles.headerCell}>
+//   //           <Text style={styles.headerText}>번호</Text>
+//   //         </DataTable.Title>
+//   //         <DataTable.Title style={styles.headerCell}>
+//   //           <Text style={styles.headerText}>사원 번호</Text>
+//   //         </DataTable.Title>
+//   //         <DataTable.Title style={styles.headerCell}>
+//   //           <Text style={styles.headerText}>이름</Text>
+//   //         </DataTable.Title>
+//   //         <DataTable.Title style={styles.headerCell}>
+//   //           <Text style={styles.headerText}>직급</Text>
+//   //         </DataTable.Title>
+//   //         <DataTable.Title style={styles.headerCell}>
+//   //           <Text style={styles.headerText}>입사일</Text>
+//   //         </DataTable.Title>
+//   //         <DataTable.Title style={styles.headerCell}> </DataTable.Title>
+//   //       </DataTable.Header>
+//   //       {paginatedData.map((row) => (
+//   //         <DataTable.Row key={row.num}>
+//   //           <DataTable.Cell style={styles.cell}>
+//   //             <CheckBox containerStyle={styles.checkboxContainer} />
+//   //           </DataTable.Cell>
+//   //           <DataTable.Cell style={styles.cell}>{row.num}</DataTable.Cell>
+//   //           <DataTable.Cell style={styles.cell}>
+//   //             {row.staffNum}
+//   //           </DataTable.Cell>
+//   //           <DataTable.Cell style={styles.cell}>{row.name}</DataTable.Cell>
+//   //           <DataTable.Cell style={styles.cell}>{row.class}</DataTable.Cell>
+//   //           <DataTable.Cell style={styles.cell}>
+//   //             {row.joinDate}
+//   //           </DataTable.Cell>
+//   //           <DataTable.Cell style={styles.cell}>
+//   //             <Icon name="edit" size={20} />
+//   //           </DataTable.Cell>
+//   //         </DataTable.Row>
+//   //       ))}
+//   //       <View style={styles.pagination}>
+//   //         <TouchableOpacity
+//   //           disabled={page === 0}
+//   //           onPress={() => setPage(page - 1)}
+//   //         >
+//   //           <Text style={styles.paginationText}>{"<"}</Text>
+//   //         </TouchableOpacity>
+//   //         {[...Array(totalPages)].map((_, i) => (
+//   //           <TouchableOpacity key={i} onPress={() => setPage(i)}>
+//   //             <Text
+//   //               style={[
+//   //                 styles.paginationText,
+//   //                 page === i && styles.activePage,
+//   //               ]}
+//   //             >
+//   //               {i + 1}
+//   //             </Text>
+//   //           </TouchableOpacity>
+//   //         ))}
+//   //         <TouchableOpacity
+//   //           disabled={page === totalPages - 1}
+//   //           onPress={() => setPage(page + 1)}
+//   //         >
+//   //           <Text style={styles.paginationText}>{">"}</Text>
+//   //         </TouchableOpacity>
+//   //       </View>
+//   //     </DataTable>
+//   //   </View>
+// </Provider>
+// );
