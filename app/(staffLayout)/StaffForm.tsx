@@ -12,11 +12,9 @@ import {
 } from "react-native";
 import { TextInput, useTheme } from "react-native-paper";
 import FontAwesome from "@expo/vector-icons/FontAwesome";
-import DatePicker from "../(staffLayout)/Calendar";
+import DatePicker from "../(staffLayout)/ModalCalendar";
 import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
 import BouncyCheckbox from "react-native-bouncy-checkbox";
-import { router } from "expo-router";
-import Calendar from "../(staffLayout)/Calendar";
 
 const StaffForm = () => {
   const [text, setText] = useState("");

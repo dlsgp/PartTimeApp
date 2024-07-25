@@ -4,7 +4,7 @@ import DatePicker from "react-native-modern-datepicker";
 import { useState, useEffect } from "react";
 import { StyleSheet, View, Text, TouchableOpacity, Modal } from "react-native";
 
-export default function TabOneScreen({onDateChange}) {
+export default function ModalCalendar({ onDateChange }) {
   const [open, setOpen] = useState(false);
   const [date, setDate] = useState<string | null>(null);
   const [select, setSelect] = useState(false);
@@ -21,8 +21,6 @@ export default function TabOneScreen({onDateChange}) {
     setDate(propDate);
     onDateChange(propDate);
   }
-
-
 
   return (
     <View style={styles.Calendarcontainer}>
