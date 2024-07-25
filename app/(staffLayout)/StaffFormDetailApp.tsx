@@ -15,8 +15,6 @@ import FontAwesome from "@expo/vector-icons/FontAwesome";
 import DatePicker from "../(staffLayout)/Calendar";
 import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
 import BouncyCheckbox from "react-native-bouncy-checkbox";
-import { router } from "expo-router";
-import Calendar from "../(staffLayout)/Calendar";
 
 const StaffFormDetailApp = () => {
   const [text, setText] = useState("");

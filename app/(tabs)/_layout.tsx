@@ -65,7 +65,7 @@ export default function TabLayout() {
         }}
       />
       <Tabs.Screen
-        name="registerManagement"
+        name="four"
         options={{
           title: "가입관리",
           tabBarIcon: ({ color }) => <TabBarIcon name="code" color={color} />,

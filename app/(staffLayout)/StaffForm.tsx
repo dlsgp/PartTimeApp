@@ -15,8 +15,7 @@ import FontAwesome from "@expo/vector-icons/FontAwesome";
 import DatePicker from "../(staffLayout)/Calendar";
 import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
 import BouncyCheckbox from "react-native-bouncy-checkbox";
-import { router } from "expo-router";
-import Calendar from "../(staffLayout)/Calendar";
+import FormBox from "./FormBox";
 
 const StaffForm = () => {
   const [text, setText] = useState("");
@@ -312,7 +311,7 @@ const StaffForm = () => {
                 <Button
                   color={"#ffffff"}
                   title="등록하기"
-                  onPress={() => console.log("저장 버튼 클릭")}
+                  onPress={() => FormBox}
                 />
               </View>
             </View>
