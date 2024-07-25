@@ -22,6 +22,7 @@ const StaffForm = () => {
   const { colors } = useTheme();
   const [selectedDate, setSelectedDate] = useState();
   const [checked, setChecked] = React.useState("first");
+  const [checked, setChecked] = React.useState("first");
   const [date1, setDate1] = useState<string | null>(null);
   const [date2, setDate2] = useState<string | null>(null);
   const [date3, setDate3] = useState<string | null>(null);
@@ -54,6 +55,10 @@ const StaffForm = () => {
   }
 
   return (
+    <KeyboardAwareScrollView
+      style={RegFormStyle.maincontainer}
+      showsVerticalScrollIndicator={false}
+    >
     <KeyboardAwareScrollView
       style={RegFormStyle.maincontainer}
       showsVerticalScrollIndicator={false}
@@ -153,7 +158,9 @@ const StaffForm = () => {
                   <TextInput
                     style={RegFormStyle.formcontainerIcon}
                     label="입사일"
+                    label="입사일"
                     value={date1 || ""}
+                    placeholder=""
                     placeholder=""
                     onChangeText={(text) => setDate1(text)}
                     mode="outlined"
@@ -186,7 +193,9 @@ const StaffForm = () => {
                     <TextInput
                       style={RegFormStyle.formcontainerIcon}
                       label="수습기간"
+                      label="수습기간"
                       value={date2 || ""}
+                      placeholder=""
                       placeholder=""
                       onChangeText={(text) => setDate2(text)}
                       mode="outlined"
@@ -217,14 +226,19 @@ const StaffForm = () => {
                   </View>
                 </View>
 
+
                 <Text style={RegFormStyle.dateText}>~</Text>
+
+                <View style={[RegFormStyle.searchSelection]}>
 
                 <View style={[RegFormStyle.searchSelection]}>
                   <View style={RegFormStyle.TextIconE}>
                     <TextInput
                       style={RegFormStyle.formcontainerIcon}
                       label="수습기간"
+                      label="수습기간"
                       value={date3 || ""}
+                      placeholder=""
                       placeholder=""
                       onChangeText={(text) => setDate3(text)}
                       mode="outlined"
@@ -264,8 +278,11 @@ const StaffForm = () => {
                   marginVertical: "6%",
                   justifyContent: "center",
                   alignItems: "center",
+                  justifyContent: "center",
+                  alignItems: "center",
                 }}
               >
+                {/* <TextInput
                 {/* <TextInput
                   style={{
                     alignSelf: "flex-start",
@@ -282,7 +299,10 @@ const StaffForm = () => {
                   disabled="false"
                 /> */}
                 <Text style={RegFormStyle.insurance}>4대보험유무</Text>
+                /> */}
+                <Text style={RegFormStyle.insurance}>4대보험유무</Text>
 
+                {/* <BouncyCheckbox
                 {/* <BouncyCheckbox
                   size={24}
                   fillColor="#2e2e2e"
@@ -323,6 +343,24 @@ const StaffForm = () => {
                     onPress={() => setChecked("no")}
                   />
                 </View>
+                <Text style={RegFormStyle.checktext}>아니요</Text> */}
+
+                <View style={RegFormStyle.radio}>
+                  <RadioButton
+                    value="yes"
+                    status={checked === "yes" ? "checked" : "unchecked"}
+                    onPress={() => setChecked("yes")}
+                  />
+                </View>
+                <Text style={RegFormStyle.checktext}>예</Text>
+
+                <View style={RegFormStyle.radio}>
+                  <RadioButton
+                    value="no"
+                    status={checked === "no" ? "checked" : "unchecked"}
+                    onPress={() => setChecked("no")}
+                  />
+                </View>
                 <Text style={RegFormStyle.checktext}>아니요</Text>
               </View>
 
@@ -330,6 +368,7 @@ const StaffForm = () => {
                 <Button
                   color={"#ffffff"}
                   title="등록하기"
+                  onPress={() => FormBox}
                   onPress={() => FormBox}
                 />
               </View>
@@ -359,6 +398,7 @@ const RegFormStyle = StyleSheet.create({
   textInputContainer: {
     marginHorizontal: "auto",
     marginLeft: 10,
+    marginLeft: 10,
   },
   checkyesorno: {
     alignItems: "center",
@@ -373,15 +413,22 @@ const RegFormStyle = StyleSheet.create({
     borderWidth: 1,
     borderRadius: 30,
     padding: 3,
+    padding: 3,
     alignSelf: "flex-end",
+    alignItems: "center",
     alignItems: "center",
     backgroundColor: "#2E294E",
     marginTop: 30,
     marginBottom: 30,
     width: 100,
     height: 30,
+    marginBottom: 30,
+    width: 100,
+    height: 30,
   },
   formcontainer: {
+    width: width * 0.65,
+    height: height * 0.04,
     width: width * 0.65,
     height: height * 0.04,
     marginVertical: "6%",
@@ -402,6 +449,7 @@ const RegFormStyle = StyleSheet.create({
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "space-between",
+    justifyContent: "space-between",
   },
   icon: {
     justifyContent: "space-between",
@@ -410,7 +458,24 @@ const RegFormStyle = StyleSheet.create({
   formcontainerIcon: {
     width: width * 0.55,
     height: height * 0.04,
+    width: width * 0.55,
+    height: height * 0.04,
     textAlign: "left",
+    marginVertical: "6%",
+  },
+  buttonText: {
+    color: "#fff",
+  },
+  insurance: {
+    fontSize: 16,
+    marginLeft: 5,
+  },
+  radio: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "center",
+    marginTop: 5,
+    marginLeft: 7,
     marginVertical: "6%",
   },
   buttonText: {
