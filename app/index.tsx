@@ -5,12 +5,7 @@ import { View } from "react-native";
 import SignInApp from "./(signIn)/SignInApp";
 
 const MainPage = () => {
-  return (
-    // <View>
-    //   <Text>Main</Text>
-    // </View>
-    <SignInApp/>
-  );
+  return <SignInApp></SignInApp>;
 };
 
 export default MainPage;

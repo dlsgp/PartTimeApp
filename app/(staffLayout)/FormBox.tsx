@@ -9,7 +9,7 @@ import {
   View,
 } from "react-native";
 import FontAwesome from "@expo/vector-icons/FontAwesome";
-import { Checkbox } from "react-native-paper";
+import { Checkbox, TextInput } from "react-native-paper";
 import { useNavigation } from "@react-navigation/native";
 import { router } from "expo-router";
 
@@ -21,8 +21,47 @@ function TabBarIcon(props: {
 }
 
 function FormBox() {
-  const [checked, setChecked] = React.useState(false);
+  const [text1, setText1] = React.useState<string | undefined>(
+    "24.07.10 수요일 출근"
+  );
+  const [text2, setText2] = React.useState<string | undefined>(
+    "24.07.11 목요일 출근"
+  );
+  const [text3, setText3] = React.useState<string | undefined>(
+    "24.07.12 금요일 출근"
+  );
+  const [isEditing1, setIsEditing1] = React.useState(false);
+  const [isEditing2, setIsEditing2] = React.useState(false);
+  const [isEditing3, setIsEditing3] = React.useState(false);
+
+  const [checked1, setChecked1] = React.useState(false);
+  const [checked2, setChecked2] = React.useState(false);
+  const [checked3, setChecked3] = React.useState(false);
   const navigation = useNavigation();
+
+  const handleEditPress1 = () => {
+    setIsEditing1(true);
+  };
+
+  const handleSavePress1 = () => {
+    setIsEditing1(false);
+  };
+
+  const handleEditPress2 = () => {
+    setIsEditing2(true);
+  };
+
+  const handleSavePress2 = () => {
+    setIsEditing2(false);
+  };
+
+  const handleEditPress3 = () => {
+    setIsEditing3(true);
+  };
+
+  const handleSavePress3 = () => {
+    setIsEditing3(false);
+  };
 
   return (
     <View style={FormBoxStyle.mobileContainer}>
@@ -75,15 +114,44 @@ function FormBox() {
           >
             <View style={[FormBoxStyle.mobileCheckbox1]}>
               <Checkbox
-                status={checked ? "checked" : "unchecked"}
+                status={checked1 ? "checked" : "unchecked"}
                 onPress={() => {
-                  setChecked(!checked);
+                  setChecked1(!checked1);
                 }}
               />
             </View>
-            <Text>24.07.11 목요일 출근</Text>
+            {isEditing1 ? (
+              <TextInput
+                value={text1 ?? ""}
+                onChangeText={setText1}
+                mode="flat"
+                theme={{ colors: { primary: "transparent" } }}
+                style={{
+                  borderWidth: 0,
+                  backgroundColor: "white",
+                  paddingHorizontal: 0,
+                  paddingVertical: 0,
+                }}
+              />
+            ) : (
+              <Text>{text1 ?? ""}</Text>
+            )}
             <View style={FormBoxStyle.mobileIconStyle}>
-              <FontAwesome name="pencil" size={18} color="#E5E5E5" />
+              {isEditing1 ? (
+                <TouchableOpacity
+                  activeOpacity={0.8}
+                  onPress={handleSavePress1}
+                >
+                  <FontAwesome name="save" size={18} color="#E5E5E5" />
+                </TouchableOpacity>
+              ) : (
+                <TouchableOpacity
+                  activeOpacity={0.8}
+                  onPress={handleEditPress1}
+                >
+                  <FontAwesome name="pencil" size={18} color="#E5E5E5" />
+                </TouchableOpacity>
+              )}
             </View>
           </View>
 
@@ -96,15 +164,43 @@ function FormBox() {
           >
             <View style={[FormBoxStyle.mobileCheckbox1]}>
               <Checkbox
-                status={checked ? "checked" : "unchecked"}
+                status={checked2 ? "checked" : "unchecked"}
                 onPress={() => {
-                  setChecked(!checked);
+                  setChecked2(!checked2);
                 }}
               />
             </View>
-            <Text>24.07.11 목요일 출근</Text>
+            {isEditing2 ? (
+              <TextInput
+                value={text2 ?? ""}
+                onChangeText={setText2}
+                mode="flat"
+                style={{
+                  borderWidth: 0,
+                  backgroundColor: "white",
+                  paddingHorizontal: 0,
+                  paddingVertical: 0,
+                }}
+              />
+            ) : (
+              <Text>{text2 ?? ""}</Text>
+            )}
             <View style={FormBoxStyle.mobileIconStyle}>
-              <FontAwesome name="pencil" size={18} color="#E5E5E5" />
+              {isEditing2 ? (
+                <TouchableOpacity
+                  activeOpacity={0.8}
+                  onPress={handleSavePress2}
+                >
+                  <FontAwesome name="save" size={18} color="#E5E5E5" />
+                </TouchableOpacity>
+              ) : (
+                <TouchableOpacity
+                  activeOpacity={0.8}
+                  onPress={handleEditPress2}
+                >
+                  <FontAwesome name="pencil" size={18} color="#E5E5E5" />
+                </TouchableOpacity>
+              )}
             </View>
           </View>
 
@@ -116,15 +212,43 @@ function FormBox() {
           >
             <View style={[FormBoxStyle.mobileCheckbox1]}>
               <Checkbox
-                status={checked ? "checked" : "unchecked"}
+                status={checked3 ? "checked" : "unchecked"}
                 onPress={() => {
-                  setChecked(!checked);
+                  setChecked3(!checked3);
                 }}
               />
             </View>
-            <Text>24.07.12 금요일 출근</Text>
+            {isEditing3 ? (
+              <TextInput
+                value={text3 ?? ""}
+                onChangeText={setText3}
+                mode="flat"
+                style={{
+                  borderWidth: 0,
+                  backgroundColor: "white",
+                  paddingHorizontal: 0,
+                  paddingVertical: 0,
+                }}
+              />
+            ) : (
+              <Text>{text3 ?? ""}</Text>
+            )}
             <View style={FormBoxStyle.mobileIconStyle}>
-              <FontAwesome name="pencil" size={18} color="#E5E5E5" />
+              {isEditing3 ? (
+                <TouchableOpacity
+                  activeOpacity={0.8}
+                  onPress={handleSavePress3}
+                >
+                  <FontAwesome name="save" size={18} color="#E5E5E5" />
+                </TouchableOpacity>
+              ) : (
+                <TouchableOpacity
+                  activeOpacity={0.8}
+                  onPress={handleEditPress3}
+                >
+                  <FontAwesome name="pencil" size={18} color="#E5E5E5" />
+                </TouchableOpacity>
+              )}
             </View>
           </View>
         </View>
