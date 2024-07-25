@@ -81,6 +81,11 @@ const PersonalSignUpApp: React.FC = () => {
       />
       <TextInput
         style={styles.input}
+        placeholder="생년월일"
+        placeholderTextColor="#aaa"
+      />
+      <TextInput
+        style={styles.input}
         placeholder="주소"
         placeholderTextColor="#aaa"
       />
@@ -170,7 +175,8 @@ const styles = StyleSheet.create({
   },
   title: {
     fontSize: 35,
-    marginBottom: 60,
+    marginBottom: 50,
+    marginTop: 50,
     textAlign: "center",
     fontWeight: 'bold',
   },

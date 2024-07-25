@@ -14,7 +14,7 @@ const SignUpSelectionApp: React.FC = () => {
   return(
 
     <SafeAreaView style={styles.container}>
-      <Text style={styles.title}>PartTime 회원가입을 환영합니다</Text>
+      <Text style={styles.title}>PartTime 회원가입을 환영합니다.</Text>
 
       {/* <Link href="PersonalSignUpApp"> */}
       <TouchableOpacity style={styles.card1} onPress={() => router.push('/PersonalSignUpApp')}>
@@ -61,7 +61,7 @@ const styles = StyleSheet.create({
   },
   title: {
     fontSize: 30,
-    marginBottom: 50,
+    marginBottom: 60,
     fontWeight: "bold",
   },
   card1: {

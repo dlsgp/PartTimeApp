@@ -1,9 +1,5 @@
 import FontAwesome from "@expo/vector-icons/FontAwesome";
-import {
-  DarkTheme,
-  DefaultTheme,
-  ThemeProvider,
-} from "@react-navigation/native";
+import { DarkTheme, DefaultTheme, ThemeProvider } from "@react-navigation/native";
 import { useFonts } from "expo-font";
 import { Stack } from "expo-router";
 import * as SplashScreen from "expo-splash-screen";
@@ -14,16 +10,13 @@ import { useColorScheme } from "@/components/useColorScheme";
 import { StatusBar } from "expo-status-bar";
 
 export {
-  // Catch any errors thrown by the Layout component.
   ErrorBoundary,
 } from "expo-router";
 
 export const unstable_settings = {
-  // Ensure that reloading on `/modal` keeps a back button present.
   initialRouteName: "(tabs)",
 };
 
-// Prevent the splash screen from auto-hiding before asset loading is complete.
 SplashScreen.preventAutoHideAsync();
 
 export default function RootLayout() {
@@ -32,7 +25,6 @@ export default function RootLayout() {
     ...FontAwesome.font,
   });
 
-  // Expo Router uses Error Boundaries to catch errors in the navigation tree.
   useEffect(() => {
     if (error) throw error;
   }, [error]);
@@ -55,15 +47,22 @@ function RootLayoutNav() {
 
   return (
     <ThemeProvider value={colorScheme === "dark" ? DarkTheme : DefaultTheme}>
-      <StatusBar
-        style={colorScheme === "dark" ? "light" : "dark"}
-        backgroundColor={colorScheme === "dark" ? "#000" : "#fff"}
-      />
-      <Stack>
-        <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
+      <StatusBar style={colorScheme === "dark" ? "light" : "dark"} backgroundColor={colorScheme === "dark" ? "#000" : "#fff"} />
+      <Stack screenOptions={{ headerShown: false }}>
+        <Stack.Screen name="(tabs)" />
         <Stack.Screen name="modal" options={{ presentation: "modal" }} />
-        {/* <Stack.Screen name="(signIn)" />
-        <Stack.Screen name="(staffLayout)" /> */}
+        <Stack.Screen name="(signIn)" />
+        <Stack.Screen name="(staffLayout)" />
+        <Stack.Screen name="(signIn)/SignInApp" />
+        <Stack.Screen name="(signIn)/SignUpSelectionApp" />
+        <Stack.Screen name="(signIn)/BusinessSignUpApp" />
+        <Stack.Screen name="(signIn)/FindPasswordApp" />
+        <Stack.Screen name="(signIn)/PersonalSignUpApp" />
+        <Stack.Screen name="(staffLayout)/index" />
+        <Stack.Screen name="(staffLayout)/FormBox" />
+        <Stack.Screen name="(staffLayout)/FormBoxtwo" />
+        <Stack.Screen name="(tabs)/index" />
+        <Stack.Screen name="(tabs)/two" />
       </Stack>
     </ThemeProvider>
   );

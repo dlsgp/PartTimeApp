@@ -40,8 +40,8 @@ const styles = StyleSheet.create({
     alignItems: "center",
   },
   title: {
-    fontSize: 50,
-    marginBottom: 60,
+    fontSize: 35,
+    marginBottom: 80,
     textAlign: "center",
     fontWeight: "bold",
   },
@@ -62,7 +62,7 @@ const styles = StyleSheet.create({
     alignItems: "center",
     borderRadius: 5,
     marginBottom: 20,
-    marginTop: 40,
+    marginTop: 30,
   },
   ButtonText: {
     color: "#fff",

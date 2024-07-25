@@ -11,7 +11,7 @@ import {
 import { Checkbox } from "react-native-paper";
 import { Image } from "react-native-elements";
 import { useNavigation } from "@react-navigation/native";
-import { Link, router } from "expo-router";
+import { Link, useRouter } from "expo-router";
 
 const { width, height } = Dimensions.get("window");
 
@@ -19,6 +19,7 @@ const { width, height } = Dimensions.get("window");
 const SignInApp = () => {
   const [checked, setChecked] = React.useState(false);
   const navigation = useNavigation();
+  const router = useRouter();
 
   const HorizonLine = ({ text }) => {
     return (
@@ -60,6 +61,7 @@ const SignInApp = () => {
         </View>
         
         <View style={styles.forgotPasswordTouch}>
+          {/* <Link href="FindPasswordApp"> */}
         <TouchableOpacity onPress={() => router.push('/(signIn)/FindPasswordApp')}>
           <Text style={styles.forgotPasswordText}>비밀번호를 잊으셨나요?</Text>
         </TouchableOpacity>
@@ -105,15 +107,14 @@ const styles = StyleSheet.create({
   },
   title: {
     fontWeight: "bold",
-    fontSize: 70,
+    fontSize: 55,
     marginBottom: 150,
   },
   input: {
     width: width * 0.8,
     height: height * 0.055,
     borderColor: "#ccc",
-    borderWidth: 1,
-    borderRadius: 5,
+    borderBottomWidth: 1,
     marginBottom: 20,
     paddingHorizontal: 10,
   },

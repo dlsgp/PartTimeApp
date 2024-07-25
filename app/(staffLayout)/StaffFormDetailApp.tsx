@@ -15,11 +15,6 @@ import FontAwesome from "@expo/vector-icons/FontAwesome";
 import DatePicker from "../(staffLayout)/ModalCalendar";
 import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
 import BouncyCheckbox from "react-native-bouncy-checkbox";
-<<<<<<< HEAD
-// import { router } from "expo-router";
-// import Calendar from "../(staffLayout)/Calendar";
-=======
->>>>>>> 5731b9b80d3c6d2369cc62bf4bca4b9fa26a4cdb
 
 const StaffFormDetailApp = () => {
   const [text, setText] = useState("");
@@ -283,7 +278,7 @@ const StaffFormDetailApp = () => {
                   placeholder="4대보험유무"
                   onChangeText={(text) => setText(text)}
                   mode="outlined"
-                  disabled="false"
+                  // disabled="false"
                 />
 
                 <BouncyCheckbox
