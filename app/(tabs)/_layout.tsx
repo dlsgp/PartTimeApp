@@ -56,7 +56,7 @@ export default function TabLayout() {
         }}
       />
       <Tabs.Screen
-        name="scheduleManagement"
+        name="three"
         options={{
           title: "스케줄관리",
           tabBarIcon: ({ color }) => (
