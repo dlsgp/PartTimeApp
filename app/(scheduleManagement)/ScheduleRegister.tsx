@@ -23,32 +23,21 @@ const ScheduleRegister = () => {
   ]);
 
   const [date1, setDate1] = useState<string | null>(null);
-  const [date2, setDate2] = useState<string | null>(null);
-
   const [showDatePicker1, setShowDatePicker1] = useState(false);
-  const [showDatePicker2, setShowDatePicker2] = useState(false);
 
   function handleChange1(propDate: string) {
     setDate1(propDate);
-  }
-  function handleChange2(propDate: string) {
-    setDate2(propDate);
   }
 
   function toggleDatePicker1() {
     setShowDatePicker1((prevState) => !prevState);
   }
-  function toggleDatePicker2() {
-    setShowDatePicker2((prevState) => !prevState);
-  }
 
   return (
-    <View style={styles.mainContianer}>
+    <View style={styles.mainContainer}>
       <StatusBar />
       <KeyboardAwareScrollView>
         <View style={styles.container}>
-          {/* 일정색상 + 직원이름 */}
-
           <View style={styles.textContainer}>
             <View>
               <Text style={styles.title}>일정색상</Text>
@@ -78,7 +67,6 @@ const ScheduleRegister = () => {
             </View>
           </View>
 
-          {/* 나머지      */}
           <View style={styles.containerTwo}>
             <View style={{ marginTop: "10%" }}>
               <View>
@@ -98,33 +86,22 @@ const ScheduleRegister = () => {
                   outlineColor="#E5E5E5"
                   activeOutlineColor="#219BDA"
                   theme={{ colors: { background: "#ffffff00" } }}
-                  right={<FontAwesome
-                    name="calendar-o"
-                    size={24}
-                    color="white"
+                />
+                <TouchableOpacity
+                  activeOpacity={0.8}
+                  onPress={toggleDatePicker1}
+                  style={styles.calendarButton}
+                >
+                  <FontAwesome name="calendar-o" size={24} color="black" />
+                </TouchableOpacity>
+                {showDatePicker1 && (
+                  <DatePicker
+                    mode="calendar"
+                    selected={date1 || ""}
+                    onDateChange={handleChange1}
+                    visible={showDatePicker1}
                   />
-                    
-                  }
-                ></TextInput><View>
-                      <TouchableOpacity
-                        activeOpacity={0.8}
-                        onPress={toggleDatePicker1}
-                      >
-                        <FontAwesome
-                          name="calendar-o"
-                          size={24}
-                          color="white"
-                        />
-                        {showDatePicker1 && (
-                          <DatePicker
-                            mode="calendar"
-                            selected={date1 || ""}
-                            onDateChange={handleChange1}
-                            visible={showDatePicker1}
-                          />
-                        )}
-                      </TouchableOpacity>
-                    </View>
+                )}
               </View>
             </View>
           </View>
@@ -135,7 +112,7 @@ const ScheduleRegister = () => {
 };
 
 const styles = StyleSheet.create({
-  mainContianer: {
+  mainContainer: {
     backgroundColor: "white",
     width: "100%",
     height: "100%",
@@ -189,6 +166,11 @@ const styles = StyleSheet.create({
   },
   formcontainerIcon: {
     width: "46%",
+  },
+  calendarButton: {
+    marginLeft: -30,
+    justifyContent: "center",
+    alignItems: "center",
   },
 });
 

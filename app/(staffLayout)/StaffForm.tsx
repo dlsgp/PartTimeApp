@@ -149,108 +149,91 @@ const StaffForm = () => {
                 theme={{ colors: { background: "white" } }}
               />
 
-              <View style={RegFormStyle.searchSelection}>
-                <View style={RegFormStyle.TextIcon}>
+              <View style={RegFormStyle.TextIcon}>
+                <TextInput
+                  style={RegFormStyle.formcontainerIcon}
+                  label="입사일"
+                  value={date1 || ""}
+                  onChangeText={(text) => setDate1(text)}
+                  mode="outlined"
+                  outlineColor="#E5E5E5"
+                  activeOutlineColor="#219BDA"
+                  theme={{ colors: { background: "white" } }}
+                />
+                <TouchableOpacity
+                  activeOpacity={0.8}
+                  onPress={toggleDatePicker1}
+                  style={RegFormStyle.calendarButton}
+                >
+                  <FontAwesome name="calendar-o" size={24} color="e5e5e5" />
+                </TouchableOpacity>
+                {showDatePicker1 && (
+                  <DatePicker
+                    mode="calendar"
+                    selected={date1 || ""}
+                    onDateChange={handleChange1}
+                    visible={showDatePicker1}
+                  />
+                )}
+              </View>
+
+              <View>
+                <View style={RegFormStyle.TextIconE}>
                   <TextInput
-                    style={RegFormStyle.formcontainerIcon}
-                    label="입사일"
-                    value={date1 || ""}
-                    onChangeText={(text) => setDate1(text)}
+                    style={RegFormStyle.formcontainerIconC}
+                    label="수습기간"
+                    value={date2 || ""}
+                    onChangeText={(text) => setDate2(text)}
                     mode="outlined"
                     outlineColor="#E5E5E5"
                     activeOutlineColor="#219BDA"
                     theme={{ colors: { background: "white" } }}
-                  ></TextInput>
-                  <View style={RegFormStyle.icon}>
-                    <TouchableOpacity
-                      activeOpacity={0.8}
-                      onPress={toggleDatePicker1}
-                    >
-                      <FontAwesome name="calendar-o" size={24} color="e5e5e5" />
-                      {showDatePicker1 && (
-                        <DatePicker
-                          mode="calendar"
-                          selected={date1 || ""}
-                          onDateChange={handleChange1}
-                          visible={showDatePicker1}
-                        />
-                      )}
-                    </TouchableOpacity>
-                  </View>
-                </View>
-              </View>
-
-              <View>
-                <View style={[RegFormStyle.searchSelection]}>
-                  <View style={RegFormStyle.TextIconE}>
-                    <TextInput
-                      style={RegFormStyle.formcontainerIcon}
-                      label="수습기간"
-                      value={date2 || ""}
-                      onChangeText={(text) => setDate2(text)}
-                      mode="outlined"
-                      outlineColor="#E5E5E5"
-                      activeOutlineColor="#219BDA"
-                      theme={{ colors: { background: "white" } }}
-                    ></TextInput>
-                    <View style={RegFormStyle.icon}>
-                      <TouchableOpacity
-                        activeOpacity={0.8}
-                        onPress={toggleDatePicker2}
-                      >
-                        <FontAwesome
-                          name="calendar-o"
-                          size={24}
-                          color="e5e5e5"
-                        />
-                        {showDatePicker2 && (
-                          <DatePicker
-                            mode="calendar"
-                            selected={date2 || ""}
-                            onDateChange={handleChange2}
-                            visible={showDatePicker2}
-                          />
-                        )}
-                      </TouchableOpacity>
-                    </View>
-                  </View>
+                  />
+                  <TouchableOpacity
+                    activeOpacity={0.8}
+                    onPress={toggleDatePicker2}
+                    style={RegFormStyle.calendarButton}
+                  >
+                    <FontAwesome name="calendar-o" size={24} color="e5e5e5" />
+                  </TouchableOpacity>
+                  {showDatePicker2 && (
+                    <DatePicker
+                      mode="calendar"
+                      selected={date2 || ""}
+                      onDateChange={handleChange2}
+                      visible={showDatePicker2}
+                    />
+                  )}
                 </View>
 
                 <Text style={RegFormStyle.dateText}>~</Text>
 
-                <View style={RegFormStyle.searchSelection}>
-                  <View style={RegFormStyle.TextIconE}>
-                    <TextInput
-                      style={RegFormStyle.formcontainerIcon}
-                      label="수습기간 종료"
-                      value={date3 || ""}
-                      onChangeText={(text) => setDate3(text)}
-                      mode="outlined"
-                      outlineColor="#E5E5E5"
-                      activeOutlineColor="#219BDA"
-                      theme={{ colors: { background: "white" } }}
-                    ></TextInput>
-                    <View style={RegFormStyle.icon}>
-                      <TouchableOpacity
-                        activeOpacity={0.8}
-                        onPress={toggleDatePicker3}
-                      >
-                        <FontAwesome
-                          name="calendar-o"
-                          size={24}
-                          color="e5e5e5"
-                        />
-                        {showDatePicker3 && (
-                          <DatePicker
-                            mode="calendar"
-                            selected={date3 || ""}
-                            onDateChange={handleChange3}
-                            visible={showDatePicker3}
-                          />
-                        )}
-                      </TouchableOpacity>
-                    </View>
-                  </View>
+                <View style={RegFormStyle.TextIconE}>
+                  <TextInput
+                    style={RegFormStyle.formcontainerIconC}
+                    label="수습기간 종료"
+                    value={date3 || ""}
+                    onChangeText={(text) => setDate3(text)}
+                    mode="outlined"
+                    outlineColor="#E5E5E5"
+                    activeOutlineColor="#219BDA"
+                    theme={{ colors: { background: "white" } }}
+                  />
+                  <TouchableOpacity
+                    activeOpacity={0.8}
+                    onPress={toggleDatePicker3}
+                    style={RegFormStyle.calendarButton}
+                  >
+                    <FontAwesome name="calendar-o" size={24} color="e5e5e5" />
+                  </TouchableOpacity>
+                  {showDatePicker3 && (
+                    <DatePicker
+                      mode="calendar"
+                      selected={date3 || ""}
+                      onDateChange={handleChange3}
+                      visible={showDatePicker3}
+                    />
+                  )}
                 </View>
               </View>
 
@@ -306,6 +289,7 @@ const RegFormStyle = StyleSheet.create({
   },
   container: {
     marginHorizontal: "4%",
+    marginBottom: "4%",
   },
   titleContainer: {
     flexDirection: "row",
@@ -330,53 +314,57 @@ const RegFormStyle = StyleSheet.create({
   buttonD: {
     borderWidth: 1,
     borderRadius: 30,
-    padding: 3,
+    padding: 0.5,
     alignSelf: "flex-end",
-    alignItems: "center",
+    textAlign: "center",
     backgroundColor: "#2E294E",
     marginTop: 30,
-    marginBottom: 30,
+    marginBottom: 20,
     width: 100,
-    height: 30,
+    height: 38,
   },
   formcontainer: {
-    width: width * 0.65,
+    width: width * 0.64,
     height: height * 0.04,
     marginVertical: "6%",
-  },
-  searchSelection: {
-    borderColor: "#e5e5e5",
   },
   TextIcon: {
     flexDirection: "row",
     alignItems: "center",
-    justifyContent: "space-between",
+    // justifyContent: "space-between",
   },
   dateText: {
     fontSize: 18,
     textAlign: "center",
+    marginBottom: "3%",
   },
   TextIconE: {
     flexDirection: "row",
     alignItems: "center",
-    justifyContent: "space-between",
+    //justifyContent: "space-between",
   },
   icon: {
     justifyContent: "space-between",
     marginLeft: "4%",
   },
   formcontainerIcon: {
-    width: width * 0.55,
+    width: width * 0.64,
     height: height * 0.04,
     textAlign: "left",
     marginVertical: "6%",
+  },
+  formcontainerIconC: {
+    width: width * 0.64,
+    height: height * 0.04,
+    textAlign: "left",
+    marginVertical: "4%",
   },
   buttonText: {
     color: "#fff",
   },
   insurance: {
     fontSize: 16,
-    marginLeft: 5,
+    marginLeft: 4,
   },
   radio: {
     flexDirection: "row",
@@ -384,6 +372,12 @@ const RegFormStyle = StyleSheet.create({
     justifyContent: "center",
     marginTop: 5,
     marginLeft: 7,
+  },
+  calendarButton: {
+    marginLeft: -30,
+    marginBottom: -5,
+    justifyContent: "center",
+    alignItems: "center",
   },
 });
 

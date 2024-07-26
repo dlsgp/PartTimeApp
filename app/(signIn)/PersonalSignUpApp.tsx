@@ -47,104 +47,106 @@ const PersonalSignUpApp: React.FC = () => {
   return (
     <SafeAreaView style={styles.container}>
       <ScrollView showsVerticalScrollIndicator={false}>
-      <Text style={styles.title}>개인회원가입</Text>
+        <Text style={styles.title}>개인회원가입</Text>
 
-      <View style={styles.id}>
-      <TextInput
-        style={styles.idinput}
-        placeholder="아이디"
-        placeholderTextColor="#aaa"
-      />
-      <View style={styles.duplicationcheck}>
-      <TouchableOpacity >
-        <Text style={styles.checkButton}>중복확인</Text>
-      </TouchableOpacity>
-      </View>
-      </View>
-
-      <TextInput
-        style={styles.input}
-        placeholder="비밀번호"
-        placeholderTextColor="#aaa"
-        secureTextEntry
-      />
-      <TextInput
-        style={styles.input}
-        placeholder="비밀번호확인"
-        placeholderTextColor="#aaa"
-        secureTextEntry
-      />
-      <TextInput
-        style={styles.input}
-        placeholder="이름"
-        placeholderTextColor="#aaa"
-      />
-      <TextInput
-        style={styles.input}
-        placeholder="생년월일"
-        placeholderTextColor="#aaa"
-      />
-      <TextInput
-        style={styles.input}
-        placeholder="주소"
-        placeholderTextColor="#aaa"
-      />
-      <TextInput
-        style={styles.input}
-        placeholder="이메일"
-        placeholderTextColor="#aaa"
-      />
-
-      <View style={styles.term}>
-      <View style={styles.checkboxContainer}>
-        <Checkbox
-          status={checked0 ? "checked" : "unchecked"}
-          onPress={handleCheckbox0Press}
-          color="#f0a500"
-        />
-        <Text style={styles.label}>이용약관에 전체동의</Text>
-      </View>
-      <View style={styles.checkboxContainer}>
-        <Checkbox
-          status={checked1 ? "checked" : "unchecked"}
-          onPress={() => {
-            setChecked1(!checked1);
-          }}
-          color="#f0a500"
-        />
-        <TouchableOpacity onPress={() => openModal(<ServiceTerms />)}>
-          <View style={styles.labelContainer}>
-            <Text style={styles.labelwarning}>[필수]</Text>
-            <Text style={styles.label}>서비스 이용약관 동의</Text>
+        <View style={styles.id}>
+          <TextInput
+            style={styles.idinput}
+            placeholder="아이디"
+            placeholderTextColor="#aaa"
+          />
+          <View style={styles.duplicationcheck}>
+            <TouchableOpacity>
+              <Text style={styles.checkButton}>중복확인</Text>
+            </TouchableOpacity>
           </View>
-        </TouchableOpacity>
-      </View>
-      <View style={styles.checkboxContainer}>
-        <Checkbox
-          status={checked2 ? "checked" : "unchecked"}
-          onPress={() => {
-            setChecked2(!checked2);
-          }}
-          color="#f0a500"
-        />
-        <TouchableOpacity onPress={() => openModal(<PrivacyPolicy />)}>
-          <View style={styles.labelContainer}>
-            <Text style={styles.labelwarning}>[필수]</Text>
-            <Text style={styles.label}>개인정보 수집 및 이용 동의</Text>
-          </View>
-        </TouchableOpacity>
-      </View>
-      </View>
+        </View>
 
-      <TouchableOpacity style={styles.signupButton}>
-        <Text style={styles.signupButtonText}>회원가입</Text>
-      </TouchableOpacity>
+        <TextInput
+          style={styles.input}
+          placeholder="비밀번호"
+          placeholderTextColor="#aaa"
+          secureTextEntry
+        />
+        <TextInput
+          style={styles.input}
+          placeholder="비밀번호확인"
+          placeholderTextColor="#aaa"
+          secureTextEntry
+        />
+        <TextInput
+          style={styles.input}
+          placeholder="이름"
+          placeholderTextColor="#aaa"
+        />
+        <TextInput
+          style={styles.input}
+          placeholder="생년월일"
+          placeholderTextColor="#aaa"
+        />
+        <TextInput
+          style={styles.input}
+          placeholder="주소"
+          placeholderTextColor="#aaa"
+        />
+        <TextInput
+          style={styles.input}
+          placeholder="이메일"
+          placeholderTextColor="#aaa"
+        />
+
+        <View style={styles.term}>
+          <View style={styles.checkboxContainer}>
+            <Checkbox
+              status={checked0 ? "checked" : "unchecked"}
+              onPress={handleCheckbox0Press}
+              color="#f0a500"
+            />
+            <Text style={styles.label}>이용약관에 전체동의</Text>
+          </View>
+          <View style={styles.checkboxContainer}>
+            <Checkbox
+              status={checked1 ? "checked" : "unchecked"}
+              onPress={() => {
+                setChecked1(!checked1);
+              }}
+              color="#f0a500"
+            />
+            <TouchableOpacity onPress={() => openModal(<ServiceTerms />)}>
+              <View style={styles.labelContainer}>
+                <Text style={styles.labelwarning}>[필수]</Text>
+                <Text style={styles.label}>서비스 이용약관 동의</Text>
+              </View>
+            </TouchableOpacity>
+          </View>
+          <View style={styles.checkboxContainer}>
+            <Checkbox
+              status={checked2 ? "checked" : "unchecked"}
+              onPress={() => {
+                setChecked2(!checked2);
+              }}
+              color="#f0a500"
+            />
+            <TouchableOpacity onPress={() => openModal(<PrivacyPolicy />)}>
+              <View style={styles.labelContainer}>
+                <Text style={styles.labelwarning}>[필수]</Text>
+                <Text style={styles.label}>개인정보 수집 및 이용 동의</Text>
+              </View>
+            </TouchableOpacity>
+          </View>
+        </View>
+
+        <TouchableOpacity style={styles.signupButton}>
+          <Text style={styles.signupButtonText}>회원가입</Text>
+        </TouchableOpacity>
       </ScrollView>
 
       <Modal visible={modalVisible} animationType="slide" transparent={true}>
         <View style={styles.modalContainer}>
           <View style={styles.modalContent}>
-            <ScrollView showsVerticalScrollIndicator={false}>{modalContent}</ScrollView>
+            <ScrollView showsVerticalScrollIndicator={false}>
+              {modalContent}
+            </ScrollView>
             <TouchableOpacity onPress={closeModal} style={styles.closeButton}>
               <Text style={styles.closeButtonText}>확인</Text>
             </TouchableOpacity>
@@ -171,17 +173,16 @@ const styles = StyleSheet.create({
     borderRadius: 5,
     width: width * 0.8,
     padding: 10,
-    
   },
   title: {
     fontSize: 35,
     marginBottom: 50,
     marginTop: 50,
     textAlign: "center",
-    fontWeight: 'bold',
+    fontWeight: "bold",
   },
   id: {
-    flexDirection: 'row',
+    flexDirection: "row",
   },
   idinput: {
     borderColor: "#ccc",
@@ -215,7 +216,6 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     alignItems: "center",
     marginBottom: 20,
-    
   },
   label: {
     marginLeft: 5,
