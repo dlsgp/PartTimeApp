@@ -302,6 +302,7 @@ const FormBoxStyle = StyleSheet.create({
     paddingRight: "12%",
     textAlign: "center",
     fontSize: 14,
+    
   },
   mobilePhoto: {
     marginTop: "12%",
