@@ -1,5 +1,4 @@
-import { Link } from "expo-router";
-import React from "react";
+import React, { useState } from "react";
 import {
   SafeAreaView,
   View,
@@ -18,11 +17,21 @@ import ServiceTerms from "./ServiceTerm";
 const { width, height } = Dimensions.get("window");
 
 const PersonalSignUpApp: React.FC = () => {
-  const [checked0, setChecked0] = React.useState(false);
-  const [checked1, setChecked1] = React.useState(false);
-  const [checked2, setChecked2] = React.useState(false);
-  const [modalVisible, setModalVisible] = React.useState(false);
-  const [modalContent, setModalContent] = React.useState<React.ReactNode>(null);
+  const [username, setUsername] = useState("");
+  const [password, setPassword] = useState("");
+  const [confirmPassword, setConfirmPassword] = useState("");
+  const [name, setName] = useState("");
+  const [birthdate, setBirthdate] = useState("");
+  const [address, setAddress] = useState("");
+  const [email, setEmail] = useState("");
+  const [errors, setErrors] = useState<any>({});
+  const [checked0, setChecked0] = useState(false);
+  const [checked1, setChecked1] = useState(false);
+  const [checked2, setChecked2] = useState(false);
+  const [modalVisible, setModalVisible] = useState(false);
+  const [modalContent, setModalContent] = useState<React.ReactNode>(null);
+  const [duplicationCheck, setDuplicationCheck] = useState(false);
+  const [currentCheckbox, setCurrentCheckbox] = useState<number | null>(null);
 
   const handleCheckbox0Press = () => {
     if (checked1 && checked2) {
@@ -35,116 +44,276 @@ const PersonalSignUpApp: React.FC = () => {
     setChecked0(!checked0);
   };
 
-  const openModal = (content: React.ReactNode) => {
+  const handleCheckbox1Press = () => {
+    const newChecked1 = !checked1;
+    setChecked1(newChecked1);
+    if (newChecked1 && checked2) {
+      setChecked0(true);
+    } else if (!newChecked1) {
+      setChecked0(false);
+    }
+    setErrors((prev: any) => ({ ...prev, checked1: null }));
+  };
+
+  const handleCheckbox2Press = () => {
+    const newChecked2 = !checked2;
+    setChecked2(newChecked2);
+    if (newChecked2 && checked1) {
+      setChecked0(true);
+    } else if (!newChecked2) {
+      setChecked0(false);
+    }
+    setErrors((prev: any) => ({ ...prev, checked2: null }));
+  };
+
+  const openModal = (content: React.ReactNode, checkboxNumber: number) => {
     setModalContent(content);
     setModalVisible(true);
+    setCurrentCheckbox(checkboxNumber);
   };
 
   const closeModal = () => {
     setModalVisible(false);
+    if (currentCheckbox === 1) {
+      setChecked1(true);
+      setErrors((prev: any) => ({ ...prev, checked1: null }));
+      if (checked1) setChecked0(true);
+    } else if (currentCheckbox === 2) {
+      setChecked2(true);
+      setErrors((prev: any) => ({ ...prev, checked2: null }));
+      if (checked1) setChecked0(true);
+    }
+    if (checked1 && checked2) {
+      setChecked0(true);
+    }
+    setCurrentCheckbox(null);
+  };
+
+  const handleSignUp = () => {
+    let newErrors: any = {};
+    if (!username) newErrors.username = "필수 입력 항목입니다.";
+    if (!password) newErrors.password = "필수 입력 항목입니다.";
+    if (!confirmPassword) newErrors.confirmPassword = "필수 입력 항목입니다.";
+    if (!name) newErrors.name = "필수 입력 항목입니다.";
+    if (!birthdate) newErrors.birthdate = "필수 입력 항목입니다.";
+    if (!address) newErrors.address = "필수 입력 항목입니다.";
+    if (!email) newErrors.email = "필수 입력 항목입니다.";
+    if (!checked1) newErrors.checked1 = "필수 체크 항목입니다.";
+    if (!checked2) newErrors.checked2 = "필수 체크 항목입니다.";
+    if (!duplicationCheck)
+      newErrors.duplicationCheck = "중복 확인은 필수입니다.";
+    setErrors(newErrors);
+
+    if (Object.keys(newErrors).length === 0) {
+      // 모든 필드가 올바르게 입력되었을 때의 처리
+      console.log("회원가입 성공");
+    }
+  };
+
+  const handleDuplicationCheck = () => {
+    if (username.trim() === "") {
+      setErrors((prev: any) => ({
+        ...prev,
+        duplicationCheck: "아이디를 입력하세요.",
+      }));
+    } else {
+      setDuplicationCheck(true);
+      setErrors((prev: any) => ({ ...prev, duplicationCheck: null }));
+    }
   };
 
   return (
     <SafeAreaView style={styles.container}>
       <ScrollView showsVerticalScrollIndicator={false}>
-      <Text style={styles.title}>개인회원가입</Text>
+        <Text style={styles.title}>개인회원가입</Text>
 
-      <View style={styles.id}>
-      <TextInput
-        style={styles.idinput}
-        placeholder="아이디"
-        placeholderTextColor="#aaa"
-      />
-      <View style={styles.duplicationcheck}>
-      <TouchableOpacity >
-        <Text style={styles.checkButton}>중복확인</Text>
-      </TouchableOpacity>
-      </View>
-      </View>
-
-      <TextInput
-        style={styles.input}
-        placeholder="비밀번호"
-        placeholderTextColor="#aaa"
-        secureTextEntry
-      />
-      <TextInput
-        style={styles.input}
-        placeholder="비밀번호확인"
-        placeholderTextColor="#aaa"
-        secureTextEntry
-      />
-      <TextInput
-        style={styles.input}
-        placeholder="이름"
-        placeholderTextColor="#aaa"
-      />
-      <TextInput
-        style={styles.input}
-        placeholder="생년월일"
-        placeholderTextColor="#aaa"
-      />
-      <TextInput
-        style={styles.input}
-        placeholder="주소"
-        placeholderTextColor="#aaa"
-      />
-      <TextInput
-        style={styles.input}
-        placeholder="이메일"
-        placeholderTextColor="#aaa"
-      />
-
-      <View style={styles.term}>
-      <View style={styles.checkboxContainer}>
-        <Checkbox
-          status={checked0 ? "checked" : "unchecked"}
-          onPress={handleCheckbox0Press}
-          color="#f0a500"
-        />
-        <Text style={styles.label}>이용약관에 전체동의</Text>
-      </View>
-      <View style={styles.checkboxContainer}>
-        <Checkbox
-          status={checked1 ? "checked" : "unchecked"}
-          onPress={() => {
-            setChecked1(!checked1);
-          }}
-          color="#f0a500"
-        />
-        <TouchableOpacity onPress={() => openModal(<ServiceTerms />)}>
-          <View style={styles.labelContainer}>
-            <Text style={styles.labelwarning}>[필수]</Text>
-            <Text style={styles.label}>서비스 이용약관 동의</Text>
+        <View style={styles.id}>
+          <TextInput
+            style={[
+              styles.idinput,
+              (errors.username || errors.duplicationCheck) && styles.errorInput,
+            ]}
+            placeholder="아이디"
+            placeholderTextColor="#aaa"
+            value={username}
+            onChangeText={(text) => {
+              setUsername(text);
+              if (text.trim() !== "") {
+                setErrors((prev: any) => ({
+                  ...prev,
+                  username: null,
+                  duplicationCheck: null,
+                }));
+              }
+            }}
+          />
+          <View
+            style={[
+              styles.duplicationcheck,
+              errors.duplicationCheck && styles.errorInput,
+            ]}
+          >
+            <TouchableOpacity onPress={handleDuplicationCheck}>
+              <Text style={styles.checkButton}>중복확인</Text>
+            </TouchableOpacity>
           </View>
-        </TouchableOpacity>
-      </View>
-      <View style={styles.checkboxContainer}>
-        <Checkbox
-          status={checked2 ? "checked" : "unchecked"}
-          onPress={() => {
-            setChecked2(!checked2);
-          }}
-          color="#f0a500"
-        />
-        <TouchableOpacity onPress={() => openModal(<PrivacyPolicy />)}>
-          <View style={styles.labelContainer}>
-            <Text style={styles.labelwarning}>[필수]</Text>
-            <Text style={styles.label}>개인정보 수집 및 이용 동의</Text>
-          </View>
-        </TouchableOpacity>
-      </View>
-      </View>
+        </View>
+        {errors.username && (
+          <Text style={styles.errorText}>{errors.username}</Text>
+        )}
+        {errors.duplicationCheck && (
+          <Text style={styles.errorText}>{errors.duplicationCheck}</Text>
+        )}
 
-      <TouchableOpacity style={styles.signupButton}>
-        <Text style={styles.signupButtonText}>회원가입</Text>
-      </TouchableOpacity>
+        <TextInput
+          style={[styles.input, errors.password && styles.errorInput]}
+          placeholder="비밀번호"
+          placeholderTextColor="#aaa"
+          secureTextEntry
+          value={password}
+          onChangeText={(text) => {
+            setPassword(text);
+            if (text.trim() !== "") {
+              setErrors((prev: any) => ({ ...prev, password: null }));
+            }
+          }}
+        />
+        {errors.password && (
+          <Text style={styles.errorText}>{errors.password}</Text>
+        )}
+
+        <TextInput
+          style={[styles.input, errors.confirmPassword && styles.errorInput]}
+          placeholder="비밀번호확인"
+          placeholderTextColor="#aaa"
+          secureTextEntry
+          value={confirmPassword}
+          onChangeText={(text) => {
+            setConfirmPassword(text);
+            if (text.trim() !== "") {
+              setErrors((prev: any) => ({ ...prev, confirmPassword: null }));
+            }
+          }}
+        />
+        {errors.confirmPassword && (
+          <Text style={styles.errorText}>{errors.confirmPassword}</Text>
+        )}
+
+        <TextInput
+          style={[styles.input, errors.name && styles.errorInput]}
+          placeholder="이름"
+          placeholderTextColor="#aaa"
+          value={name}
+          onChangeText={(text) => {
+            setName(text);
+            if (text.trim() !== "") {
+              setErrors((prev: any) => ({ ...prev, name: null }));
+            }
+          }}
+        />
+        {errors.name && <Text style={styles.errorText}>{errors.name}</Text>}
+
+        <TextInput
+          style={[styles.input, errors.birthdate && styles.errorInput]}
+          placeholder="생년월일"
+          placeholderTextColor="#aaa"
+          value={birthdate}
+          onChangeText={(text) => {
+            setBirthdate(text);
+            if (text.trim() !== "") {
+              setErrors((prev: any) => ({ ...prev, birthdate: null }));
+            }
+          }}
+        />
+        {errors.birthdate && (
+          <Text style={styles.errorText}>{errors.birthdate}</Text>
+        )}
+
+        <TextInput
+          style={[styles.input, errors.address && styles.errorInput]}
+          placeholder="주소"
+          placeholderTextColor="#aaa"
+          value={address}
+          onChangeText={(text) => {
+            setAddress(text);
+            if (text.trim() !== "") {
+              setErrors((prev: any) => ({ ...prev, address: null }));
+            }
+          }}
+        />
+        {errors.address && (
+          <Text style={styles.errorText}>{errors.address}</Text>
+        )}
+
+        <TextInput
+          style={[styles.input, errors.email && styles.errorInput]}
+          placeholder="이메일"
+          placeholderTextColor="#aaa"
+          value={email}
+          onChangeText={(text) => {
+            setEmail(text);
+            if (text.trim() !== "") {
+              setErrors((prev: any) => ({ ...prev, email: null }));
+            }
+          }}
+        />
+        {errors.email && <Text style={styles.errorText}>{errors.email}</Text>}
+
+        <View style={styles.term}>
+          <View style={styles.checkboxContainer}>
+            <Checkbox
+              status={checked0 ? "checked" : "unchecked"}
+              onPress={handleCheckbox0Press}
+              color="#f0a500"
+            />
+            <Text style={styles.label}>이용약관에 전체동의</Text>
+          </View>
+          <View style={styles.checkboxContainer}>
+            <Checkbox
+              status={checked1 ? "checked" : "unchecked"}
+              onPress={handleCheckbox1Press}
+              color="#f0a500"
+            />
+            <TouchableOpacity onPress={() => openModal(<ServiceTerms />, 1)}>
+              <View style={styles.labelContainer}>
+                <Text style={styles.labelwarning}>[필수]</Text>
+                <Text style={styles.label}>서비스 이용약관 동의</Text>
+              </View>
+            </TouchableOpacity>
+          </View>
+          {errors.checked1 && (
+            <Text style={styles.errorText1}>{errors.checked1}</Text>
+          )}
+
+          <View style={styles.checkboxContainer}>
+            <Checkbox
+              status={checked2 ? "checked" : "unchecked"}
+              onPress={handleCheckbox2Press}
+              color="#f0a500"
+            />
+            <TouchableOpacity onPress={() => openModal(<PrivacyPolicy />, 2)}>
+              <View style={styles.labelContainer}>
+                <Text style={styles.labelwarning}>[필수]</Text>
+                <Text style={styles.label}>개인정보 수집 및 이용 동의</Text>
+              </View>
+            </TouchableOpacity>
+          </View>
+          {errors.checked2 && (
+            <Text style={styles.errorText1}>{errors.checked2}</Text>
+          )}
+        </View>
+
+        <TouchableOpacity style={styles.signupButton} onPress={handleSignUp}>
+          <Text style={styles.signupButtonText}>회원가입</Text>
+        </TouchableOpacity>
       </ScrollView>
 
       <Modal visible={modalVisible} animationType="slide" transparent={true}>
         <View style={styles.modalContainer}>
           <View style={styles.modalContent}>
-            <ScrollView showsVerticalScrollIndicator={false}>{modalContent}</ScrollView>
+            <ScrollView showsVerticalScrollIndicator={false}>
+              {modalContent}
+            </ScrollView>
             <TouchableOpacity onPress={closeModal} style={styles.closeButton}>
               <Text style={styles.closeButtonText}>확인</Text>
             </TouchableOpacity>
@@ -171,17 +340,16 @@ const styles = StyleSheet.create({
     borderRadius: 5,
     width: width * 0.8,
     padding: 10,
-    
   },
   title: {
     fontSize: 35,
     marginBottom: 50,
     marginTop: 50,
     textAlign: "center",
-    fontWeight: 'bold',
+    fontWeight: "bold",
   },
   id: {
-    flexDirection: 'row',
+    flexDirection: "row",
   },
   idinput: {
     borderColor: "#ccc",
@@ -215,7 +383,6 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     alignItems: "center",
     marginBottom: 20,
-    
   },
   label: {
     marginLeft: 5,
@@ -261,6 +428,22 @@ const styles = StyleSheet.create({
   },
   closeButtonText: {
     color: "#fff",
+  },
+  errorText: {
+    color: "red",
+    alignSelf: "flex-start",
+    marginBottom: 10,
+    marginLeft: 10,
+  },
+  errorText1: {
+    color: "red",
+    alignSelf: "flex-start",
+    marginBottom: 10,
+    marginLeft: 40,
+    marginTop: -20,
+  },
+  errorInput: {
+    borderColor: "red",
   },
 });
 
