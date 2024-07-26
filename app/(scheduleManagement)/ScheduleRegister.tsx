@@ -62,18 +62,13 @@ const ScheduleRegister = () => {
   function handleChange1(propDate: string) {
     setDate1(propDate);
   }
-  function handleChange2(propDate: string) {
-    setDate2(propDate);
-  }
 
   function toggleDatePicker1() {
     setShowDatePicker1((prevState) => !prevState);
   }
-  function toggleDatePicker2() {
-    setShowDatePicker2((prevState) => !prevState);
-  }
 
   return (
+    <View style={styles.mainContainer}>
     <View style={styles.mainContainer}>
       <StatusBar />
       <KeyboardAwareScrollView nestedScrollEnabled={true}>
@@ -247,6 +242,7 @@ const ScheduleRegister = () => {
 };
 
 const styles = StyleSheet.create({
+  mainContainer: {
   mainContainer: {
     backgroundColor: "white",
     width: "100%",
