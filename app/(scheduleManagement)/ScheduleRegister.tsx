@@ -105,39 +105,6 @@ const ScheduleRegister = () => {
 
           <View style={styles.containerTwo}>
             <View style={{ marginTop: "10%" }}>
-              <View>
-                <Text
-                  style={[styles.title, { marginLeft: 6, marginBottom: 4 }]}
-                >
-                  근무기간
-                </Text>
-              </View>
-              <View style={styles.TextIconE}>
-                <TextInput
-                  style={styles.formcontainerIcon}
-                  value={date1 || ""}
-                  placeholder="근무기간"
-                  onChangeText={(text) => setDate1(text)}
-                  mode="outlined"
-                  outlineColor="#E5E5E5"
-                  activeOutlineColor="#219BDA"
-                  theme={{ colors: { background: "#ffffff00" } }}
-                />
-                <TouchableOpacity
-                  activeOpacity={0.8}
-                  onPress={toggleDatePicker1}
-                  style={styles.calendarButton}
-                >
-                  <FontAwesome name="calendar-o" size={24} color="black" />
-                </TouchableOpacity>
-                {showDatePicker1 && (
-                  <DatePicker
-                    mode="calendar"
-                    selected={date1 || ""}
-                    onDateChange={handleChange1}
-                    visible={showDatePicker1}
-                  />
-                )}
               <Text style={[styles.title, { marginLeft: 6, marginBottom: 4 }]}>
                 근무기간
               </Text>
@@ -275,7 +242,6 @@ const ScheduleRegister = () => {
 };
 
 const styles = StyleSheet.create({
-  mainContainer: {
   mainContainer: {
   mainContainer: {
     backgroundColor: "white",
