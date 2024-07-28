@@ -1,6 +1,6 @@
 import { FontAwesome } from "@expo/vector-icons";
 import { StatusBar } from "expo-status-bar";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import {
   Button,
   FlatList,
@@ -13,6 +13,9 @@ import {
 import DropDownPicker from "react-native-dropdown-picker";
 import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
 import DateTimePicker from "@react-native-community/datetimepicker";
+import { TextInput } from "react-native";
+import { Checkbox } from "react-native-paper";
+import { router } from "expo-router";
 
 const ScheduleRegister = () => {
   const [open, setOpen] = useState(false);
@@ -29,46 +32,63 @@ const ScheduleRegister = () => {
     { label: "김영희", value: "김영희" },
   ]);
 
-  const [date1, setDate1] = useState<string | null>(null);
-  const [date2, setDate2] = useState<string | null>(null);
-  const [showDatePicker1, setShowDatePicker1] = useState(false);
-  const [showDatePicker2, setShowDatePicker2] = useState(false);
+  // dateTimepicker
+  const [startDate, setStartDate] = useState(new Date());
+  const [endDate, setEndDate] = useState(new Date());
+  const [startTime, setStartTime] = useState(new Date());
+  const [startTimeTwo, setStartTimeTwo] = useState(new Date());
+  const [endTime, setEndTime] = useState(new Date());
+  const [endTimeTwo, setEndTimeTwo] = useState(new Date());
+  const [showStart, setShowStart] = useState(true);
+  const [showEnd, setShowEnd] = useState(true);
+  const [showStartTime, setShowStartTime] = useState(true);
+  const [showEndTime, setShowEndTime] = useState(true);
+  const [showStartTimeTwo, setShowStartTimeTwo] = useState(true);
+  const [showEndTimeTwo, setShowEndTimeTwo] = useState(true);
 
-  const [date, setDate] = useState(new Date(1598051730000));
-  const [mode, setMode] = useState("date");
-  const [show, setShow] = useState(false);
-
-  const onChange = (event, selectedDate) => {
-    const currentDate = selectedDate;
-    setShow(false);
-    setDate(currentDate);
+  const onChangeStart = (event, selectedDate) => {
+    const currentDate = selectedDate || startDate;
+    setShowStart(true);
+    setStartDate(currentDate);
   };
 
-  const showMode = (currentMode) => {
-    setShow(true);
-    setMode(currentMode);
+  const onChangeEnd = (event, selectedDate) => {
+    const currentDate = selectedDate || endDate;
+    setShowEnd(true);
+    setEndDate(currentDate);
   };
 
-  const showDatepicker = () => {
-    showMode("date");
+  const onChangeStartTime = (event, selectedDate) => {
+    const currentDate = selectedDate || startDate;
+    setShowStartTime(true);
+    setStartTime(currentDate);
   };
 
-  const showTimepicker = () => {
-    showMode("time");
+  const onChangeEndTime = (event, selectedDate) => {
+    const currentDate = selectedDate || endDate;
+    setShowEndTime(true);
+    setEndTime(currentDate);
   };
 
-  
+  const onChangeStartTimeTwo = (event, selectedDate) => {
+    const currentDate = selectedDate || startDate;
+    setShowStartTimeTwo(true);
+    setStartTimeTwo(currentDate);
+  };
 
-  function handleChange1(propDate: string) {
-    setDate1(propDate);
-  }
+  const onChangeEndTimeTwo = (event, selectedDate) => {
+    const currentDate = selectedDate || endDate;
+    setShowEndTimeTwo(true);
+    setEndTimeTwo(currentDate);
+  };
 
-  function toggleDatePicker1() {
-    setShowDatePicker1((prevState) => !prevState);
-  }
+  //
+
+  const [text, onChangeText] = React.useState("메모");
+  const [checked1, setChecked1] = React.useState(false);
+  const [checked2, setChecked2] = React.useState(false);
 
   return (
-    <View style={styles.mainContainer}>
     <View style={styles.mainContainer}>
       <StatusBar />
       <KeyboardAwareScrollView nestedScrollEnabled={true}>
@@ -103,138 +123,231 @@ const ScheduleRegister = () => {
             </View>
           </View>
 
-          <View style={styles.containerTwo}>
-            <View style={{ marginTop: "10%" }}>
-              <Text style={[styles.title, { marginLeft: 6, marginBottom: 4 }]}>
+          <View
+            style={[
+              styles.containerTwo,
+              { borderBottomLeftRadius: 0, borderBottomRightRadius: 0 },
+            ]}
+          >
+            <View style={{ flex: 1, alignItems: "flex-start" }}>
+              <Text
+                style={[
+                  styles.title,
+                  { marginLeft: 6, marginBottom: 6, marginTop: "6%" },
+                ]}
+              >
                 근무기간
               </Text>
 
-              {/* <View
-                style={{
-                  flexDirection: "row",
-                  alignItems: "center",
-                }}
-              >
-                <View style={styles.TextIconE}>
-                  <TextInput
-                    style={styles.formcontainerIcon}
-                    value={date1 || ""}
-                    placeholder="근무기간"
-                    onChangeText={(text) => setDate1(text)}
-                    mode="outlined"
-                    outlineColor="#E5E5E5"
-                    activeOutlineColor="#219BDA"
-                    theme={{ colors: { background: "#ffffff00" } }}
-                  />
-                  <TouchableOpacity
-                    activeOpacity={0.8}
-                    onPress={toggleDatePicker1}
-                    style={styles.calendarButton}
+              <View style={styles.textContainer}>
+                <View>
+                  {/* <Text
+                    style={[styles.title, { marginLeft: "10%", marginVertical: 8 }]}
                   >
-                    <FontAwesome name="calendar-o" size={24} color="black" />
-                  </TouchableOpacity>
-                  {showDatePicker1 && (
-                    <DatePicker
-                      mode="calendar"
-                      selected={date1 || ""}
-                      onDateChange={handleChange1}
-                      visible={showDatePicker1}
-                    />
-                  )}
-                </View>
-
-                <Text
-                  style={{
-                    fontSize: 16,
-                    color: "#929292",
-                  }}
-                >
-                  ~
-                </Text>
-
-                <View style={styles.TextIconE}>
-                  <TextInput
-                    style={styles.formcontainerIcon}
-                    value={date2 || ""}
-                    placeholder="근무기간"
-                    onChangeText={(text) => setDate2(text)}
-                    mode="outlined"
-                    outlineColor="#E5E5E5"
-                    activeOutlineColor="#219BDA"
-                    theme={{ colors: { background: "#ffffff00" } }}
-                  />
-                  <TouchableOpacity
-                    activeOpacity={0.8}
-                    onPress={toggleDatePicker2}
-                    style={styles.calendarButton}
-                  >
-                    <FontAwesome name="calendar-o" size={24} color="black" />
-                  </TouchableOpacity>
-                  {showDatePicker2 && (
-                    <DatePicker
-                      mode="calendar"
-                      selected={date2 || ""}
-                      onDateChange={handleChange2}
-                      visible={showDatePicker2}
-                    />
-                  )}
-                </View>
-              </View> */}
-
-              <SafeAreaView>
-                <View style={{ flexDirection: "row" }}>
-                  <Button onPress={showDatepicker} title="날짜선택" />
-                  {show && (
+                    근무시작
+                  </Text> */}
+                  {showStart && (
                     <DateTimePicker
                       testID="dateTimePicker"
-                      value={date1}
-                      mode={mode}
+                      value={startDate}
+                      mode="date"
                       is24Hour={true}
-                      onChange={onChange}
-                      style={{ alignContent: "flex-start" }}
+                      onChange={onChangeStart}
                     />
                   )}
                 </View>
-
-                <Text>근무 시작: {date.toLocaleString()}</Text>
-                <Text>근무 끝: {date.toLocaleString()}</Text>
-
-                <Button onPress={showTimepicker} title="Show time picker!" />
-              </SafeAreaView>
-
-              <View style={styles.textContainer}>
-                <Text
-                  style={[styles.title, { marginLeft: 6, marginVertical: 8 }]}
+                <View
+                  style={{ justifyContent: "flex-end", alignItems: "flex-end" }}
                 >
-                  출근시간
-                </Text>
-
-                <View style={{ marginLeft: "30%" }}>
-                  <Text
-                    style={[styles.title, { marginLeft: 6, marginVertical: 8 }]}
+                  <Text style={styles.dateText}>-</Text>
+                </View>
+                <View style={{ flex: 1, alignItems: "flex-start" }}>
+                  {/* <Text
+                    style={[
+                      styles.title,
+                      { marginLeft: "10%", marginVertical: 8 },
+                    ]}
                   >
-                    퇴근시간
-                  </Text>
+                    근무끝
+                  </Text> */}
+                  {showEnd && (
+                    <DateTimePicker
+                      testID="dateTimePicker"
+                      value={endDate}
+                      mode="date"
+                      is24Hour={true}
+                      onChange={onChangeEnd}
+                    />
+                  )}
                 </View>
               </View>
 
               <View>
-                <SafeAreaView>
-                  {/* <Button onPress={showTimepicker} title="Show time picker!" />
-                  <Text>selected: {date.toLocaleString()}</Text>
-                  {show && (
-                    <DateTimePicker
-                      testID="dateTimePicker"
-                      value={date}
-                      mode={mode}
-                      is24Hour={true}
-                      onChange={onChange}
-                    />
-                  )} */}
-                </SafeAreaView>
+                {/* <Text>시작: {startDate.toLocaleTimeString()}</Text>
+              <Text>퇴근시간: {endDate.toLocaleTimeString()}</Text> */}
               </View>
             </View>
+
+            <View style={{ flex: 1, alignItems: "flex-start" }}>
+              <Text
+                style={[
+                  styles.title,
+                  { marginLeft: 6, marginBottom: 6, marginTop: "6%" },
+                ]}
+              >
+                출퇴근시간
+              </Text>
+
+              <View style={styles.textContainer}>
+                <View>
+                  {showStartTime && (
+                    <DateTimePicker
+                      testID="dateTimePicker"
+                      value={startTime}
+                      mode="time"
+                      is24Hour={true}
+                      onChange={onChangeStartTime}
+                    />
+                  )}
+                </View>
+                <View
+                  style={{ justifyContent: "flex-end", alignItems: "flex-end" }}
+                >
+                  <Text style={styles.dateText}>-</Text>
+                </View>
+                <View style={{ flex: 1, alignItems: "flex-start" }}>
+                  {showEndTime && (
+                    <DateTimePicker
+                      testID="dateTimePicker"
+                      value={endTime}
+                      mode="time"
+                      is24Hour={true}
+                      onChange={onChangeEndTime}
+                    />
+                  )}
+                </View>
+              </View>
+
+              <View></View>
+            </View>
+
+            <View style={{ flex: 1, alignItems: "flex-start" }}>
+              <Text
+                style={[
+                  styles.title,
+                  { marginLeft: 6, marginBottom: 6, marginTop: "6%" },
+                ]}
+              >
+                휴게시간
+              </Text>
+
+              <View style={styles.textContainer}>
+                <View>
+                  {showStartTimeTwo && (
+                    <DateTimePicker
+                      testID="dateTimePicker"
+                      value={startTimeTwo}
+                      mode="time"
+                      is24Hour={true}
+                      onChange={onChangeStartTimeTwo}
+                    />
+                  )}
+                </View>
+                <View
+                  style={{ justifyContent: "flex-end", alignItems: "flex-end" }}
+                >
+                  <Text style={styles.dateText}>-</Text>
+                </View>
+                <View style={{ flex: 1, alignItems: "flex-start" }}>
+                  {showEndTimeTwo && (
+                    <DateTimePicker
+                      testID="dateTimePicker"
+                      value={endTimeTwo}
+                      mode="time"
+                      is24Hour={true}
+                      onChange={onChangeEndTimeTwo}
+                    />
+                  )}
+                </View>
+              </View>
+            </View>
+
+            <View style={[styles.textContainer, { marginTop: "6%" }]}>
+              <Text
+                style={[
+                  styles.title,
+                  { marginLeft: 6, marginBottom: 6, marginTop: "4%" },
+                ]}
+              >
+                야간
+              </Text>
+              <Checkbox
+                status={checked1 ? "checked" : "unchecked"}
+                onPress={() => {
+                  setChecked1(!checked1);
+                }}
+              />
+
+              <Text
+                style={[
+                  styles.title,
+                  { marginLeft: 6, marginBottom: 6, marginTop: "4%" },
+                ]}
+              >
+                연장
+              </Text>
+              <Checkbox
+                status={checked2 ? "checked" : "unchecked"}
+                onPress={() => {
+                  setChecked2(!checked2);
+                }}
+              />
+            </View>
           </View>
+
+          <View
+            style={[
+              styles.containerTwo,
+              {
+                marginTop: "12%",
+                borderTopLeftRadius: 0,
+                borderTopRightRadius: 0,
+              },
+            ]}
+          >
+            <View>
+              <Text
+                style={[
+                  styles.title,
+                  { marginLeft: 6, marginBottom: 6, marginTop: "6%" },
+                ]}
+              >
+                메모
+              </Text>
+              <TextInput
+                style={styles.input}
+                onChangeText={onChangeText}
+                value={text}
+              />
+            </View>
+          </View>
+        </View>
+
+        <View style={styles.buttonContainer}>
+          <TouchableOpacity
+            activeOpacity={0.8}
+            style={[
+              styles.button,
+              {
+                flexDirection: "row",
+                alignItems: "center",
+                justifyContent: "center",
+              },
+            ]}
+            onPress={() => router.push("/MainCalendar")}
+          >
+            <Text style={styles.buttonText}>등록하기</Text>
+          </TouchableOpacity>
         </View>
       </KeyboardAwareScrollView>
     </View>
@@ -243,19 +356,22 @@ const ScheduleRegister = () => {
 
 const styles = StyleSheet.create({
   mainContainer: {
-  mainContainer: {
     backgroundColor: "white",
     width: "100%",
     height: "100%",
   },
   container: {
     flex: 1,
-    backgroundColor: "pink",
     marginHorizontal: "6%",
     marginVertical: "4%",
   },
   textContainer: {
     flexDirection: "row",
+  },
+  dateText: {
+    fontSize: 30,
+    fontWeight: "700",
+    marginLeft: "4%",
   },
   boxContainer: {
     flexDirection: "row",
@@ -292,9 +408,9 @@ const styles = StyleSheet.create({
     zIndex: 1000,
   },
   containerTwo: {
-    backgroundColor: "#EAEAEA",
-    borderTopLeftRadius: 30,
-    borderTopRightRadius: 30,
+    backgroundColor: "#f7f7f7",
+    borderRadius: 30,
+    paddingBottom: "10%",
     zIndex: -100,
   },
   TextIconE: {
@@ -322,23 +438,30 @@ const styles = StyleSheet.create({
   checkDay: {
     marginHorizontal: 4,
   },
+
+  input: {
+    height: 60,
+    width: 200,
+    margin: 12,
+    borderWidth: 1,
+    borderColor: "#484848",
+    padding: 10,
+    marginTop: 10,
+  },
+  buttonContainer: {
+    alignSelf: "flex-end",
+    marginRight: "4%",
+  },
+  button: {
+    width: 110,
+    height: 34,
+    borderRadius: 30,
+    backgroundColor: "#2E294E",
+  },
+  buttonText: {
+    color: "#fff",
+    fontWeight: "700",
+  },
 });
 
 export default ScheduleRegister;
-
-{
-  /* <SafeAreaView>
-                <Button onPress={showDatepicker} title="Show date picker!" />
-                <Button onPress={showTimepicker} title="Show time picker!" />
-                <Text>selected: {date.toLocaleString()}</Text>
-                {show && (
-                  <DateTimePicker
-                    testID="dateTimePicker"
-                    value={date}
-                    mode={mode}
-                    is24Hour={true}
-                    onChange={onChange}
-                  />
-                )}
-              </SafeAreaView> */
-}
