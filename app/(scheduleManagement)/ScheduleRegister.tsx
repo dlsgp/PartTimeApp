@@ -88,6 +88,23 @@ const ScheduleRegister = () => {
   const [checked1, setChecked1] = React.useState(false);
   const [checked2, setChecked2] = React.useState(false);
 
+  const [boxColor, setBoxColor] = React.useState("#FFBD00");
+
+  const colors = [
+    "#2080d8",
+    "#FFBD00",
+    "#ff86a2",
+    "#344c0d",
+    "#e1dcf6",
+    "#fffbf3",
+  ];
+
+  const changeColor = () => {
+    const currentColorIndex = colors.indexOf(boxColor);
+    const nextColorIndex = (currentColorIndex + 1) % colors.length;
+    setBoxColor(colors[nextColorIndex]);
+  };
+
   return (
     <View style={styles.mainContainer}>
       <StatusBar />
@@ -103,8 +120,8 @@ const ScheduleRegister = () => {
           </View>
 
           <View style={styles.boxContainer}>
-            <TouchableOpacity activeOpacity={0.8}>
-              <View style={styles.box}>
+            <TouchableOpacity activeOpacity={0.8} onPress={changeColor}>
+              <View style={[styles.box, { backgroundColor: boxColor }]}>
                 <Text style={styles.boxColor}>색상</Text>
               </View>
             </TouchableOpacity>
@@ -380,7 +397,6 @@ const styles = StyleSheet.create({
   box: {
     width: 70,
     height: 30,
-    backgroundColor: "yellow",
     borderRadius: 10,
     justifyContent: "center",
   },
