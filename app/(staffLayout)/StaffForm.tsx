@@ -268,11 +268,13 @@ const StaffForm = () => {
               </View>
 
               <View style={RegFormStyle.buttonD}>
-                <Button
-                  color={"#ffffff"}
-                  title="등록하기"
-                  onPress={() => console.log("등록 버튼 클릭")}
-                />
+              <TouchableOpacity
+              activeOpacity={0.8}
+              style={RegFormStyle.button2}
+              onPress={() => console.log("등록 버튼 클릭")}
+            >
+              <Text style={RegFormStyle.buttonText2}>등록하기</Text>
+            </TouchableOpacity>
               </View>
             </View>
           </KeyboardAvoidingView>
@@ -312,16 +314,16 @@ const RegFormStyle = StyleSheet.create({
     marginVertical: "auto",
   },
   buttonD: {
-    borderWidth: 1,
+    // borderWidth: 1,
     borderRadius: 30,
     padding: 0.5,
     alignSelf: "flex-end",
     textAlign: "center",
-    backgroundColor: "#2E294E",
-    marginTop: 30,
-    marginBottom: 20,
-    width: 100,
-    height: 38,
+    // backgroundColor: "#2E294E",
+    // marginTop: 30,
+    // marginBottom: 20,
+    // width: 100,
+    // height: 38,
   },
   formcontainer: {
     width: width * 0.64,
@@ -378,6 +380,19 @@ const RegFormStyle = StyleSheet.create({
     marginBottom: -5,
     justifyContent: "center",
     alignItems: "center",
+  },
+  button2: {
+    width: 110,
+    height: 34,
+    borderRadius: 30,
+    backgroundColor: "#2E294E",
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  buttonText2: {
+    color: "#fff",
+    fontWeight: "700",
   },
 });
 

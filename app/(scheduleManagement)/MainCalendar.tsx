@@ -132,10 +132,15 @@ export default function MainCalendar() {
             <View style={styles.modalContent}>
               <View style={styles.modalInner}>
                 <ScheduleRegister />
-                <Button
-                  title="등록하기"
-                  onPress={() => setModalVisible(false)}
-                />
+                <View style={styles.buttonContainer}>
+            <TouchableOpacity
+              activeOpacity={0.8}
+              style={styles.button2}
+              onPress={() => setModalVisible(false)}
+            >
+              <Text style={styles.buttonText}>등록하기</Text>
+            </TouchableOpacity>
+          </View>
               </View>
             </View>
           </Modal>
@@ -185,5 +190,22 @@ const styles = StyleSheet.create({
     borderTopLeftRadius: 20,
     borderTopRightRadius: 20,
     padding: 20,
+  },
+  buttonContainer: {
+    alignSelf: "flex-end",
+    marginRight: "4%",
+  },
+  button2: {
+    width: 110,
+    height: 34,
+    borderRadius: 30,
+    backgroundColor: "#2E294E",
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  buttonText: {
+    color: "#fff",
+    fontWeight: "700",
   },
 });

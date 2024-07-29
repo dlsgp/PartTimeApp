@@ -402,9 +402,11 @@ const styles = StyleSheet.create({
     alignItems: "center",
     width: width * 0.8,
     height: height * 0.055,
+    justifyContent: 'center',
   },
   signupButtonText: {
     color: "#fff",
+    fontSize: 16,
   },
   modalContainer: {
     flex: 1,

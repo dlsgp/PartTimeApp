@@ -6,6 +6,8 @@ import {
   KeyboardAvoidingView,
   Platform,
   StyleSheet,
+  Text,
+  TouchableOpacity,
   View,
 } from "react-native";
 import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
@@ -77,11 +79,18 @@ const Mypage = () => {
                 theme={{ colors: { background: "white" } }}
               />
               <View style={RegFormStyle.buttonD}>
-                <Button
+                {/* <Button
                   color={"#ffffff"}
                   title="수정하기"
                   onPress={() => router.push("/FormBox")}
-                />
+                /> */}
+                <TouchableOpacity
+              activeOpacity={0.8}
+              style={RegFormStyle.button2}
+              onPress={() => router.push("/FormBox")}
+            >
+              <Text style={RegFormStyle.buttonText}>수정하기</Text>
+            </TouchableOpacity>
               </View>
 
               <TextInput
@@ -201,6 +210,19 @@ const RegFormStyle = StyleSheet.create({
     height: 26,
     marginVertical: "4%",
     marginRight: "4%",
+  },
+  button2: {
+    width: 110,
+    height: 34,
+    borderRadius: 30,
+    backgroundColor: "#2E294E",
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  buttonText: {
+    color: "#fff",
+    fontWeight: "700",
   },
 });
 

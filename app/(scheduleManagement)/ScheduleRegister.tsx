@@ -1,9 +1,8 @@
 import { FontAwesome } from "@expo/vector-icons";
 import { StatusBar } from "expo-status-bar";
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 import {
-  Button,
-  FlatList,
+  Platform,
   SafeAreaView,
   StyleSheet,
   Text,
@@ -15,7 +14,6 @@ import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view
 import DateTimePicker from "@react-native-community/datetimepicker";
 import { TextInput } from "react-native";
 import { Checkbox } from "react-native-paper";
-import { router } from "expo-router";
 
 const ScheduleRegister = () => {
   const [open, setOpen] = useState(false);
@@ -39,56 +37,56 @@ const ScheduleRegister = () => {
   const [startTimeTwo, setStartTimeTwo] = useState(new Date());
   const [endTime, setEndTime] = useState(new Date());
   const [endTimeTwo, setEndTimeTwo] = useState(new Date());
-  const [showStart, setShowStart] = useState(true);
-  const [showEnd, setShowEnd] = useState(true);
-  const [showStartTime, setShowStartTime] = useState(true);
-  const [showEndTime, setShowEndTime] = useState(true);
-  const [showStartTimeTwo, setShowStartTimeTwo] = useState(true);
-  const [showEndTimeTwo, setShowEndTimeTwo] = useState(true);
+  const [showStart, setShowStart] = useState(false);
+  const [showEnd, setShowEnd] = useState(false);
+  const [showStartTime, setShowStartTime] = useState(false);
+  const [showEndTime, setShowEndTime] = useState(false);
+  const [showStartTimeTwo, setShowStartTimeTwo] = useState(false);
+  const [showEndTimeTwo, setShowEndTimeTwo] = useState(false);
 
   const onChangeStart = (event, selectedDate) => {
     const currentDate = selectedDate || startDate;
-    setShowStart(true);
+    setShowStart(Platform.OS === 'ios');
     setStartDate(currentDate);
   };
 
   const onChangeEnd = (event, selectedDate) => {
     const currentDate = selectedDate || endDate;
-    setShowEnd(true);
+    setShowEnd(Platform.OS === 'ios');
     setEndDate(currentDate);
   };
 
   const onChangeStartTime = (event, selectedDate) => {
-    const currentDate = selectedDate || startDate;
-    setShowStartTime(true);
+    const currentDate = selectedDate || startTime;
+    setShowStartTime(Platform.OS === 'ios');
     setStartTime(currentDate);
   };
 
   const onChangeEndTime = (event, selectedDate) => {
-    const currentDate = selectedDate || endDate;
-    setShowEndTime(true);
+    const currentDate = selectedDate || endTime;
+    setShowEndTime(Platform.OS === 'ios');
     setEndTime(currentDate);
   };
 
   const onChangeStartTimeTwo = (event, selectedDate) => {
-    const currentDate = selectedDate || startDate;
-    setShowStartTimeTwo(true);
+    const currentDate = selectedDate || startTimeTwo;
+    setShowStartTimeTwo(Platform.OS === 'ios');
     setStartTimeTwo(currentDate);
   };
 
   const onChangeEndTimeTwo = (event, selectedDate) => {
-    const currentDate = selectedDate || endDate;
-    setShowEndTimeTwo(true);
+    const currentDate = selectedDate || endTimeTwo;
+    setShowEndTimeTwo(Platform.OS === 'ios');
     setEndTimeTwo(currentDate);
   };
 
   //
 
-  const [text, onChangeText] = React.useState("메모");
-  const [checked1, setChecked1] = React.useState(false);
-  const [checked2, setChecked2] = React.useState(false);
+  const [text, onChangeText] = useState("메모");
+  const [checked1, setChecked1] = useState(false);
+  const [checked2, setChecked2] = useState(false);
 
-  const [boxColor, setBoxColor] = React.useState("#FFBD00");
+  const [boxColor, setBoxColor] = useState("#FFBD00");
 
   const colors = [
     "#2080d8",
@@ -108,7 +106,10 @@ const ScheduleRegister = () => {
   return (
     <View style={styles.mainContainer}>
       <StatusBar />
-      <KeyboardAwareScrollView nestedScrollEnabled={true}>
+      <KeyboardAwareScrollView
+        nestedScrollEnabled={true}
+        showsVerticalScrollIndicator={false}
+      >
         <View style={styles.container}>
           <View style={styles.textContainer}>
             <View>
@@ -158,17 +159,27 @@ const ScheduleRegister = () => {
 
               <View style={styles.textContainer}>
                 <View>
-                  {/* <Text
-                    style={[styles.title, { marginLeft: "10%", marginVertical: 8 }]}
-                  >
-                    근무시작
-                  </Text> */}
-                  {showStart && (
+                  {Platform.OS === 'ios' ? (
                     <DateTimePicker
                       testID="dateTimePicker"
                       value={startDate}
                       mode="date"
                       is24Hour={true}
+                      onChange={onChangeStart}
+                      locale="ko"
+                    />
+                  ) : (
+                    <TouchableOpacity onPress={() => setShowStart(true)}>
+                      <Text>{startDate.toDateString()}</Text>
+                    </TouchableOpacity>
+                  )}
+                  {showStart && Platform.OS === 'android' && (
+                    <DateTimePicker
+                      testID="dateTimePicker"
+                      value={startDate}
+                      mode="date"
+                      is24Hour={true}
+                      display="default"
                       onChange={onChangeStart}
                       locale="ko"
                     />
@@ -180,20 +191,27 @@ const ScheduleRegister = () => {
                   <Text style={styles.dateText}>-</Text>
                 </View>
                 <View style={{ flex: 1, alignItems: "flex-start" }}>
-                  {/* <Text
-                    style={[
-                      styles.title,
-                      { marginLeft: "10%", marginVertical: 8 },
-                    ]}
-                  >
-                    근무끝
-                  </Text> */}
-                  {showEnd && (
+                  {Platform.OS === 'ios' ? (
                     <DateTimePicker
                       testID="dateTimePicker"
                       value={endDate}
                       mode="date"
                       is24Hour={true}
+                      onChange={onChangeEnd}
+                      locale="ko"
+                    />
+                  ) : (
+                    <TouchableOpacity onPress={() => setShowEnd(true)}>
+                      <Text>{endDate.toDateString()}</Text>
+                    </TouchableOpacity>
+                  )}
+                  {showEnd && Platform.OS === 'android' && (
+                    <DateTimePicker
+                      testID="dateTimePicker"
+                      value={endDate}
+                      mode="date"
+                      is24Hour={true}
+                      display="default"
                       onChange={onChangeEnd}
                       locale="ko"
                     />
@@ -219,12 +237,27 @@ const ScheduleRegister = () => {
 
               <View style={styles.textContainer}>
                 <View>
-                  {showStartTime && (
+                  {Platform.OS === 'ios' ? (
                     <DateTimePicker
                       testID="dateTimePicker"
                       value={startTime}
                       mode="time"
                       is24Hour={true}
+                      onChange={onChangeStartTime}
+                      locale="ko"
+                    />
+                  ) : (
+                    <TouchableOpacity onPress={() => setShowStartTime(true)}>
+                      <Text>{startTime.toLocaleTimeString()}</Text>
+                    </TouchableOpacity>
+                  )}
+                  {showStartTime && Platform.OS === 'android' && (
+                    <DateTimePicker
+                      testID="dateTimePicker"
+                      value={startTime}
+                      mode="time"
+                      is24Hour={true}
+                      display="default"
                       onChange={onChangeStartTime}
                       locale="ko"
                     />
@@ -236,7 +269,7 @@ const ScheduleRegister = () => {
                   <Text style={styles.dateText}>-</Text>
                 </View>
                 <View style={{ flex: 1, alignItems: "flex-start" }}>
-                  {showEndTime && (
+                  {Platform.OS === 'ios' ? (
                     <DateTimePicker
                       testID="dateTimePicker"
                       value={endTime}
@@ -245,11 +278,24 @@ const ScheduleRegister = () => {
                       onChange={onChangeEndTime}
                       locale="ko"
                     />
+                  ) : (
+                    <TouchableOpacity onPress={() => setShowEndTime(true)}>
+                      <Text>{endTime.toLocaleTimeString()}</Text>
+                    </TouchableOpacity>
+                  )}
+                  {showEndTime && Platform.OS === 'android' && (
+                    <DateTimePicker
+                      testID="dateTimePicker"
+                      value={endTime}
+                      mode="time"
+                      is24Hour={true}
+                      display="default"
+                      onChange={onChangeEndTime}
+                      locale="ko"
+                    />
                   )}
                 </View>
               </View>
-
-              <View></View>
             </View>
 
             <View style={{ flex: 1, alignItems: "flex-start" }}>
@@ -264,12 +310,27 @@ const ScheduleRegister = () => {
 
               <View style={styles.textContainer}>
                 <View>
-                  {showStartTimeTwo && (
+                  {Platform.OS === 'ios' ? (
                     <DateTimePicker
                       testID="dateTimePicker"
                       value={startTimeTwo}
                       mode="time"
                       is24Hour={true}
+                      onChange={onChangeStartTimeTwo}
+                      locale="ko"
+                    />
+                  ) : (
+                    <TouchableOpacity onPress={() => setShowStartTimeTwo(true)}>
+                      <Text>{startTimeTwo.toLocaleTimeString()}</Text>
+                    </TouchableOpacity>
+                  )}
+                  {showStartTimeTwo && Platform.OS === 'android' && (
+                    <DateTimePicker
+                      testID="dateTimePicker"
+                      value={startTimeTwo}
+                      mode="time"
+                      is24Hour={true}
+                      display="default"
                       onChange={onChangeStartTimeTwo}
                       locale="ko"
                     />
@@ -281,12 +342,27 @@ const ScheduleRegister = () => {
                   <Text style={styles.dateText}>-</Text>
                 </View>
                 <View style={{ flex: 1, alignItems: "flex-start" }}>
-                  {showEndTimeTwo && (
+                  {Platform.OS === 'ios' ? (
                     <DateTimePicker
                       testID="dateTimePicker"
                       value={endTimeTwo}
                       mode="time"
                       is24Hour={true}
+                      onChange={onChangeEndTimeTwo}
+                      locale="ko"
+                    />
+                  ) : (
+                    <TouchableOpacity onPress={() => setShowEndTimeTwo(true)}>
+                      <Text>{endTimeTwo.toLocaleTimeString()}</Text>
+                    </TouchableOpacity>
+                  )}
+                  {showEndTimeTwo && Platform.OS === 'android' && (
+                    <DateTimePicker
+                      testID="dateTimePicker"
+                      value={endTimeTwo}
+                      mode="time"
+                      is24Hour={true}
+                      display="default"
                       onChange={onChangeEndTimeTwo}
                       locale="ko"
                     />
@@ -296,29 +372,40 @@ const ScheduleRegister = () => {
             </View>
 
             <View style={[styles.textContainer, { marginTop: "6%" }]}>
-              <Text
-                style={[
-                  styles.title,
-                  { marginLeft: 6, marginBottom: 6, marginTop: "4%" },
-                ]}
+              <TouchableOpacity
+                onPress={() => {
+                  setChecked1(!checked1);
+                }}
               >
-                야간
-              </Text>
+                <Text
+                  style={[
+                    styles.title,
+                    { marginLeft: 6, marginBottom: 6, marginTop: "4%" },
+                  ]}
+                >
+                  야간
+                </Text>
+              </TouchableOpacity>
               <Checkbox
                 status={checked1 ? "checked" : "unchecked"}
                 onPress={() => {
                   setChecked1(!checked1);
                 }}
               />
-
-              <Text
-                style={[
-                  styles.title,
-                  { marginLeft: 6, marginBottom: 6, marginTop: "4%" },
-                ]}
+              <TouchableOpacity
+                onPress={() => {
+                  setChecked2(!checked2);
+                }}
               >
-                연장
-              </Text>
+                <Text
+                  style={[
+                    styles.title,
+                    { marginLeft: 6, marginBottom: 6, marginTop: "4%" },
+                  ]}
+                >
+                  연장
+                </Text>
+              </TouchableOpacity>
               <Checkbox
                 status={checked2 ? "checked" : "unchecked"}
                 onPress={() => {
@@ -356,7 +443,7 @@ const ScheduleRegister = () => {
           </View>
         </View>
 
-        <View style={styles.buttonContainer}>
+        {/* <View style={styles.buttonContainer}>
           <TouchableOpacity
             activeOpacity={0.8}
             style={[
@@ -369,9 +456,8 @@ const ScheduleRegister = () => {
             ]}
           >
             <Text style={styles.buttonText}>등록하기</Text>
-            
           </TouchableOpacity>
-        </View>
+        </View> */}
       </KeyboardAwareScrollView>
     </View>
   );
@@ -381,7 +467,7 @@ const styles = StyleSheet.create({
   mainContainer: {
     backgroundColor: "white",
     width: "100%",
-    height: "100%",
+    height: "95%",
   },
   container: {
     flex: 1,
@@ -390,6 +476,7 @@ const styles = StyleSheet.create({
   },
   textContainer: {
     flexDirection: "row",
+    alignItems: "center",
   },
   dateText: {
     fontSize: 30,
@@ -430,37 +517,10 @@ const styles = StyleSheet.create({
     zIndex: 1000,
   },
   containerTwo: {
-    // backgroundColor: "rgba(0, 0, 0, 0.1)",
     borderRadius: 30,
     paddingBottom: "10%",
     zIndex: -100,
   },
-  TextIconE: {
-    flexDirection: "row",
-    alignItems: "center",
-    width: "48%",
-  },
-  formcontainerIcon: {
-    width: "100%",
-    paddingRight: 40,
-  },
-  calendarButton: {
-    position: "absolute",
-    left: 130,
-    justifyContent: "center",
-    alignItems: "center",
-  },
-  checkContainer: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-  },
-  day: {
-    marginHorizontal: "4%",
-  },
-  checkDay: {
-    marginHorizontal: 4,
-  },
-
   input: {
     height: 60,
     width: 200,
@@ -479,6 +539,9 @@ const styles = StyleSheet.create({
     height: 34,
     borderRadius: 30,
     backgroundColor: "#2E294E",
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "center",
   },
   buttonText: {
     color: "#fff",

@@ -195,6 +195,7 @@ const styles = StyleSheet.create({
     height: 30,
     borderRadius: 5,
     marginRight: 20,
+    justifyContent: 'center',
   },
   button2: {
     backgroundColor: "#ccc",
@@ -202,6 +203,7 @@ const styles = StyleSheet.create({
     width: 50,
     height: 30,
     borderRadius: 5,
+    justifyContent: 'center',
   },
   buttonText: {
     fontSize: 15,
@@ -237,6 +239,7 @@ const styles = StyleSheet.create({
     borderRadius: 5,
     width: "45%",
     alignItems: "center",
+    
   },
   modalButtonText: {
     color: "#fff",

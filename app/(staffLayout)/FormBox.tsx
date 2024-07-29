@@ -104,6 +104,7 @@ function FormBox() {
           <Text style={FormBoxStyle.mobileText2}>2024.07.10 입사</Text>
           <Text style={FormBoxStyle.mobileText3}>~ 2024.10.09</Text>
         </View>
+
         <View style={FormBoxStyle.iconText}>
           <View
             style={{
@@ -134,7 +135,13 @@ function FormBox() {
                 }}
               />
             ) : (
-              <Text>{text1 ?? ""}</Text>
+              <TouchableOpacity
+                onPress={() => {
+                  setChecked1(!checked1);
+                }}
+              >
+                <Text>{text1 ?? ""}</Text>
+              </TouchableOpacity>
             )}
             <View style={FormBoxStyle.mobileIconStyle}>
               {isEditing1 ? (
@@ -183,7 +190,13 @@ function FormBox() {
                 }}
               />
             ) : (
-              <Text>{text2 ?? ""}</Text>
+              <TouchableOpacity
+                onPress={() => {
+                  setChecked2(!checked2);
+                }}
+              >
+                <Text>{text2 ?? ""}</Text>
+              </TouchableOpacity>
             )}
             <View style={FormBoxStyle.mobileIconStyle}>
               {isEditing2 ? (
@@ -231,7 +244,13 @@ function FormBox() {
                 }}
               />
             ) : (
-              <Text>{text3 ?? ""}</Text>
+              <TouchableOpacity
+                onPress={() => {
+                  setChecked3(!checked3);
+                }}
+              >
+                <Text>{text3 ?? ""}</Text>
+              </TouchableOpacity>
             )}
             <View style={FormBoxStyle.mobileIconStyle}>
               {isEditing3 ? (
@@ -298,11 +317,10 @@ const FormBoxStyle = StyleSheet.create({
   },
 
   mobileCheckbox1: {
-    marginLeft: "16%",
-    paddingRight: "12%",
+    // marginLeft: "16%",
+    paddingRight: "5%",
     textAlign: "center",
     fontSize: 14,
-    
   },
   mobilePhoto: {
     marginTop: "12%",
@@ -312,8 +330,9 @@ const FormBoxStyle = StyleSheet.create({
   },
   iconText: {
     display: "flex",
-    justifyContent: "space-between",
-    marginBottom: "10%",
+    justifyContent: "center",
+    marginBottom: "11%",
+    alignItems: "center",
   },
   mobileText: {
     fontSize: 18, //-6

@@ -5,6 +5,7 @@ import React, { useState } from "react";
 import { Platform, StyleSheet, Text, View } from "react-native";
 import { Checkbox, TextInput } from "react-native-paper";
 import DropDownPicker from "react-native-dropdown-picker";
+import { Stack } from "expo-router";
 
 export default function SalaryForm() {
   const [name, setName] = React.useState("");
@@ -26,7 +27,7 @@ export default function SalaryForm() {
   ]);
 
   return (
-    <View style={styles.container}>
+    <View style={[styles.container, ]}>
       <StatusBar style={Platform.OS === "ios" ? "light" : "auto"} />
       <View style={styles.subContainer}>
         <View style={styles.barContainer}>
