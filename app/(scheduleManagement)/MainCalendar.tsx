@@ -3,14 +3,18 @@ import { useState } from "react";
 import { format } from "date-fns";
 import {
   Dimensions,
+  Modal,
   ScrollView,
   StyleSheet,
+  Text,
+  TextInput,
   TouchableOpacity,
   View,
 } from "react-native";
 import { Calendar, LocaleConfig } from "react-native-calendars";
 import { FontAwesome6 } from "@expo/vector-icons";
 import { router } from "expo-router";
+import ScheduleRegister from "./ScheduleRegister";
 
 LocaleConfig.locales["fr"] = {
   monthNames: [
@@ -87,6 +91,8 @@ export default function MainCalendar() {
     },
   };
 
+  const [modalVisible, setModalVisible] = useState(false);
+
   return (
     <View style={styles.container}>
       <StatusBar />
@@ -94,7 +100,7 @@ export default function MainCalendar() {
         <View style={styles.buttonCalendar}>
           <TouchableOpacity
             activeOpacity={0.8}
-            onPress={() => router.push("/ScheduleRegister")}
+            onPress={() => setModalVisible(true)}
             style={styles.button}
           >
             <FontAwesome6 name="plus" size={18} color="#FFBD00" />
@@ -113,25 +119,18 @@ export default function MainCalendar() {
             onDayPress={(day) => {
               setSelectedDate(day.dateString);
             }}
-            // current={"2024-07-25"}
-            // onDayPress={(day) => {
-            //   console.log("selected day", day);
-            // }}
-
-            // markedDates={{
-            //   "2024-07-01": {
-            //     selected: true,
-            //     marked: true,
-            //     selectedColor: "#2E294E",
-            //   },
-            //   "2024-08-10": { marked: true },
-            //   "2024-08-16": {
-            //     selected: true,
-            //     marked: true,
-            //     selectedColor: "#2E294E",
-            //   },
-            // }}
           />
+          <Modal
+            animationType="slide"
+            visible={modalVisible}
+            onRequestClose={() => setModalVisible(false)}
+          >
+            <View style={styles.modalContent}>
+              <View style={styles.modalInner}>
+                <ScheduleRegister />
+              </View>
+            </View>
+          </Modal>
         </View>
       </ScrollView>
     </View>
@@ -165,5 +164,18 @@ const styles = StyleSheet.create({
     padding: 10,
     borderRadius: 5,
     marginRight: "4%",
+  },
+
+  modalContent: {
+    flex: 1,
+    justifyContent: "flex-end",
+    backgroundColor: "rgba(0, 0, 0, 0.5)",
+    paddingTop: 70,
+  },
+  modalInner: {
+    backgroundColor: "white",
+    borderTopLeftRadius: 20,
+    borderTopRightRadius: 20,
+    padding: 20,
   },
 });

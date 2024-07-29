@@ -170,6 +170,7 @@ const ScheduleRegister = () => {
                       mode="date"
                       is24Hour={true}
                       onChange={onChangeStart}
+                      locale="ko"
                     />
                   )}
                 </View>
@@ -194,6 +195,7 @@ const ScheduleRegister = () => {
                       mode="date"
                       is24Hour={true}
                       onChange={onChangeEnd}
+                      locale="ko"
                     />
                   )}
                 </View>
@@ -224,6 +226,7 @@ const ScheduleRegister = () => {
                       mode="time"
                       is24Hour={true}
                       onChange={onChangeStartTime}
+                      locale="ko"
                     />
                   )}
                 </View>
@@ -240,6 +243,7 @@ const ScheduleRegister = () => {
                       mode="time"
                       is24Hour={true}
                       onChange={onChangeEndTime}
+                      locale="ko"
                     />
                   )}
                 </View>
@@ -267,6 +271,7 @@ const ScheduleRegister = () => {
                       mode="time"
                       is24Hour={true}
                       onChange={onChangeStartTimeTwo}
+                      locale="ko"
                     />
                   )}
                 </View>
@@ -283,6 +288,7 @@ const ScheduleRegister = () => {
                       mode="time"
                       is24Hour={true}
                       onChange={onChangeEndTimeTwo}
+                      locale="ko"
                     />
                   )}
                 </View>
@@ -420,11 +426,11 @@ const styles = StyleSheet.create({
     },
     shadowOpacity: 0.2,
     borderColor: "none",
-    width: "80%",
+    width: "78%",
     zIndex: 1000,
   },
   containerTwo: {
-    backgroundColor: "#f7f7f7",
+    // backgroundColor: "rgba(0, 0, 0, 0.1)",
     borderRadius: 30,
     paddingBottom: "10%",
     zIndex: -100,
