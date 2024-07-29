@@ -30,8 +30,10 @@ const PersonalSignUpApp: React.FC = () => {
   const [checked2, setChecked2] = useState(false);
   const [modalVisible, setModalVisible] = useState(false);
   const [modalContent, setModalContent] = useState<React.ReactNode>(null);
-  const [duplicationCheck, setDuplicationCheck] = useState(false);
+  const [duplicationCheck1, setDuplicationCheck1] = useState(false);
+  const [duplicationCheck2, setDuplicationCheck2] = useState(false);
   const [currentCheckbox, setCurrentCheckbox] = useState<number | null>(null);
+  const [tel , setTel] = useState("");
 
   const handleCheckbox0Press = () => {
     if (checked1 && checked2) {
@@ -98,10 +100,13 @@ const PersonalSignUpApp: React.FC = () => {
     if (!birthdate) newErrors.birthdate = "필수 입력 항목입니다.";
     if (!address) newErrors.address = "필수 입력 항목입니다.";
     if (!email) newErrors.email = "필수 입력 항목입니다.";
+    if (!tel) newErrors.tel = "필수 입력 항목입니다.";
     if (!checked1) newErrors.checked1 = "필수 체크 항목입니다.";
     if (!checked2) newErrors.checked2 = "필수 체크 항목입니다.";
-    if (!duplicationCheck)
-      newErrors.duplicationCheck = "중복 확인은 필수입니다.";
+    if (!duplicationCheck1)
+      newErrors.duplicationCheck1 = "중복 확인은 필수입니다.";
+    if (!duplicationCheck2)
+      newErrors.duplicationCheck2 = "중복 확인은 필수입니다.";
     setErrors(newErrors);
 
     if (Object.keys(newErrors).length === 0) {
@@ -110,15 +115,27 @@ const PersonalSignUpApp: React.FC = () => {
     }
   };
 
-  const handleDuplicationCheck = () => {
+  const handleDuplicationCheck1 = () => {
     if (username.trim() === "") {
       setErrors((prev: any) => ({
         ...prev,
-        duplicationCheck: "아이디를 입력하세요.",
+        duplicationCheck1: "아이디를 입력하세요.",
       }));
     } else {
-      setDuplicationCheck(true);
-      setErrors((prev: any) => ({ ...prev, duplicationCheck: null }));
+      setDuplicationCheck1(true);
+      setErrors((prev: any) => ({ ...prev, duplicationCheck1: null }));
+    }
+  };
+
+  const handleDuplicationCheck2 = () => {
+    if (email.trim() === "") {
+      setErrors((prev: any) => ({
+        ...prev,
+        duplicationCheck2: "이메일을 입력하세요.",
+      }));
+    } else {
+      setDuplicationCheck2(true);
+      setErrors((prev: any) => ({ ...prev, duplicationCheck2: null }));
     }
   };
 
@@ -131,7 +148,7 @@ const PersonalSignUpApp: React.FC = () => {
           <TextInput
             style={[
               styles.idinput,
-              (errors.username || errors.duplicationCheck) && styles.errorInput,
+              (errors.username || errors.duplicationCheck1) && styles.errorInput,
             ]}
             placeholder="아이디"
             placeholderTextColor="#aaa"
@@ -142,7 +159,7 @@ const PersonalSignUpApp: React.FC = () => {
                 setErrors((prev: any) => ({
                   ...prev,
                   username: null,
-                  duplicationCheck: null,
+                  duplicationCheck1: null,
                 }));
               }
             }}
@@ -150,10 +167,10 @@ const PersonalSignUpApp: React.FC = () => {
           <View
             style={[
               styles.duplicationcheck,
-              errors.duplicationCheck && styles.errorInput,
+              errors.duplicationCheck1 && styles.errorInput,
             ]}
           >
-            <TouchableOpacity onPress={handleDuplicationCheck}>
+            <TouchableOpacity onPress={handleDuplicationCheck1}>
               <Text style={styles.checkButton}>중복확인</Text>
             </TouchableOpacity>
           </View>
@@ -161,8 +178,8 @@ const PersonalSignUpApp: React.FC = () => {
         {errors.username && (
           <Text style={styles.errorText}>{errors.username}</Text>
         )}
-        {errors.duplicationCheck && (
-          <Text style={styles.errorText}>{errors.duplicationCheck}</Text>
+        {errors.duplicationCheck1 && (
+          <Text style={styles.errorText}>{errors.duplicationCheck1}</Text>
         )}
 
         <TextInput
@@ -246,18 +263,56 @@ const PersonalSignUpApp: React.FC = () => {
         )}
 
         <TextInput
-          style={[styles.input, errors.email && styles.errorInput]}
-          placeholder="이메일"
+          style={[styles.input, errors.tel && styles.errorInput]}
+          placeholder="전화번호"
           placeholderTextColor="#aaa"
-          value={email}
+          value={tel}
           onChangeText={(text) => {
-            setEmail(text);
+            setTel(text);
             if (text.trim() !== "") {
-              setErrors((prev: any) => ({ ...prev, email: null }));
+              setErrors((prev: any) => ({ ...prev, tel: null }));
             }
           }}
         />
-        {errors.email && <Text style={styles.errorText}>{errors.email}</Text>}
+        {errors.tel && <Text style={styles.errorText}>{errors.tel}</Text>}
+
+        <View style={styles.id}>
+          <TextInput
+            style={[
+              styles.idinput,
+              (errors.email || errors.duplicationCheck2) && styles.errorInput,
+            ]}
+            placeholder="이메일"
+            placeholderTextColor="#aaa"
+            value={email}
+            onChangeText={(text) => {
+              setEmail(text);
+              if (text.trim() !== "") {
+                setErrors((prev: any) => ({
+                  ...prev,
+                  email: null,
+                  duplicationCheck2: null,
+                }));
+              }
+            }}
+          />
+          <View
+            style={[
+              styles.duplicationcheck,
+              errors.duplicationCheck2 && styles.errorInput,
+            ]}
+          >
+            <TouchableOpacity onPress={handleDuplicationCheck2}>
+              <Text style={styles.checkButton}>중복확인</Text>
+            </TouchableOpacity>
+          </View>
+        </View>
+        {errors.email && (
+          <Text style={styles.errorText}>{errors.email}</Text>
+        )}
+        {errors.duplicationCheck2 && (
+          <Text style={styles.errorText}>{errors.duplicationCheck2}</Text>
+        )}
 
         <View style={styles.term}>
           <View style={styles.checkboxContainer}>
@@ -365,6 +420,7 @@ const styles = StyleSheet.create({
     marginBottom: 10,
     paddingHorizontal: 10,
     width: width * 0.2,
+    justifyContent: 'center',
   },
   input: {
     borderColor: "#ccc",
@@ -377,7 +433,6 @@ const styles = StyleSheet.create({
   checkButton: {
     color: "#f0a500",
     alignSelf: "flex-end",
-    marginTop: 10,
   },
   checkboxContainer: {
     flexDirection: "row",
