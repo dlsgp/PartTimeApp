@@ -24,7 +24,6 @@ function PersonList() {
 
   const showModal = () => setVisible(true);
   const hideModal = () => setVisible(false);
-  const containerStyle = { backgroundColor: "white", padding: 20 };
 
   const [showForm1, setShowForm1] = useState(false);
 
@@ -33,7 +32,10 @@ function PersonList() {
   }
 
   return (
-    <ScrollView style={style.viewContainer} showsVerticalScrollIndicator={false}>
+    <ScrollView
+      style={style.viewContainer}
+      showsVerticalScrollIndicator={false}
+    >
       <View style={style.mainContainer}>
         <Searchbar
           placeholder="Search"
@@ -43,7 +45,10 @@ function PersonList() {
         />
         <View style={style.container}>
           <View style={style.image}>
-            <TouchableOpacity activeOpacity={0.8} onPress={modalSalaryForm1}>
+            <TouchableOpacity
+              activeOpacity={0.8}
+              onPress={() => router.push("/SalaryForm")}
+            >
               <Avatar.Image
                 size={120}
                 source={require("../../assets/images/profile.jpg")}
@@ -55,10 +60,15 @@ function PersonList() {
           </View>
 
           <View style={style.image}>
-            <Avatar.Image
-              size={120}
-              source={require("../../assets/images/profile.jpg")}
-            />
+            <TouchableOpacity
+              activeOpacity={0.8}
+              onPress={() => router.push("/SalaryForm")}
+            >
+              <Avatar.Image
+                size={120}
+                source={require("../../assets/images/profile.jpg")}
+              />
+            </TouchableOpacity>
             <View style={style.textContainer}>
               <Text style={style.text}>박미리</Text>
             </View>
@@ -67,20 +77,30 @@ function PersonList() {
 
         <View style={style.container}>
           <View style={style.image}>
-            <Avatar.Image
-              size={120}
-              source={require("../../assets/images/profile.jpg")}
-            />
+            <TouchableOpacity
+              activeOpacity={0.8}
+              onPress={() => router.push("/SalaryForm")}
+            >
+              <Avatar.Image
+                size={120}
+                source={require("../../assets/images/profile.jpg")}
+              />
+            </TouchableOpacity>
             <View style={style.textContainer}>
               <Text style={style.text}>이진리</Text>
             </View>
           </View>
 
           <View style={style.image}>
-            <Avatar.Image
-              size={120}
-              source={require("../../assets/images/profile.jpg")}
-            />
+            <TouchableOpacity
+              activeOpacity={0.8}
+              onPress={() => router.push("/SalaryForm")}
+            >
+              <Avatar.Image
+                size={120}
+                source={require("../../assets/images/profile.jpg")}
+              />
+            </TouchableOpacity>
             <View style={style.textContainer}>
               <Text style={style.text}>나시리</Text>
             </View>
@@ -89,20 +109,30 @@ function PersonList() {
 
         <View style={style.container}>
           <View style={style.image}>
-            <Avatar.Image
-              size={120}
-              source={require("../../assets/images/profile.jpg")}
-            />
+            <TouchableOpacity
+              activeOpacity={0.8}
+              onPress={() => router.push("/SalaryForm")}
+            >
+              <Avatar.Image
+                size={120}
+                source={require("../../assets/images/profile.jpg")}
+              />
+            </TouchableOpacity>
             <View style={style.textContainer}>
               <Text style={style.text}>주피리</Text>
             </View>
           </View>
 
           <View style={style.image}>
-            <Avatar.Image
-              size={120}
-              source={require("../../assets/images/profile.jpg")}
-            />
+            <TouchableOpacity
+              activeOpacity={0.8}
+              onPress={() => router.push("/SalaryForm")}
+            >
+              <Avatar.Image
+                size={120}
+                source={require("../../assets/images/profile.jpg")}
+              />
+            </TouchableOpacity>
             <View style={style.textContainer}>
               <Text style={style.text}>홍길동</Text>
             </View>
@@ -111,20 +141,30 @@ function PersonList() {
 
         <View style={style.container}>
           <View style={style.image}>
-            <Avatar.Image
-              size={120}
-              source={require("../../assets/images/profile.jpg")}
-            />
+            <TouchableOpacity
+              activeOpacity={0.8}
+              onPress={() => router.push("/SalaryForm")}
+            >
+              <Avatar.Image
+                size={120}
+                source={require("../../assets/images/profile.jpg")}
+              />
+            </TouchableOpacity>
             <View style={style.textContainer}>
               <Text style={style.text}>김철수</Text>
             </View>
           </View>
 
           <View style={style.image}>
-            <Avatar.Image
-              size={120}
-              source={require("../../assets/images/profile.jpg")}
-            />
+            <TouchableOpacity
+              activeOpacity={0.8}
+              onPress={() => router.push("/SalaryForm")}
+            >
+              <Avatar.Image
+                size={120}
+                source={require("../../assets/images/profile.jpg")}
+              />
+            </TouchableOpacity>
             <View style={style.textContainer}>
               <Text style={style.text}>박시연</Text>
             </View>
@@ -133,36 +173,36 @@ function PersonList() {
 
         <View style={style.container}>
           <View style={style.image}>
-            <Avatar.Image
-              size={120}
-              source={require("../../assets/images/profile.jpg")}
-            />
+            <TouchableOpacity
+              activeOpacity={0.8}
+              onPress={() => router.push("/SalaryForm")}
+            >
+              <Avatar.Image
+                size={120}
+                source={require("../../assets/images/profile.jpg")}
+              />
+            </TouchableOpacity>
             <View style={style.textContainer}>
               <Text style={style.text}>김영희</Text>
             </View>
           </View>
 
           <View style={style.image}>
-            <Avatar.Image
-              size={120}
-              source={require("../../assets/images/profile.jpg")}
-            />
+            <TouchableOpacity
+              activeOpacity={0.8}
+              onPress={() => router.push("/SalaryForm")}
+            >
+              <Avatar.Image
+                size={120}
+                source={require("../../assets/images/profile.jpg")}
+              />
+            </TouchableOpacity>
             <View style={style.textContainer}>
               <Text style={style.text}>김홍구</Text>
             </View>
           </View>
         </View>
       </View>
-      {/* <PaperProvider>
-      <Portal>
-        <Modal visible={visible} onDismiss={hideModal} contentContainerStyle={containerStyle}>
-          <Text>Example Modal.  Click outside this area to dismiss.</Text>
-        </Modal>
-      </Portal>
-      <Button style={{marginTop: 30}} onPress={showModal}>
-        Show
-      </Button>
-    </PaperProvider> */}
     </ScrollView>
   );
 }
@@ -201,6 +241,13 @@ const style = StyleSheet.create({
   text: {
     fontWeight: "700",
     fontSize: 20,
+  },
+  modalContainer: {
+    backgroundColor: "white",
+    flex: 1,
+    padding: 20,
+    margin: 20,
+    borderRadius: 10,
   },
 });
 

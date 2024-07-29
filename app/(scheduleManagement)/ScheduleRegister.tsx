@@ -367,9 +367,9 @@ const ScheduleRegister = () => {
                 justifyContent: "center",
               },
             ]}
-            onPress={() => router.push("/MainCalendar")}
           >
             <Text style={styles.buttonText}>등록하기</Text>
+            
           </TouchableOpacity>
         </View>
       </KeyboardAwareScrollView>

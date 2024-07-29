@@ -2,6 +2,7 @@ import { StatusBar } from "expo-status-bar";
 import { useState } from "react";
 import { format } from "date-fns";
 import {
+  Button,
   Dimensions,
   Modal,
   ScrollView,
@@ -92,6 +93,8 @@ export default function MainCalendar() {
   };
 
   const [modalVisible, setModalVisible] = useState(false);
+  const [visible, setVisible] = useState(false);
+  const hideModal = () => setVisible(false);
 
   return (
     <View style={styles.container}>
@@ -122,12 +125,17 @@ export default function MainCalendar() {
           />
           <Modal
             animationType="slide"
+            transparent={true}
             visible={modalVisible}
             onRequestClose={() => setModalVisible(false)}
           >
             <View style={styles.modalContent}>
               <View style={styles.modalInner}>
                 <ScheduleRegister />
+                <Button
+                  title="등록하기"
+                  onPress={() => setModalVisible(false)}
+                />
               </View>
             </View>
           </Modal>
