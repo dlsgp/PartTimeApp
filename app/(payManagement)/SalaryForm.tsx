@@ -3,7 +3,7 @@ import { FontAwesome } from "@expo/vector-icons";
 import { StatusBar } from "expo-status-bar";
 import React, { useState } from "react";
 import { Platform, StyleSheet, Text, View } from "react-native";
-import { Checkbox, TextInput } from "react-native-paper";
+import { Checkbox, RadioButton, TextInput } from "react-native-paper";
 import DropDownPicker from "react-native-dropdown-picker";
 import { Stack } from "expo-router";
 
@@ -13,8 +13,7 @@ export default function SalaryForm() {
   const [hourwage, setHourwage] = React.useState("");
   const [bonuswage, setBonuswage] = React.useState("");
   const [etcwage, setEtcwage] = React.useState("");
-  const [checked1, setChecked1] = React.useState(false);
-  const [checked2, setChecked2] = React.useState(false);
+  const [checked, setChecked] = React.useState("first");
 
   const [open, setOpen] = useState(false);
   const [value, setValue] = useState(null);
@@ -27,7 +26,7 @@ export default function SalaryForm() {
   ]);
 
   return (
-    <View style={[styles.container, ]}>
+    <View style={[styles.container]}>
       <StatusBar style={Platform.OS === "ios" ? "light" : "auto"} />
       <View style={styles.subContainer}>
         <View style={styles.barContainer}>
@@ -63,62 +62,64 @@ export default function SalaryForm() {
                 onChangeText={(text) => setHourwage(text)}
                 style={styles.input}
               />
-              <View style={styles.checkContainer}>
-                <Text style={styles.checkText}>4대보험유무</Text>
-                <View
-                  style={{ flexDirection: "row", marginLeft: 16, marginTop: 4 }}
-                >
-                  <View style={styles.answerContainer}>
-                    <Text style={styles.answer}>예</Text>
-                    <Checkbox
-                      status={checked1 ? "checked" : "unchecked"}
-                      onPress={() => {
-                        setChecked1(!checked1);
-                      }}
+              <Text style={styles.checkText}>4대보험유무</Text>
+              <View
+                style={{
+                  display: "flex",
+                  flexDirection: "row",
+                  justifyContent: "flex-start",
+                  alignItems: "center",
+                }}
+              >
+                
+                <View style={styles.radioGroup}>
+                  <View style={styles.radio}>
+                    <Text style={styles.checktext1}>예</Text>
+                    <RadioButton
+                      value="yes"
+                      status={checked === "yes" ? "checked" : "unchecked"}
+                      onPress={() => setChecked("yes")}
                     />
-                  </View>
-                  <View style={styles.answerContainer}>
-                    <Text style={styles.answer}>아니오</Text>
-                    <Checkbox
-                      status={checked2 ? "checked" : "unchecked"}
-                      onPress={() => {
-                        setChecked2(!checked2);
-                      }}
+                    <Text style={styles.checktext1}>아니요</Text>
+                    <RadioButton
+                      value="no"
+                      status={checked === "no" ? "checked" : "unchecked"}
+                      onPress={() => setChecked("no")}
                     />
                   </View>
                 </View>
               </View>
+            </View>
+          </View>
 
-              <TextInput
-                label="주휴수당"
-                value={bonuswage}
-                onChangeText={(text) => setBonuswage(text)}
-                style={styles.input}
-              />
-              <TextInput
-                label="기타수당"
-                value={etcwage}
-                onChangeText={(text) => setEtcwage(text)}
-                style={styles.input}
-              />
-              <View style={styles.checkContainer}>
-                <View style={styles.timeContainer}>
-                  <View style={{ justifyContent: "center" }}>
-                    <Text style={styles.time}>근무시간</Text>
-                  </View>
-                  <View>
-                    <DropDownPicker
-                      open={open}
-                      value={value}
-                      items={items}
-                      setOpen={setOpen}
-                      setValue={setValue}
-                      setItems={setItems}
-                      placeholder="주 선택"
-                      style={styles.dropdown}
-                    />
-                  </View>
-                </View>
+          <TextInput
+            label="주휴수당"
+            value={bonuswage}
+            onChangeText={(text) => setBonuswage(text)}
+            style={styles.input}
+          />
+          <TextInput
+            label="기타수당"
+            value={etcwage}
+            onChangeText={(text) => setEtcwage(text)}
+            style={styles.input}
+          />
+          <View style={styles.checkContainer}>
+            <View style={styles.timeContainer}>
+              <View style={{ justifyContent: "center" }}>
+                <Text style={styles.time}>근무시간</Text>
+              </View>
+              <View>
+                <DropDownPicker
+                  open={open}
+                  value={value}
+                  items={items}
+                  setOpen={setOpen}
+                  setValue={setValue}
+                  setItems={setItems}
+                  placeholder="주 선택"
+                  style={styles.dropdown}
+                />
               </View>
             </View>
           </View>
@@ -185,18 +186,21 @@ const styles = StyleSheet.create({
   checkText: {
     fontSize: 16,
     color: "#454545",
-    marginLeft: "8%",
-    marginTop: "2%",
+    marginRight: "6%",
+    
   },
-  answerContainer: {
+  radioGroup: {
     flexDirection: "row",
     alignItems: "center",
   },
-  answer: {
+  radio: {
+    flexDirection: "row",
+    alignItems: "center",
+  },
+  checktext1: {
     fontSize: 16,
     color: "#454545",
-    marginLeft: "8%",
-    flexDirection: "column",
+    marginRight: 10,
   },
   time: {
     fontSize: 16,
@@ -213,6 +217,7 @@ const styles = StyleSheet.create({
     borderColor: "#2E294E",
     borderWidth: 1,
     marginHorizontal: "6%",
-    width: "80%",
+    width: "70%",
   },
 });
+

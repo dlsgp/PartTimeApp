@@ -32,6 +32,7 @@ const BusinessSignUpApp: React.FC = () => {
   const [modalContent, setModalContent] = useState<React.ReactNode>(null);
   const [duplicationCheck1, setDuplicationCheck1] = useState(false);
   const [duplicationCheck2, setDuplicationCheck2] = useState(false);
+  const [duplicationCheck3, setDuplicationCheck3] = useState(false);
   const [currentCheckbox, setCurrentCheckbox] = useState<number | null>(null);
   const [tel, setTel] = useState("");
 
@@ -107,6 +108,8 @@ const BusinessSignUpApp: React.FC = () => {
       newErrors.duplicationCheck1 = "중복 확인은 필수입니다.";
     if (!duplicationCheck2)
       newErrors.duplicationCheck2 = "중복 확인은 필수입니다.";
+    if (!duplicationCheck3)
+      newErrors.duplicationCheck3 = "중복 확인은 필수입니다.";
     setErrors(newErrors);
 
     if (Object.keys(newErrors).length === 0) {
@@ -138,6 +141,17 @@ const BusinessSignUpApp: React.FC = () => {
       setErrors((prev: any) => ({ ...prev, duplicationCheck2: null }));
     }
   };
+  const handleDuplicationCheck3 = () => {
+    if (email.trim() === "") {
+      setErrors((prev: any) => ({
+        ...prev,
+        duplicationCheck3: "사업자등록번호를 입력하세요.",
+      }));
+    } else {
+      setDuplicationCheck3(true);
+      setErrors((prev: any) => ({ ...prev, duplicationCheck3: null }));
+    }
+  };
 
   return (
     <SafeAreaView style={styles.container}>
@@ -148,7 +162,8 @@ const BusinessSignUpApp: React.FC = () => {
           <TextInput
             style={[
               styles.idinput,
-              (errors.username || errors.duplicationCheck1) && styles.errorInput,
+              (errors.username || errors.duplicationCheck1) &&
+                styles.errorInput,
             ]}
             placeholder="아이디"
             placeholderTextColor="#aaa"
@@ -304,16 +319,20 @@ const BusinessSignUpApp: React.FC = () => {
 
         <View style={styles.id}>
           <TextInput
-            style={[styles.idinput, errors.businessNumber && styles.errorInput]}
+            style={[
+              styles.idinput,
+              (errors.businessNumber || errors.duplicationCheck3) && styles.errorInput,
+            ]}
             placeholder="사업자등록번호"
             placeholderTextColor="#aaa"
             value={businessNumber}
             onChangeText={(text) => {
-              setBusinessNumber(text);
+              setEmail(text);
               if (text.trim() !== "") {
                 setErrors((prev: any) => ({
                   ...prev,
-                  businessNumber: null,
+                  email: null,
+                  duplicationCheck3: null,
                 }));
               }
             }}
@@ -321,16 +340,17 @@ const BusinessSignUpApp: React.FC = () => {
           <View
             style={[
               styles.duplicationcheck,
-              errors.businessNumber && styles.errorInput,
+              errors.duplicationCheck3 && styles.errorInput,
             ]}
           >
-            <TouchableOpacity>
+            <TouchableOpacity onPress={handleDuplicationCheck3}>
               <Text style={styles.checkButton}>중복확인</Text>
             </TouchableOpacity>
           </View>
         </View>
-        {errors.businessNumber && (
-          <Text style={styles.errorText}>{errors.businessNumber}</Text>
+        {errors.businessNumber && <Text style={styles.errorText}>{errors.businessNumber}</Text>}
+        {errors.duplicationCheck3 && (
+          <Text style={styles.errorText}>{errors.duplicationCheck3}</Text>
         )}
 
         <View style={styles.term}>
@@ -439,7 +459,7 @@ const styles = StyleSheet.create({
     marginBottom: 10,
     paddingHorizontal: 10,
     width: width * 0.2,
-    justifyContent: 'center',
+    justifyContent: "center",
   },
   input: {
     borderColor: "#ccc",
@@ -477,12 +497,11 @@ const styles = StyleSheet.create({
     alignItems: "center",
     width: width * 0.8,
     height: height * 0.055,
-    justifyContent: 'center',
+    justifyContent: "center",
   },
   signupButtonText: {
     color: "#fff",
     fontSize: 16,
-
   },
   modalContainer: {
     flex: 1,

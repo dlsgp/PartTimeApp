@@ -2,6 +2,7 @@ import * as React from "react";
 import { useState } from "react";
 import {
   Button,
+  Dimensions,
   Image,
   KeyboardAvoidingView,
   Platform,
@@ -13,6 +14,8 @@ import {
 import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
 import { TextInput } from "react-native-paper";
 import { router } from "expo-router";
+
+const { width, height } = Dimensions.get("window");
 
 const Mypage = () => {
   const [text, setText] = useState("");
@@ -189,25 +192,25 @@ const RegFormStyle = StyleSheet.create({
     marginRight: "4%",
   },
   formcontainer: {
-    width: 272,
-    height: 26,
+    width: width * 0.7,
+    height: height * 0.035,
     marginVertical: "4%",
     marginRight: "4%",
   },
   formcontainerAad: {
-    width: 272,
-    height: 26,
+    width: width * 0.7,
+    height: height * 0.035,
     marginVertical: "2%",
     marginRight: "4%",
   },
   formcontainerAD: {
-    width: 272,
-    height: 26,
+    width: width * 0.7,
+    height: height * 0.035,
     marginRight: "4%",
   },
   formcontainerB: {
-    width: 272,
-    height: 26,
+    width: width * 0.7,
+    height: height * 0.035,
     marginVertical: "4%",
     marginRight: "4%",
   },
