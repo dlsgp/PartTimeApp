@@ -170,7 +170,7 @@ const ScheduleRegister = () => {
                     />
                   ) : (
                     <TouchableOpacity onPress={() => setShowStart(true)}>
-                      <Text>{startDate.toDateString()}</Text>
+                      <Text>{startDate.toLocaleDateString('ko-KR', { year: '2-digit', month: 'long', day: 'numeric', weekday: 'short' })}</Text>
                     </TouchableOpacity>
                   )}
                   {showStart && Platform.OS === 'android' && (
@@ -202,7 +202,7 @@ const ScheduleRegister = () => {
                     />
                   ) : (
                     <TouchableOpacity onPress={() => setShowEnd(true)}>
-                      <Text>{endDate.toDateString()}</Text>
+                      <Text>{endDate.toLocaleDateString('ko-KR', { year: '2-digit', month: 'long', day: 'numeric', weekday: 'short' })}</Text>
                     </TouchableOpacity>
                   )}
                   {showEnd && Platform.OS === 'android' && (
@@ -479,9 +479,10 @@ const styles = StyleSheet.create({
     alignItems: "center",
   },
   dateText: {
-    fontSize: 30,
+    fontSize: 25,
     fontWeight: "700",
-    marginLeft: "4%",
+    marginLeft: 5,
+    marginRight: 5,
   },
   boxContainer: {
     flexDirection: "row",
