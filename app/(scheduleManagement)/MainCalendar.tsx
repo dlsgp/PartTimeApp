@@ -14,7 +14,6 @@ import {
 } from "react-native";
 import { Calendar, LocaleConfig } from "react-native-calendars";
 import { FontAwesome6 } from "@expo/vector-icons";
-import { router } from "expo-router";
 import ScheduleRegister from "./ScheduleRegister";
 
 LocaleConfig.locales["fr"] = {
@@ -133,14 +132,16 @@ export default function MainCalendar() {
               <View style={styles.modalInner}>
                 <ScheduleRegister />
                 <View style={styles.buttonContainer}>
-            <TouchableOpacity
-              activeOpacity={0.8}
-              style={styles.button2}
-              onPress={() => setModalVisible(false)}
-            >
-              <Text style={styles.buttonText}>등록하기</Text>
-            </TouchableOpacity>
-          </View>
+                  <TouchableOpacity
+                    activeOpacity={0.8}
+                    style={styles.button2}
+                    onPress={() => {
+                      setModalVisible(false);
+                    }}
+                  >
+                    <Text style={styles.buttonText}>등록하기</Text>
+                  </TouchableOpacity>
+                </View>
               </View>
             </View>
           </Modal>

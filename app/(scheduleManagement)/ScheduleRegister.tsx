@@ -30,6 +30,9 @@ const ScheduleRegister = () => {
     { label: "김영희", value: "김영희" },
   ]);
 
+  
+
+ 
   // dateTimepicker
   const [startDate, setStartDate] = useState(new Date());
   const [endDate, setEndDate] = useState(new Date());
@@ -102,6 +105,8 @@ const ScheduleRegister = () => {
     const nextColorIndex = (currentColorIndex + 1) % colors.length;
     setBoxColor(colors[nextColorIndex]);
   };
+
+ 
 
   return (
     <View style={styles.mainContainer}>
