@@ -133,14 +133,14 @@ export default function MainCalendar() {
               <View style={styles.modalInner}>
                 <ScheduleRegister />
                 <View style={styles.buttonContainer}>
-            <TouchableOpacity
-              activeOpacity={0.8}
-              style={styles.button2}
-              onPress={() => setModalVisible(false)}
-            >
-              <Text style={styles.buttonText}>등록하기</Text>
-            </TouchableOpacity>
-          </View>
+                  <TouchableOpacity
+                    activeOpacity={0.8}
+                    style={styles.button2}
+                    onPress={() => setModalVisible(false)}
+                  >
+                    <Text style={styles.buttonText}>등록하기</Text>
+                  </TouchableOpacity>
+                </View>
               </View>
             </View>
           </Modal>
