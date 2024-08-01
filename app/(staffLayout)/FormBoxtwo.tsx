@@ -81,7 +81,7 @@ function FormBoxtwo() {
               justifyContent: "center",
             },
           ]}
-          onPress={() => router.push("/StaffFormDetailApp")}
+          onPress={() => router.push("/StaffForm")}
         >
           <Text style={FormBoxStyle.buttonText}>작성하기</Text>
           <View>

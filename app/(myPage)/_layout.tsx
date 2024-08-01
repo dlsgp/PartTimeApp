@@ -5,5 +5,7 @@ export default function MyPageLayout() {
     <Stack>
       <Stack.Screen name="index" options={{ headerShown: false }} />
     </Stack>
+
+    
   );
 }
