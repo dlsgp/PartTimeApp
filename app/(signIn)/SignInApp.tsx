@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import {
   SafeAreaView,
   View,
@@ -13,6 +13,7 @@ import { Image } from "react-native-elements";
 import { useNavigation } from "@react-navigation/native";
 import { useRouter } from "expo-router";
 import { login } from "../../components/src/services/apiService";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 
 const { width, height } = Dimensions.get("window");
 
@@ -34,13 +35,26 @@ const SignInApp = () => {
     );
   };
 
+  useEffect(() => {
+    const checkLoggedIn = async () => {
+      const token = await AsyncStorage.getItem("userToken");
+      if (token) {
+        router.push("/(staffLayout)/FormBox");
+      }
+    };
+    checkLoggedIn();
+  }, []);
+
   const handleLogin = async () => {
     try {
       const response = await login(id, password);
       if (response.success) {
         console.log("Login successful:", response);
+        if(checked) {
+          await AsyncStorage.setItem("userToken", response.token);
+        }
         // 로그인 성공 시 홈 화면으로 이동
-        router.push('/(staffLayout)/FormBox'); // 라우터 설정에 따라 변경
+        router.push("/(staffLayout)/FormBox"); // 라우터 설정에 따라 변경
       } else {
         setError(response.message || "로그인 실패");
       }
@@ -84,8 +98,12 @@ const SignInApp = () => {
         </View>
 
         <View style={styles.forgotPasswordTouch}>
-          <TouchableOpacity onPress={() => router.push('/(signIn)/FindPasswordApp')}>
-            <Text style={styles.forgotPasswordText}>비밀번호를 잊으셨나요?</Text>
+          <TouchableOpacity
+            onPress={() => router.push("/(signIn)/FindPasswordApp")}
+          >
+            <Text style={styles.forgotPasswordText}>
+              비밀번호를 잊으셨나요?
+            </Text>
           </TouchableOpacity>
         </View>
       </View>
@@ -94,7 +112,9 @@ const SignInApp = () => {
         <Text style={styles.loginButtonText}>LOGIN</Text>
       </TouchableOpacity>
 
-      <TouchableOpacity onPress={() => router.push('/(signIn)/SignUpSelectionApp')}>
+      <TouchableOpacity
+        onPress={() => router.push("/(signIn)/SignUpSelectionApp")}
+      >
         <Text style={styles.registerText}>회원가입</Text>
       </TouchableOpacity>
 
@@ -191,23 +211,23 @@ const styles = StyleSheet.create({
     height: 40,
   },
   horizonLine: {
-    flexDirection: 'row',
-    alignItems: 'center',
+    flexDirection: "row",
+    alignItems: "center",
     marginVertical: 20,
   },
   line: {
     flex: 1,
     height: 1,
-    backgroundColor: '#aaa',
+    backgroundColor: "#aaa",
   },
   horizonLineText: {
     marginHorizontal: 10,
-    backgroundColor: '#fff',
+    backgroundColor: "#fff",
     paddingHorizontal: 5,
-    color: '#aaa',
+    color: "#aaa",
   },
   errorText: {
-    color: 'red',
+    color: "red",
     marginBottom: 20,
   },
 });

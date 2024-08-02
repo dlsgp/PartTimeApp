@@ -14,6 +14,7 @@ import { Checkbox } from "react-native-paper";
 import ServiceTerms from "./ServiceTerm";
 import PrivacyPolicy from "./PrivacyPolicy";
 import { bsignup } from "../../components/src/services/apiService";
+import { router } from "expo-router";
 
 const { width, height } = Dimensions.get("window");
 
@@ -126,7 +127,15 @@ const BusinessSignUpApp: React.FC = () => {
           tel,
         };
         const response = await bsignup(businessData);
-        console.log("사업자 회원가입 성공", response);
+        if (response.success) {
+          console.log("사업자 회원가입 성공", response);
+          router.push("/(signin)/SignInApp");
+        } else {
+          setErrors({
+            ...errors,
+            bsignup: response.message || "사업자 회원가입 실패",
+          });
+        }
       } catch (error) {
         console.log("사업자 회원가입 실패", error);
       }
@@ -328,21 +337,20 @@ const BusinessSignUpApp: React.FC = () => {
             }
           }}
         />
-        {errors.add1 && (
-          <Text style={styles.errorText}>{errors.add1}</Text>
-        )}
+        {errors.add1 && <Text style={styles.errorText}>{errors.add1}</Text>}
 
         <View style={styles.id}>
           <TextInput
             style={[
               styles.idinput,
-              (errors.businessNumber || errors.duplicationCheck3) && styles.errorInput,
+              (errors.businessNumber || errors.duplicationCheck3) &&
+                styles.errorInput,
             ]}
             placeholder="사업자등록번호"
             placeholderTextColor="#aaa"
             value={businessNumber}
             onChangeText={(text) => {
-              setEmail(text);
+              setBusinessNumber(text);
               if (text.trim() !== "") {
                 setErrors((prev: any) => ({
                   ...prev,
@@ -363,7 +371,9 @@ const BusinessSignUpApp: React.FC = () => {
             </TouchableOpacity>
           </View>
         </View>
-        {errors.businessNumber && <Text style={styles.errorText}>{errors.businessNumber}</Text>}
+        {errors.businessNumber && (
+          <Text style={styles.errorText}>{errors.businessNumber}</Text>
+        )}
         {errors.duplicationCheck3 && (
           <Text style={styles.errorText}>{errors.duplicationCheck3}</Text>
         )}
