@@ -129,7 +129,7 @@ const BusinessSignUpApp: React.FC = () => {
         const response = await bsignup(businessData);
         if (response.success) {
           console.log("사업자 회원가입 성공", response);
-          router.push("/(signin)/SignInApp");
+          router.push("/(signIn)/SignInApp");
         } else {
           setErrors({
             ...errors,

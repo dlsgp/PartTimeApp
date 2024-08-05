@@ -39,7 +39,12 @@ const SignInApp = () => {
     const checkLoggedIn = async () => {
       const token = await AsyncStorage.getItem("userToken");
       if (token) {
-        router.push("/(staffLayout)/FormBox");
+        const userType = await AsyncStorage.getItem("userType");
+        if (userType === "1") {
+          router.push("/(staffLayout)/FormBox");
+        } else if (userType === "2") {
+          router.push("/(adminLayout)/AdminPage"); // 관리자 페이지로 추후 변경
+        }
       }
     };
     checkLoggedIn();
@@ -50,11 +55,16 @@ const SignInApp = () => {
       const response = await login(id, password);
       if (response.success) {
         console.log("Login successful:", response);
-        if(checked) {
+        if (checked) {
           await AsyncStorage.setItem("userToken", response.token);
+          await AsyncStorage.setItem("userType", response.type.toString());
         }
-        // 로그인 성공 시 홈 화면으로 이동
-        router.push("/(staffLayout)/FormBox"); // 라우터 설정에 따라 변경
+        
+        if(response.userType === 1) {
+          router.push("/(staffLayout)/FormBox"); // 일반 회원 라우터 설정에 따라 변경
+        } else if (response.userType === 2) {
+          router.push("/(adminLayout)/AdminPage"); // 관리자 페이지로 추후 변경
+        }
       } else {
         setError(response.message || "로그인 실패");
       }

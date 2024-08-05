@@ -36,15 +36,16 @@ const FindPasswordApp = () => {
     try {
       const response = await sendVerificationCode(id, email);
       console.log("sendVerificationCode response:", response);
+      setStep(2);
       if (response.success) {
-        console.log("Verification code sent successfully.");
+        console.log("인증 코드 전송 성공");
         setStep(2);
         console.log("Step updated to 2");
       } else {
-        setError(response.message || "Failed to send verification code");
+        setError(response.message || "인증 코드를 보내는데 실패하였습니다");
       }
     } catch (error) {
-      setError(error.message || "Failed to send verification code");
+      setError(error.message || "인증 코드를 보내는데 실패하였습니다");
     } finally {
       setLoading(false);
     }
@@ -59,10 +60,10 @@ const FindPasswordApp = () => {
         setStep(3);
         console.log("Step updated to 3");
       } else {
-        setError(response.message || "Failed to verify code");
+        setError(response.message || "인증 코드 확인에 실패하였습니다");
       }
     } catch (error) {
-      setError(error.message || "Failed to verify code");
+      setError(error.message || "인증 코드 확인에 실패하였습니다");
     } finally {
       setLoading(false);
     }
@@ -70,21 +71,22 @@ const FindPasswordApp = () => {
 
   const handleResetPassword = async () => {
     if (newPassword !== confirmNewPassword) {
-      setError("Passwords do not match");
+      setError("비밀번호가 일치하지 않습니다");
       return;
     }
     setLoading(true);
     try {
       const response = await resetPassword(email, verificationCode, newPassword);
       console.log("resetPassword response:", response);
+      setStep(4);
       if (response.success) {
         setStep(4);
         console.log("Step updated to 4");
       } else {
-        setError(response.message || "Failed to reset password");
+        setError(response.message || "비밀번호 초기화에 실패하였습니다");
       }
     } catch (error) {
-      setError(error.message || "Failed to reset password");
+      setError(error.message || "비밀번호 초기화에 실패하였습니다");
     } finally {
       setLoading(false);
     }

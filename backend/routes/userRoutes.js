@@ -27,22 +27,25 @@ router.post("/login", async (req, res) => {
     connection = await oracledb.getConnection(dbConfig);
 
     const result = await connection.execute(
-      `SELECT * FROM register WHERE id = :id AND pwd = :password`,
+      `SELECT type FROM register WHERE id = :id AND pwd = :password`,
       [id, password]
     );
 
     if (result.rows.length > 0) {
+      const userType = result.rows[0][0];
+      console.log("User type:", userType);
+      console.log(result.rows);
       res.status(200).json({
         success: true,
         message: "Login successful",
-        user: result.rows[0],
+        userType: userType,
       });
     } else {
-      res.status(401).json({ success: false, message: "Invalid credentials" });
+      res.status(401).json({ success: false, message: "잘못된 자격 증명입니다" });
     }
   } catch (err) {
     console.error(err);
-    res.status(500).json({ success: false, message: "Internal server error" });
+    res.status(500).json({ success: false, message: "인터넷 서버 오류 500" });
   } finally {
     if (connection) {
       try {
@@ -66,17 +69,17 @@ router.post("/signup", async (req, res) => {
 
     const result = await connection.execute(
       `INSERT INTO register (reg_num, type, id, pwd, name, tel, email, add1, birth)
-      VALUES (reg_num_seq.NEXTVAL, 1, :username, :password, :name, :tel, :email, :add1, TO_DATE(:birth, 'YYYY-MM-DD'))`,
+      VALUES (reg_num_seq.NEXTVAL, 1, :username, :password, :name, :tel, :email, :add1, birth)`,
       [username, password, name, tel, email, add1, birth],
       { autoCommit: true }
     );
 
     res
       .status(200)
-      .json({ success: true, message: "Signup successful", user: result });
+      .json({ success: true, message: "회원가입 성공", user: result });
   } catch (err) {
     console.error(err);
-    res.status(500).json({ success: false, message: "Internal server error" });
+    res.status(500).json({ success: false, message: "인터넷 서버 오류 500" });
   } finally {
     if (connection) {
       try {
@@ -108,12 +111,12 @@ router.post("/bsignup", async (req, res) => {
 
     res.json({
       success: true,
-      message: "Business signup successful",
+      message: "사업자 회원가입 성공",
       user: result,
     });
   } catch (err) {
     console.error(err);
-    res.status(500).json({ success: false, message: "Internal server error" });
+    res.status(500).json({ success: false, message: "인터넷 서버 오류 500" });
   } finally {
     if (connection) {
       try {
@@ -154,17 +157,17 @@ router.post("/send-verification-code", async (req, res) => {
       transporter.sendMail(mailOptions, (error, info) => {
         if (error) {
           console.error(error);
-          res.status(500).json({ message: "Failed to send email" });
+          res.status(500).json({ success: false, message: "이메일 전송에 실패했습니다." });
         } else {
-          res.status(200).json({ message: "Verification code sent" });
+          res.status(200).json({ success: true, message: "인증 번호 발송에 성공하였습니다." });
         }
       });
     } else {
-      res.status(400).json({ message: "Invalid user or email" });
+      res.status(400).json({ success: false, message: "잘못된 아이디 혹은 패스워드입니다." });
     }
   } catch (err) {
     console.error(err);
-    res.status(500).json({ success: false, message: "Internal server error" });
+    res.status(500).json({ success: false, message: "인터넷 서버 오류 500" });
   } finally {
     if (connection) {
       try {
@@ -181,9 +184,9 @@ router.post("/verify-code", async (req, res) => {
   const { email, verificationCode } = req.body;
 
   if (verificationCodes[email] === verificationCode) {
-    res.status(200).json({ success: true, message: "Code verified" });
+    res.status(200).json({ success: true, message: "코드 검증 완료" });
   } else {
-    res.status(400).json({ success: false, message: "Invalid verification code" });
+    res.status(400).json({ success: false, message: "잘못된 인증 코드입니다." });
   }
 });
 
@@ -193,7 +196,7 @@ router.post("/reset-password", async (req, res) => {
   const dbConfig = req.app.get("dbConfig");
 
   if (verificationCodes[email] !== verificationCode) {
-    return res.status(400).json({ message: "Invalid verification code" });
+    return res.status(400).json({ message: "잘못된 인증 코드입니다." });
   }
 
   let connection;
@@ -208,13 +211,13 @@ router.post("/reset-password", async (req, res) => {
     );
 
     if (result.rowsAffected > 0) {
-      res.status(200).json({ message: "Password reset successful" });
+      res.status(200).json({ message: "비밀번호 초기화 성공" });
     } else {
-      res.status(400).json({ message: "Failed to reset password" });
+      res.status(400).json({ message: "비밀번호 초기화에 실패하였습니다" });
     }
   } catch (err) {
     console.error(err);
-    res.status(500).json({ success: false, message: "Internal server error" });
+    res.status(500).json({ success: false, message: "인터넷 서버 오류 500" });
   } finally {
     if (connection) {
       try {

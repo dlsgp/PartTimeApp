@@ -14,6 +14,7 @@ import { Checkbox } from "react-native-paper";
 import PrivacyPolicy from "./PrivacyPolicy";
 import ServiceTerms from "./ServiceTerm";
 import { signUp } from "@/components/src/services/apiService";
+import { router } from "expo-router";
 
 const { width, height } = Dimensions.get("window");
 
@@ -122,9 +123,17 @@ const PersonalSignUpApp: React.FC = () => {
           tel,
         };
         const response = await signUp(userData);
-        console.log(response); // 회원가입 성공
+        if (response.success) {
+          console.log(response); // 회원가입 성공
+          router.push("/(signIn)/SignInApp");
+        } else {
+          setErrors({
+            ...errors,
+            signUp: response.message || "개인 회원가입 실패",
+          });
+        }
       } catch (error) {
-        console.error(error); // 회원가입 실패
+        console.error("개인 회원가입 실패", error); // 회원가입 실패
       }
     }
   };
@@ -162,7 +171,8 @@ const PersonalSignUpApp: React.FC = () => {
           <TextInput
             style={[
               styles.idinput,
-              (errors.username || errors.duplicationCheck1) && styles.errorInput,
+              (errors.username || errors.duplicationCheck1) &&
+                styles.errorInput,
             ]}
             placeholder="아이디"
             placeholderTextColor="#aaa"
@@ -256,9 +266,7 @@ const PersonalSignUpApp: React.FC = () => {
             }
           }}
         />
-        {errors.birth && (
-          <Text style={styles.errorText}>{errors.birth}</Text>
-        )}
+        {errors.birth && <Text style={styles.errorText}>{errors.birth}</Text>}
 
         <TextInput
           style={[styles.input, errors.add1 && styles.errorInput]}
@@ -272,9 +280,7 @@ const PersonalSignUpApp: React.FC = () => {
             }
           }}
         />
-        {errors.add1 && (
-          <Text style={styles.errorText}>{errors.add1}</Text>
-        )}
+        {errors.add1 && <Text style={styles.errorText}>{errors.add1}</Text>}
 
         <TextInput
           style={[styles.input, errors.tel && styles.errorInput]}
@@ -321,9 +327,7 @@ const PersonalSignUpApp: React.FC = () => {
             </TouchableOpacity>
           </View>
         </View>
-        {errors.email && (
-          <Text style={styles.errorText}>{errors.email}</Text>
-        )}
+        {errors.email && <Text style={styles.errorText}>{errors.email}</Text>}
         {errors.duplicationCheck2 && (
           <Text style={styles.errorText}>{errors.duplicationCheck2}</Text>
         )}
