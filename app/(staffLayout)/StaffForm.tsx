@@ -15,6 +15,7 @@ import { RadioButton, TextInput, useTheme } from "react-native-paper";
 import FontAwesome from "@expo/vector-icons/FontAwesome";
 import DatePicker from "../(staffLayout)/ModalCalendar";
 import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
+import { router } from "expo-router";
 
 const { width, height } = Dimensions.get("window");
 
@@ -268,13 +269,13 @@ const StaffForm = () => {
               </View>
 
               <View style={RegFormStyle.buttonD}>
-              <TouchableOpacity
-              activeOpacity={0.8}
-              style={RegFormStyle.button2}
-              onPress={() => console.log("등록 버튼 클릭")}
-            >
-              <Text style={RegFormStyle.buttonText2}>등록하기</Text>
-            </TouchableOpacity>
+                <TouchableOpacity
+                  activeOpacity={0.8}
+                  style={RegFormStyle.button2}
+                  onPress={() => router.push("/FormBox")}
+                >
+                  <Text style={RegFormStyle.buttonText2}>등록하기</Text>
+                </TouchableOpacity>
               </View>
             </View>
           </KeyboardAvoidingView>

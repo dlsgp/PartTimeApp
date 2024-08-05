@@ -9,11 +9,20 @@ export default function staffLayout() {
           headerShown: false,
         }}
       />
-      <Stack.Screen name="StaffForm" options={{ headerShown: false }} />
+      <Stack.Screen
+        name="StaffForm"
+        options={{
+          headerShown: false,
+        }}
+      />
       <Stack.Screen
         name="StaffFormDetailApp"
-        options={{ headerShown: false }}
+        options={{
+          headerShown: false,
+        }}
       />
+      {/* <Stack.Screen name="FormBox" />
+      <Stack.Screen name="FormBoxtwo" /> */}
     </Stack>
   );
 }

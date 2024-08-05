@@ -1,7 +1,8 @@
 import { FontAwesome } from "@expo/vector-icons";
 import { StatusBar } from "expo-status-bar";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import {
+  Alert,
   Platform,
   SafeAreaView,
   StyleSheet,
@@ -14,7 +15,7 @@ import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view
 import DateTimePicker from "@react-native-community/datetimepicker";
 import { TextInput } from "react-native";
 import { Checkbox } from "react-native-paper";
-import { format } from "date-fns";
+import MainCalendar from "./MainCalendar";
 
 const ScheduleRegister = () => {
   const [open, setOpen] = useState(false);
@@ -44,6 +45,25 @@ const ScheduleRegister = () => {
   const [showEndTime, setShowEndTime] = useState(false);
   const [showStartTimeTwo, setShowStartTimeTwo] = useState(false);
   const [showEndTimeTwo, setShowEndTimeTwo] = useState(false);
+
+  const [markedDates, setMarkedDates] = useState({});
+
+  useEffect(() => {
+    if (startDate && endDate) {
+      const newMarkedDates = {};
+      const currentDate = new Date(startDate);
+
+      while (currentDate <= endDate) {
+        const dateStr = currentDate.toISOString().split("T")[0];
+        newMarkedDates[dateStr] = {
+          periods: [{ color: "#FFBD00" }, { color: "#ff86a2" }],
+        };
+        currentDate.setDate(currentDate.getDate() + 1);
+      }
+
+      setMarkedDates(newMarkedDates);
+    }
+  }, [startDate, endDate]);
 
   const onChangeStart = (event, selectedDate) => {
     const currentDate = selectedDate || startDate;
@@ -102,46 +122,6 @@ const ScheduleRegister = () => {
     const currentColorIndex = colors.indexOf(boxColor);
     const nextColorIndex = (currentColorIndex + 1) % colors.length;
     setBoxColor(colors[nextColorIndex]);
-  };
-
-  const [markedDates, setMarkedDates] = useState({});
-  const [modalVisible, setModalVisible] = useState(false);
-
-  const [posts, setPosts] = useState([
-    {
-      id: 1,
-      title: "제목입니다.",
-      contents: "내용입니다.",
-      date: "2022-02-26",
-    },
-    {
-      id: 2,
-      title: "제목입니다.",
-      contents: "내용입니다.",
-      date: "2022-02-27",
-    },
-  ]);
-
-  const handleRegister = () => {
-    const formattedStartDate = format(startDate, "yyyy-MM-dd");
-    const newMarkedDates = {
-      ...markedDates,
-      [formattedStartDate]: {
-        marked: true,
-        dotColor: boxColor,
-      },
-    };
-    setMarkedDates(newMarkedDates);
-    setModalVisible(false);
-    setPosts([
-      ...posts,
-      {
-        id: posts.length + 1,
-        title: value,
-        contents: text,
-        date: formattedStartDate,
-      },
-    ]);
   };
 
   return (
@@ -251,6 +231,7 @@ const ScheduleRegister = () => {
                       is24Hour={true}
                       onChange={onChangeEnd}
                       locale="ko"
+                      minimumDate={startDate}
                     />
                   ) : (
                     <TouchableOpacity onPress={() => setShowEnd(true)}>
@@ -273,6 +254,7 @@ const ScheduleRegister = () => {
                       display="default"
                       onChange={onChangeEnd}
                       locale="ko"
+                      minimumDate={startDate}
                     />
                   )}
                 </View>
@@ -502,6 +484,10 @@ const ScheduleRegister = () => {
           </View>
         </View>
 
+        {/* <TouchableOpacity style={styles.exportButton} onPress={exportSelection}>
+          <Text style={styles.exportButtonText}>Export 선택된 값</Text>
+        </TouchableOpacity> */}
+
         {/* <View style={styles.buttonContainer}>
           <TouchableOpacity
             activeOpacity={0.8}
@@ -517,6 +503,7 @@ const ScheduleRegister = () => {
             <Text style={styles.buttonText}>등록하기</Text>
           </TouchableOpacity>
         </View> */}
+        <MainCalendar markedDates={markedDates} />
       </KeyboardAwareScrollView>
     </View>
   );
@@ -606,6 +593,9 @@ const styles = StyleSheet.create({
   buttonText: {
     color: "#fff",
     fontWeight: "700",
+  },
+  exportButtonText: {
+    color: "#fff",
   },
 });
 
