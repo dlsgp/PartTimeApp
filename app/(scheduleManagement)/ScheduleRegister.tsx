@@ -1,7 +1,8 @@
 import { FontAwesome } from "@expo/vector-icons";
 import { StatusBar } from "expo-status-bar";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import {
+  Alert,
   Platform,
   SafeAreaView,
   StyleSheet,
@@ -14,7 +15,7 @@ import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view
 import DateTimePicker from "@react-native-community/datetimepicker";
 import { TextInput } from "react-native";
 import { Checkbox } from "react-native-paper";
-import { format } from "date-fns";
+import MainCalendar from "./MainCalendar";
 
 const ScheduleRegister = () => {
   const [open, setOpen] = useState(false);
@@ -44,6 +45,25 @@ const ScheduleRegister = () => {
   const [showEndTime, setShowEndTime] = useState(false);
   const [showStartTimeTwo, setShowStartTimeTwo] = useState(false);
   const [showEndTimeTwo, setShowEndTimeTwo] = useState(false);
+
+  const [markedDates, setMarkedDates] = useState({});
+
+  useEffect(() => {
+    if (startDate && endDate) {
+      const newMarkedDates = {};
+      const currentDate = new Date(startDate);
+
+      while (currentDate <= endDate) {
+        const dateStr = currentDate.toISOString().split("T")[0];
+        newMarkedDates[dateStr] = {
+          periods: [{ color: "#FFBD00" }, { color: "#ff86a2" }],
+        };
+        currentDate.setDate(currentDate.getDate() + 1);
+      }
+
+      setMarkedDates(newMarkedDates);
+    }
+  }, [startDate, endDate]);
 
   const onChangeStart = (event, selectedDate) => {
     const currentDate = selectedDate || startDate;
@@ -464,6 +484,10 @@ const ScheduleRegister = () => {
           </View>
         </View>
 
+        {/* <TouchableOpacity style={styles.exportButton} onPress={exportSelection}>
+          <Text style={styles.exportButtonText}>Export 선택된 값</Text>
+        </TouchableOpacity> */}
+
         {/* <View style={styles.buttonContainer}>
           <TouchableOpacity
             activeOpacity={0.8}
@@ -479,6 +503,7 @@ const ScheduleRegister = () => {
             <Text style={styles.buttonText}>등록하기</Text>
           </TouchableOpacity>
         </View> */}
+        <MainCalendar markedDates={markedDates} />
       </KeyboardAwareScrollView>
     </View>
   );
@@ -568,6 +593,9 @@ const styles = StyleSheet.create({
   buttonText: {
     color: "#fff",
     fontWeight: "700",
+  },
+  exportButtonText: {
+    color: "#fff",
   },
 });
 

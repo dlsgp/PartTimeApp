@@ -1,5 +1,5 @@
 import { StatusBar } from "expo-status-bar";
-import { ReactElement, useState } from "react";
+import { ReactElement, useEffect, useState } from "react";
 import { format } from "date-fns";
 import {
   Button,
@@ -59,41 +59,46 @@ LocaleConfig.locales["ko"] = {
 };
 LocaleConfig.defaultLocale = "ko";
 
-export default function MainCalendar() {
-  const posts = [
-    {
-      id: 1,
-      title: "제목입니다.",
-      contents: "내용입니다.",
-      date: "2022-02-26",
-    },
-    {
-      id: 2,
-      title: "제목입니다.",
-      contents: "내용입니다.",
-      date: "2022-02-27",
-    },
-  ];
-  const markedDates = posts.reduce((acc, current) => {
-    const formattedDate = format(new Date(current.date), "yyyy-MM-dd");
-    acc[formattedDate] = { marked: true, dotColor: "#ffffff" };
-    return acc;
-  }, {});
+export default function MainCalendar({ markedDates = {} }) {
+  // const markedDates = posts.reduce((acc, current) => {
+  //   const formattedDate = format(new Date(current.date), "yyyy-MM-dd");
+  //   acc[formattedDate] = { marked: true, dotColor: "#ffffff" };
+  //   return acc;
+  // }, {});
 
+  const [year, setYear] = useState(new Date().getFullYear());
+  const [month, setMonth] = useState(new Date().getMonth() + 1);
+  const [list, setList] = useState([]);
+  const [center, setCenter] = useState([]);
+  const [loading, setLoading] = useState(true);
   const [selectedDate, setSelectedDate] = useState(
     format(new Date(), "yyyy-MM-dd")
   );
-  const markedSelectedDates = {
-    ...markedDates,
-    [selectedDate]: {
-      selected: true,
-      marked: markedDates[selectedDate]?.marked,
-    },
-  };
-
   const [modalVisible, setModalVisible] = useState(false);
   const [visible, setVisible] = useState(false);
   const hideModal = () => setVisible(false);
+
+  const localMarkedDates = list.reduce((acc, current) => {
+    const formattedDate = current.date;
+    acc[formattedDate] = { marked: true };
+    return acc;
+  }, {});
+
+  const markedSelectedDates = {
+    ...markedDates,
+    ...localMarkedDates,
+    [selectedDate]: {
+      selected: true,
+      marked:
+        markedDates[selectedDate]?.marked ||
+        localMarkedDates[selectedDate]?.marked,
+    },
+  };
+
+  const daySchedule = (day) => {
+    const schedule = list.filter((v) => v.lectureDate === day);
+    console.log(schedule);
+  };
 
   return (
     <View style={styles.container}>
@@ -109,7 +114,6 @@ export default function MainCalendar() {
           </TouchableOpacity>
           <Calendar
             style={styles.calendar}
-            markedDates={markedSelectedDates}
             // width={Dimensions.get("window").width * 0.9}
             // height={Dimensions.get("window").height * 0.7}
             theme={{
@@ -120,6 +124,7 @@ export default function MainCalendar() {
             }}
             onDayPress={(day) => {
               setSelectedDate(day.dateString);
+              daySchedule(day.dateString);
             }}
             onDayLongPress={(day) => {
               console.log("selected day", day);
@@ -129,6 +134,8 @@ export default function MainCalendar() {
             // 달력에서 보이는 달이 바뀔 때 실행되는 핸들러. 기본값 = undefined
             onMonthChange={(month) => {
               console.log("month changed", month);
+              setMonth(month.month);
+              setYear(month.year);
             }}
             // 월 내비게이션 화살표 숨기기. 기본값 = false
             hideArrows={false}
@@ -177,26 +184,27 @@ export default function MainCalendar() {
             // 몇 달 사이에 스와이프할 수 있는 옵션을 활성화하세요. 기본값 = false
             enableSwipeMonths={true}
             markingType="multi-period"
-            markedDates={{
-              "2024-08-14": {
-                periods: [{ color: "#FFBD00" }, { color: "#ff86a2" }],
-              },
-              "2024-08-15": {
-                periods: [{ color: "#FFBD00" }, { color: "#ff86a2" }],
-              },
-              "2024-08-16": {
-                periods: [{ color: "transparent" }, { color: "transparent" }],
-              },
-              "2024-08-17": {
-                periods: [{ color: "transparent" }, { color: "#ff86a2" }],
-              },
-              "2024-08-18": {
-                periods: [{ color: "#ff86a2" }, { color: "#2080d8" }],
-              },
-              "2024-08-19": {
-                periods: [{ color: "#FFBD00" }, { color: "#ff86a2" }],
-              },
-            }}
+            markedDates={markedSelectedDates}
+            // markedDates={{
+            //   "2024-08-14": {
+            //     periods: [{ color: "#FFBD00" }, { color: "#ff86a2" }],
+            //   },
+            //   "2024-08-15": {
+            //     periods: [{ color: "#FFBD00" }, { color: "#ff86a2" }],
+            //   },
+            //   "2024-08-16": {
+            //     periods: [{ color: "transparent" }, { color: "transparent" }],
+            //   },
+            //   "2024-08-17": {
+            //     periods: [{ color: "transparent" }, { color: "#ff86a2" }],
+            //   },
+            //   "2024-08-18": {
+            //     periods: [{ color: "#ff86a2" }, { color: "#2080d8" }],
+            //   },
+            //   "2024-08-19": {
+            //     periods: [{ color: "#FFBD00" }, { color: "#ff86a2" }],
+            //   },
+            // }}
           />
           {/* "#2080d8",
     "#FFBD00",
