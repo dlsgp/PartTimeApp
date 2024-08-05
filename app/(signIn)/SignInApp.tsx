@@ -1,25 +1,29 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import {
-  Dimensions,
   SafeAreaView,
-  StyleSheet,
+  View,
   Text,
   TextInput,
   TouchableOpacity,
-  View,
+  StyleSheet,
+  Dimensions,
 } from "react-native";
 import { Checkbox } from "react-native-paper";
 import { Image } from "react-native-elements";
 import { useNavigation } from "@react-navigation/native";
-import { Link, useRouter } from "expo-router";
+import { useRouter } from "expo-router";
+import { login } from "../../components/src/services/apiService";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 
 const { width, height } = Dimensions.get("window");
 
-
 const SignInApp = () => {
-  const [checked, setChecked] = React.useState(false);
+  const [checked, setChecked] = useState(false);
   const navigation = useNavigation();
   const router = useRouter();
+  const [id, setId] = useState("");
+  const [password, setPassword] = useState("");
+  const [error, setError] = useState("");
 
   const HorizonLine = ({ text }) => {
     return (
@@ -31,6 +35,35 @@ const SignInApp = () => {
     );
   };
 
+  useEffect(() => {
+    const checkLoggedIn = async () => {
+      const token = await AsyncStorage.getItem("userToken");
+      if (token) {
+        router.push("/(staffLayout)/FormBox");
+      }
+    };
+    checkLoggedIn();
+  }, []);
+
+  const handleLogin = async () => {
+    try {
+      const response = await login(id, password);
+      if (response.success) {
+        console.log("Login successful:", response);
+        if(checked) {
+          await AsyncStorage.setItem("userToken", response.token);
+        }
+        // 로그인 성공 시 홈 화면으로 이동
+        router.push("/(staffLayout)/FormBox"); // 라우터 설정에 따라 변경
+      } else {
+        setError(response.message || "로그인 실패");
+      }
+    } catch (error) {
+      console.log("Login error:", error);
+      setError("로그인 중 오류가 발생했습니다.");
+    }
+  };
+
   return (
     <SafeAreaView style={styles.container}>
       <Text style={styles.title}>Sign In</Text>
@@ -38,46 +71,54 @@ const SignInApp = () => {
         style={styles.input}
         placeholder="ID"
         placeholderTextColor="#aaa"
+        value={id}
+        onChangeText={setId}
       />
       <TextInput
         style={styles.input}
         placeholder="Password"
         placeholderTextColor="#aaa"
         secureTextEntry
+        value={password}
+        onChangeText={setPassword}
       />
+
+      {error ? <Text style={styles.errorText}>{error}</Text> : null}
 
       <View style={styles.options}>
         <View style={styles.autoLogin}>
           <Checkbox
             status={checked ? "checked" : "unchecked"}
-            onPress={() => {
-              setChecked(!checked);
-            }}
+            onPress={() => setChecked(!checked)}
             color="#f0a500"
           />
-          <TouchableOpacity onPress={() => { setChecked(!checked) }}>
+          <TouchableOpacity onPress={() => setChecked(!checked)}>
             <Text style={styles.autoLoginText}>자동로그인</Text>
           </TouchableOpacity>
         </View>
-        
-        <View style={styles.forgotPasswordTouch}>
-          {/* <Link href="FindPasswordApp"> */}
-        <TouchableOpacity onPress={() => router.push('/(signIn)/FindPasswordApp')}>
-          <Text style={styles.forgotPasswordText}>비밀번호를 잊으셨나요?</Text>
-        </TouchableOpacity>
-        </View>
 
+        <View style={styles.forgotPasswordTouch}>
+          <TouchableOpacity
+            onPress={() => router.push("/(signIn)/FindPasswordApp")}
+          >
+            <Text style={styles.forgotPasswordText}>
+              비밀번호를 잊으셨나요?
+            </Text>
+          </TouchableOpacity>
+        </View>
       </View>
 
-      <TouchableOpacity style={styles.loginButton}>
+      <TouchableOpacity style={styles.loginButton} onPress={handleLogin}>
         <Text style={styles.loginButtonText}>LOGIN</Text>
       </TouchableOpacity>
 
-      <TouchableOpacity onPress={() => router.push('/(signIn)/SignUpSelectionApp')}>
+      <TouchableOpacity
+        onPress={() => router.push("/(signIn)/SignUpSelectionApp")}
+      >
         <Text style={styles.registerText}>회원가입</Text>
       </TouchableOpacity>
-        
-        <HorizonLine text="소셜로그인"/>
+
+      <HorizonLine text="소셜로그인" />
 
       <View style={styles.socialLoginButtons}>
         <TouchableOpacity>
@@ -170,20 +211,24 @@ const styles = StyleSheet.create({
     height: 40,
   },
   horizonLine: {
-    flexDirection: 'row',
-    alignItems: 'center',
+    flexDirection: "row",
+    alignItems: "center",
     marginVertical: 20,
   },
   line: {
     flex: 1,
     height: 1,
-    backgroundColor: '#aaa',
+    backgroundColor: "#aaa",
   },
   horizonLineText: {
     marginHorizontal: 10,
-    backgroundColor: '#fff',
+    backgroundColor: "#fff",
     paddingHorizontal: 5,
-    color: '#aaa',
+    color: "#aaa",
+  },
+  errorText: {
+    color: "red",
+    marginBottom: 20,
   },
 });
 

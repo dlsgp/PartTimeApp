@@ -13,6 +13,7 @@ import {
 import { Checkbox } from "react-native-paper";
 import PrivacyPolicy from "./PrivacyPolicy";
 import ServiceTerms from "./ServiceTerm";
+import { signUp } from "@/components/src/services/apiService";
 
 const { width, height } = Dimensions.get("window");
 
@@ -21,8 +22,8 @@ const PersonalSignUpApp: React.FC = () => {
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
   const [name, setName] = useState("");
-  const [birthdate, setBirthdate] = useState("");
-  const [address, setAddress] = useState("");
+  const [birth, setBirth] = useState("");
+  const [add1, setAdd1] = useState("");
   const [email, setEmail] = useState("");
   const [errors, setErrors] = useState<any>({});
   const [checked0, setChecked0] = useState(false);
@@ -33,7 +34,7 @@ const PersonalSignUpApp: React.FC = () => {
   const [duplicationCheck1, setDuplicationCheck1] = useState(false);
   const [duplicationCheck2, setDuplicationCheck2] = useState(false);
   const [currentCheckbox, setCurrentCheckbox] = useState<number | null>(null);
-  const [tel , setTel] = useState("");
+  const [tel, setTel] = useState("");
 
   const handleCheckbox0Press = () => {
     if (checked1 && checked2) {
@@ -91,14 +92,14 @@ const PersonalSignUpApp: React.FC = () => {
     setCurrentCheckbox(null);
   };
 
-  const handleSignUp = () => {
+  const handleSignUp = async () => {
     let newErrors: any = {};
     if (!username) newErrors.username = "필수 입력 항목입니다.";
     if (!password) newErrors.password = "필수 입력 항목입니다.";
     if (!confirmPassword) newErrors.confirmPassword = "필수 입력 항목입니다.";
     if (!name) newErrors.name = "필수 입력 항목입니다.";
-    if (!birthdate) newErrors.birthdate = "필수 입력 항목입니다.";
-    if (!address) newErrors.address = "필수 입력 항목입니다.";
+    if (!birth) newErrors.birth = "필수 입력 항목입니다.";
+    if (!add1) newErrors.add1 = "필수 입력 항목입니다.";
     if (!email) newErrors.email = "필수 입력 항목입니다.";
     if (!tel) newErrors.tel = "필수 입력 항목입니다.";
     if (!checked1) newErrors.checked1 = "필수 체크 항목입니다.";
@@ -110,8 +111,21 @@ const PersonalSignUpApp: React.FC = () => {
     setErrors(newErrors);
 
     if (Object.keys(newErrors).length === 0) {
-      // 모든 필드가 올바르게 입력되었을 때의 처리
-      console.log("회원가입 성공");
+      try {
+        const userData = {
+          username,
+          password,
+          name,
+          birth,
+          add1,
+          email,
+          tel,
+        };
+        const response = await signUp(userData);
+        console.log(response); // 회원가입 성공
+      } catch (error) {
+        console.error(error); // 회원가입 실패
+      }
     }
   };
 
@@ -234,32 +248,32 @@ const PersonalSignUpApp: React.FC = () => {
           style={[styles.input, errors.birthdate && styles.errorInput]}
           placeholder="생년월일"
           placeholderTextColor="#aaa"
-          value={birthdate}
+          value={birth}
           onChangeText={(text) => {
-            setBirthdate(text);
+            setBirth(text);
             if (text.trim() !== "") {
-              setErrors((prev: any) => ({ ...prev, birthdate: null }));
+              setErrors((prev: any) => ({ ...prev, birth: null }));
             }
           }}
         />
-        {errors.birthdate && (
-          <Text style={styles.errorText}>{errors.birthdate}</Text>
+        {errors.birth && (
+          <Text style={styles.errorText}>{errors.birth}</Text>
         )}
 
         <TextInput
-          style={[styles.input, errors.address && styles.errorInput]}
+          style={[styles.input, errors.add1 && styles.errorInput]}
           placeholder="주소"
           placeholderTextColor="#aaa"
-          value={address}
+          value={add1}
           onChangeText={(text) => {
-            setAddress(text);
+            setAdd1(text);
             if (text.trim() !== "") {
-              setErrors((prev: any) => ({ ...prev, address: null }));
+              setErrors((prev: any) => ({ ...prev, add1: null }));
             }
           }}
         />
-        {errors.address && (
-          <Text style={styles.errorText}>{errors.address}</Text>
+        {errors.add1 && (
+          <Text style={styles.errorText}>{errors.add1}</Text>
         )}
 
         <TextInput
@@ -420,7 +434,7 @@ const styles = StyleSheet.create({
     marginBottom: 10,
     paddingHorizontal: 10,
     width: width * 0.2,
-    justifyContent: 'center',
+    justifyContent: "center",
   },
   input: {
     borderColor: "#ccc",
@@ -457,7 +471,7 @@ const styles = StyleSheet.create({
     alignItems: "center",
     width: width * 0.8,
     height: height * 0.055,
-    justifyContent: 'center',
+    justifyContent: "center",
   },
   signupButtonText: {
     color: "#fff",

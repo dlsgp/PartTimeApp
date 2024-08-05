@@ -14,6 +14,7 @@ import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view
 import DateTimePicker from "@react-native-community/datetimepicker";
 import { TextInput } from "react-native";
 import { Checkbox } from "react-native-paper";
+import { format } from "date-fns";
 
 const ScheduleRegister = () => {
   const [open, setOpen] = useState(false);
@@ -30,9 +31,6 @@ const ScheduleRegister = () => {
     { label: "김영희", value: "김영희" },
   ]);
 
-  
-
- 
   // dateTimepicker
   const [startDate, setStartDate] = useState(new Date());
   const [endDate, setEndDate] = useState(new Date());
@@ -49,37 +47,37 @@ const ScheduleRegister = () => {
 
   const onChangeStart = (event, selectedDate) => {
     const currentDate = selectedDate || startDate;
-    setShowStart(Platform.OS === 'ios');
+    setShowStart(Platform.OS === "ios");
     setStartDate(currentDate);
   };
 
   const onChangeEnd = (event, selectedDate) => {
     const currentDate = selectedDate || endDate;
-    setShowEnd(Platform.OS === 'ios');
+    setShowEnd(Platform.OS === "ios");
     setEndDate(currentDate);
   };
 
   const onChangeStartTime = (event, selectedDate) => {
     const currentDate = selectedDate || startTime;
-    setShowStartTime(Platform.OS === 'ios');
+    setShowStartTime(Platform.OS === "ios");
     setStartTime(currentDate);
   };
 
   const onChangeEndTime = (event, selectedDate) => {
     const currentDate = selectedDate || endTime;
-    setShowEndTime(Platform.OS === 'ios');
+    setShowEndTime(Platform.OS === "ios");
     setEndTime(currentDate);
   };
 
   const onChangeStartTimeTwo = (event, selectedDate) => {
     const currentDate = selectedDate || startTimeTwo;
-    setShowStartTimeTwo(Platform.OS === 'ios');
+    setShowStartTimeTwo(Platform.OS === "ios");
     setStartTimeTwo(currentDate);
   };
 
   const onChangeEndTimeTwo = (event, selectedDate) => {
     const currentDate = selectedDate || endTimeTwo;
-    setShowEndTimeTwo(Platform.OS === 'ios');
+    setShowEndTimeTwo(Platform.OS === "ios");
     setEndTimeTwo(currentDate);
   };
 
@@ -105,8 +103,6 @@ const ScheduleRegister = () => {
     const nextColorIndex = (currentColorIndex + 1) % colors.length;
     setBoxColor(colors[nextColorIndex]);
   };
-
- 
 
   return (
     <View style={styles.mainContainer}>
@@ -137,9 +133,13 @@ const ScheduleRegister = () => {
                 open={open}
                 value={value}
                 items={items}
+                //   [
+                //   { label: "직원1", value: "직원1" },
+                //   { label: "직원2", value: "직원2" },
+                // ]
+
                 setOpen={setOpen}
                 setValue={setValue}
-                setItems={setItems}
                 placeholder="직원이름"
                 style={styles.dropdown}
               />
@@ -164,7 +164,7 @@ const ScheduleRegister = () => {
 
               <View style={styles.textContainer}>
                 <View>
-                  {Platform.OS === 'ios' ? (
+                  {Platform.OS === "ios" ? (
                     <DateTimePicker
                       testID="dateTimePicker"
                       value={startDate}
@@ -175,10 +175,17 @@ const ScheduleRegister = () => {
                     />
                   ) : (
                     <TouchableOpacity onPress={() => setShowStart(true)}>
-                      <Text>{startDate.toLocaleDateString('ko-KR', { year: '2-digit', month: 'long', day: 'numeric', weekday: 'short' })}</Text>
+                      <Text>
+                        {startDate.toLocaleDateString("ko-KR", {
+                          year: "2-digit",
+                          month: "long",
+                          day: "numeric",
+                          weekday: "short",
+                        })}
+                      </Text>
                     </TouchableOpacity>
                   )}
-                  {showStart && Platform.OS === 'android' && (
+                  {showStart && Platform.OS === "android" && (
                     <DateTimePicker
                       testID="dateTimePicker"
                       value={startDate}
@@ -196,7 +203,7 @@ const ScheduleRegister = () => {
                   <Text style={styles.dateText}>-</Text>
                 </View>
                 <View style={{ flex: 1, alignItems: "flex-start" }}>
-                  {Platform.OS === 'ios' ? (
+                  {Platform.OS === "ios" ? (
                     <DateTimePicker
                       testID="dateTimePicker"
                       value={endDate}
@@ -204,13 +211,21 @@ const ScheduleRegister = () => {
                       is24Hour={true}
                       onChange={onChangeEnd}
                       locale="ko"
+                      minimumDate={startDate}
                     />
                   ) : (
                     <TouchableOpacity onPress={() => setShowEnd(true)}>
-                      <Text>{endDate.toLocaleDateString('ko-KR', { year: '2-digit', month: 'long', day: 'numeric', weekday: 'short' })}</Text>
+                      <Text>
+                        {endDate.toLocaleDateString("ko-KR", {
+                          year: "2-digit",
+                          month: "long",
+                          day: "numeric",
+                          weekday: "short",
+                        })}
+                      </Text>
                     </TouchableOpacity>
                   )}
-                  {showEnd && Platform.OS === 'android' && (
+                  {showEnd && Platform.OS === "android" && (
                     <DateTimePicker
                       testID="dateTimePicker"
                       value={endDate}
@@ -219,6 +234,7 @@ const ScheduleRegister = () => {
                       display="default"
                       onChange={onChangeEnd}
                       locale="ko"
+                      minimumDate={startDate}
                     />
                   )}
                 </View>
@@ -242,7 +258,7 @@ const ScheduleRegister = () => {
 
               <View style={styles.textContainer}>
                 <View>
-                  {Platform.OS === 'ios' ? (
+                  {Platform.OS === "ios" ? (
                     <DateTimePicker
                       testID="dateTimePicker"
                       value={startTime}
@@ -256,7 +272,7 @@ const ScheduleRegister = () => {
                       <Text>{startTime.toLocaleTimeString()}</Text>
                     </TouchableOpacity>
                   )}
-                  {showStartTime && Platform.OS === 'android' && (
+                  {showStartTime && Platform.OS === "android" && (
                     <DateTimePicker
                       testID="dateTimePicker"
                       value={startTime}
@@ -274,7 +290,7 @@ const ScheduleRegister = () => {
                   <Text style={styles.dateText}>-</Text>
                 </View>
                 <View style={{ flex: 1, alignItems: "flex-start" }}>
-                  {Platform.OS === 'ios' ? (
+                  {Platform.OS === "ios" ? (
                     <DateTimePicker
                       testID="dateTimePicker"
                       value={endTime}
@@ -288,7 +304,7 @@ const ScheduleRegister = () => {
                       <Text>{endTime.toLocaleTimeString()}</Text>
                     </TouchableOpacity>
                   )}
-                  {showEndTime && Platform.OS === 'android' && (
+                  {showEndTime && Platform.OS === "android" && (
                     <DateTimePicker
                       testID="dateTimePicker"
                       value={endTime}
@@ -315,7 +331,7 @@ const ScheduleRegister = () => {
 
               <View style={styles.textContainer}>
                 <View>
-                  {Platform.OS === 'ios' ? (
+                  {Platform.OS === "ios" ? (
                     <DateTimePicker
                       testID="dateTimePicker"
                       value={startTimeTwo}
@@ -329,7 +345,7 @@ const ScheduleRegister = () => {
                       <Text>{startTimeTwo.toLocaleTimeString()}</Text>
                     </TouchableOpacity>
                   )}
-                  {showStartTimeTwo && Platform.OS === 'android' && (
+                  {showStartTimeTwo && Platform.OS === "android" && (
                     <DateTimePicker
                       testID="dateTimePicker"
                       value={startTimeTwo}
@@ -347,7 +363,7 @@ const ScheduleRegister = () => {
                   <Text style={styles.dateText}>-</Text>
                 </View>
                 <View style={{ flex: 1, alignItems: "flex-start" }}>
-                  {Platform.OS === 'ios' ? (
+                  {Platform.OS === "ios" ? (
                     <DateTimePicker
                       testID="dateTimePicker"
                       value={endTimeTwo}
@@ -361,7 +377,7 @@ const ScheduleRegister = () => {
                       <Text>{endTimeTwo.toLocaleTimeString()}</Text>
                     </TouchableOpacity>
                   )}
-                  {showEndTimeTwo && Platform.OS === 'android' && (
+                  {showEndTimeTwo && Platform.OS === "android" && (
                     <DateTimePicker
                       testID="dateTimePicker"
                       value={endTimeTwo}

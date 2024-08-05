@@ -13,6 +13,8 @@ import {
 import { Checkbox } from "react-native-paper";
 import ServiceTerms from "./ServiceTerm";
 import PrivacyPolicy from "./PrivacyPolicy";
+import { bsignup } from "../../components/src/services/apiService";
+import { router } from "expo-router";
 
 const { width, height } = Dimensions.get("window");
 
@@ -22,7 +24,7 @@ const BusinessSignUpApp: React.FC = () => {
   const [confirmPassword, setConfirmPassword] = useState("");
   const [email, setEmail] = useState("");
   const [name, setName] = useState("");
-  const [businessAddress, setBusinessAddress] = useState("");
+  const [add1, setadd1] = useState("");
   const [businessNumber, setBusinessNumber] = useState("");
   const [errors, setErrors] = useState<any>({});
   const [checked0, setChecked0] = useState(false);
@@ -92,14 +94,14 @@ const BusinessSignUpApp: React.FC = () => {
     setCurrentCheckbox(null);
   };
 
-  const handleSignUp = () => {
+  const handleSignUp = async () => {
     let newErrors: any = {};
     if (!username) newErrors.username = "필수 입력 항목입니다.";
     if (!password) newErrors.password = "필수 입력 항목입니다.";
     if (!confirmPassword) newErrors.confirmPassword = "필수 입력 항목입니다.";
     if (!email) newErrors.email = "필수 입력 항목입니다.";
     if (!name) newErrors.name = "필수 입력 항목입니다.";
-    if (!businessAddress) newErrors.businessAddress = "필수 입력 항목입니다.";
+    if (!add1) newErrors.add1 = "필수 입력 항목입니다.";
     if (!businessNumber) newErrors.businessNumber = "필수 입력 항목입니다.";
     if (!tel) newErrors.tel = "필수 입력 항목입니다.";
     if (!checked1) newErrors.checked1 = "필수 체크 항목입니다.";
@@ -114,7 +116,29 @@ const BusinessSignUpApp: React.FC = () => {
 
     if (Object.keys(newErrors).length === 0) {
       // 모든 필드가 올바르게 입력되었을 때의 처리
-      console.log("회원가입 성공");
+      try {
+        const businessData = {
+          username,
+          password,
+          name,
+          add1,
+          businessNumber,
+          email,
+          tel,
+        };
+        const response = await bsignup(businessData);
+        if (response.success) {
+          console.log("사업자 회원가입 성공", response);
+          router.push("/(signin)/SignInApp");
+        } else {
+          setErrors({
+            ...errors,
+            bsignup: response.message || "사업자 회원가입 실패",
+          });
+        }
+      } catch (error) {
+        console.log("사업자 회원가입 실패", error);
+      }
     }
   };
 
@@ -299,35 +323,34 @@ const BusinessSignUpApp: React.FC = () => {
         {errors.name && <Text style={styles.errorText}>{errors.name}</Text>}
 
         <TextInput
-          style={[styles.input, errors.businessAddress && styles.errorInput]}
+          style={[styles.input, errors.add1 && styles.errorInput]}
           placeholder="사업장주소"
           placeholderTextColor="#aaa"
-          value={businessAddress}
+          value={add1}
           onChangeText={(text) => {
-            setBusinessAddress(text);
+            setadd1(text);
             if (text.trim() !== "") {
               setErrors((prev: any) => ({
                 ...prev,
-                businessAddress: null,
+                add1: null,
               }));
             }
           }}
         />
-        {errors.businessAddress && (
-          <Text style={styles.errorText}>{errors.businessAddress}</Text>
-        )}
+        {errors.add1 && <Text style={styles.errorText}>{errors.add1}</Text>}
 
         <View style={styles.id}>
           <TextInput
             style={[
               styles.idinput,
-              (errors.businessNumber || errors.duplicationCheck3) && styles.errorInput,
+              (errors.businessNumber || errors.duplicationCheck3) &&
+                styles.errorInput,
             ]}
             placeholder="사업자등록번호"
             placeholderTextColor="#aaa"
             value={businessNumber}
             onChangeText={(text) => {
-              setEmail(text);
+              setBusinessNumber(text);
               if (text.trim() !== "") {
                 setErrors((prev: any) => ({
                   ...prev,
@@ -348,7 +371,9 @@ const BusinessSignUpApp: React.FC = () => {
             </TouchableOpacity>
           </View>
         </View>
-        {errors.businessNumber && <Text style={styles.errorText}>{errors.businessNumber}</Text>}
+        {errors.businessNumber && (
+          <Text style={styles.errorText}>{errors.businessNumber}</Text>
+        )}
         {errors.duplicationCheck3 && (
           <Text style={styles.errorText}>{errors.duplicationCheck3}</Text>
         )}
