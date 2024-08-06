@@ -15,6 +15,7 @@ import PrivacyPolicy from "./PrivacyPolicy";
 import ServiceTerms from "./ServiceTerm";
 import { signUp } from "@/components/src/services/apiService";
 import { router } from "expo-router";
+import Postcode from '@actbase/react-daum-postcode';
 
 const { width, height } = Dimensions.get("window");
 
@@ -24,7 +25,9 @@ const PersonalSignUpApp: React.FC = () => {
   const [confirmPassword, setConfirmPassword] = useState("");
   const [name, setName] = useState("");
   const [birth, setBirth] = useState("");
+  const [postcode, setPostcode] = useState("");
   const [add1, setAdd1] = useState("");
+  const [add2, setAdd2] = useState("");
   const [email, setEmail] = useState("");
   const [errors, setErrors] = useState<any>({});
   const [checked0, setChecked0] = useState(false);
@@ -36,6 +39,7 @@ const PersonalSignUpApp: React.FC = () => {
   const [duplicationCheck2, setDuplicationCheck2] = useState(false);
   const [currentCheckbox, setCurrentCheckbox] = useState<number | null>(null);
   const [tel, setTel] = useState("");
+  const [postcodeModalVisible, setPostcodeModalVisible] = useState(false);
 
   const handleCheckbox0Press = () => {
     if (checked1 && checked2) {
@@ -100,7 +104,9 @@ const PersonalSignUpApp: React.FC = () => {
     if (!confirmPassword) newErrors.confirmPassword = "필수 입력 항목입니다.";
     if (!name) newErrors.name = "필수 입력 항목입니다.";
     if (!birth) newErrors.birth = "필수 입력 항목입니다.";
+    if (!postcode) newErrors.add1 = "필수 입력 항목입니다.";
     if (!add1) newErrors.add1 = "필수 입력 항목입니다.";
+    if (!add2) newErrors.add1 = "필수 입력 항목입니다.";
     if (!email) newErrors.email = "필수 입력 항목입니다.";
     if (!tel) newErrors.tel = "필수 입력 항목입니다.";
     if (!checked1) newErrors.checked1 = "필수 체크 항목입니다.";
@@ -118,7 +124,9 @@ const PersonalSignUpApp: React.FC = () => {
           password,
           name,
           birth,
+          postcode,
           add1,
+          add2,
           email,
           tel,
         };
@@ -160,6 +168,12 @@ const PersonalSignUpApp: React.FC = () => {
       setDuplicationCheck2(true);
       setErrors((prev: any) => ({ ...prev, duplicationCheck2: null }));
     }
+  };
+
+  const handlePostcodeComplete = (data) => {
+    setPostcode(data.zonecode);
+    setAdd1(data.address);
+    setPostcodeModalVisible(false);
   };
 
   return (
@@ -268,6 +282,32 @@ const PersonalSignUpApp: React.FC = () => {
         />
         {errors.birth && <Text style={styles.errorText}>{errors.birth}</Text>}
 
+        <View style={styles.postcode}>
+          <TextInput
+            style={[
+              styles.postcodeinput,
+              (errors.postcode || errors.postcode) && styles.postcode,
+            ]}
+            placeholder="우편번호"
+            placeholderTextColor="#aaa"
+            value={postcode}
+            onChangeText={(text) => {
+              setPostcode(text);
+              if (text.trim() !== "") {
+                setErrors((prev: any) => ({
+                  ...prev,
+                  postcode: null,
+                }));
+              }
+            }}
+          />
+          <View style={[styles.postcodesearch]}>
+            <TouchableOpacity onPress={() => setPostcodeModalVisible(true)}>
+              <Text style={styles.checkButton}>우편번호 찾기</Text>
+            </TouchableOpacity>
+          </View>
+        </View>
+
         <TextInput
           style={[styles.input, errors.add1 && styles.errorInput]}
           placeholder="주소"
@@ -280,7 +320,20 @@ const PersonalSignUpApp: React.FC = () => {
             }
           }}
         />
-        {errors.add1 && <Text style={styles.errorText}>{errors.add1}</Text>}
+        {errors.add2 && <Text style={styles.errorText}>{errors.add2}</Text>}
+        <TextInput
+          style={[styles.input, errors.add2 && styles.errorInput]}
+          placeholder="상세주소"
+          placeholderTextColor="#aaa"
+          value={add2}
+          onChangeText={(text) => {
+            setAdd2(text);
+            if (text.trim() !== "") {
+              setErrors((prev: any) => ({ ...prev, add2: null }));
+            }
+          }}
+        />
+        {errors.add2 && <Text style={styles.errorText}>{errors.add2}</Text>}
 
         <TextInput
           style={[styles.input, errors.tel && styles.errorInput]}
@@ -390,6 +443,23 @@ const PersonalSignUpApp: React.FC = () => {
             <TouchableOpacity onPress={closeModal} style={styles.closeButton}>
               <Text style={styles.closeButtonText}>확인</Text>
             </TouchableOpacity>
+          </View>
+        </View>
+      </Modal>
+
+      <Modal visible={postcodeModalVisible} animationType="slide" transparent={true}>
+        <View style={styles.modalContainer2}>
+          <View style={styles.modalContent2}>
+            <Postcode
+              style={{ width: '100%', height: '100%' }}
+              jsOptions={{ animation: true }}
+              onSelected={handlePostcodeComplete}
+            />
+            <View>
+            <TouchableOpacity onPress={() => setPostcodeModalVisible(false)} style={styles.closeButton}>
+              <Text style={styles.closeButtonText}>닫기</Text>
+            </TouchableOpacity>
+            </View>
           </View>
         </View>
       </Modal>
@@ -519,6 +589,38 @@ const styles = StyleSheet.create({
   },
   errorInput: {
     borderColor: "red",
+  },
+  postcode: {
+    flexDirection: "row",
+  },
+  postcodeinput: {
+    borderColor: "#ccc",
+    borderBottomWidth: 1,
+    marginBottom: 10,
+    paddingHorizontal: 10,
+    width: width * 0.5,
+    height: height * 0.055,
+  },
+  postcodesearch: {
+    borderColor: "#ccc",
+    borderBottomWidth: 1,
+    marginBottom: 10,
+    paddingHorizontal: 10,
+    width: width * 0.3,
+    justifyContent: "center",
+  },
+  modalContainer2: {
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "center",
+    backgroundColor: "rgba(0, 0, 0, 0.5)",
+  },
+  modalContent2: {
+    width: width * 0.9,
+    height: height * 0.65,
+    backgroundColor: "#fff",
+    borderRadius: 10,
+    padding: 20,
   },
 });
 

@@ -11,7 +11,7 @@ import {
 import { Checkbox } from "react-native-paper";
 import { Image } from "react-native-elements";
 import { useNavigation } from "@react-navigation/native";
-import { useRouter } from "expo-router";
+import { useFocusEffect, useRouter } from "expo-router";
 import { login } from "../../components/src/services/apiService";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 
@@ -41,14 +41,31 @@ const SignInApp = () => {
       if (token) {
         const userType = await AsyncStorage.getItem("userType");
         if (userType === "1") {
-          router.push("/(staffLayout)/FormBox");
+          navigation.navigate("StaffTabs");
         } else if (userType === "2") {
-          router.push("/(adminLayout)/AdminPage"); // 관리자 페이지로 추후 변경
+          navigation.navigate("AdminTabs");
         }
       }
     };
     checkLoggedIn();
   }, []);
+
+  useFocusEffect(
+    React.useCallback(() => {
+      const resetLoginState = async () => {
+        const token = await AsyncStorage.getItem("userToken");
+        if (token) {
+          const userType = await AsyncStorage.getItem("userType");
+          if (userType === "1") {
+            navigation.navigate("StaffTabs");
+          } else if (userType === "2") {
+            navigation.navigate("AdminTabs");
+          }
+        }
+      };
+      resetLoginState();
+    }, [])
+  );
 
   const handleLogin = async () => {
     try {
@@ -60,10 +77,10 @@ const SignInApp = () => {
           await AsyncStorage.setItem("userType", response.type.toString());
         }
         
-        if(response.userType === 1) {
-          router.push("/(staffLayout)/FormBox"); // 일반 회원 라우터 설정에 따라 변경
+        if (response.userType === 1) {
+          navigation.navigate("StaffTabs");
         } else if (response.userType === 2) {
-          router.push("/(adminLayout)/AdminPage"); // 관리자 페이지로 추후 변경
+          navigation.navigate("AdminTabs");
         }
       } else {
         setError(response.message || "로그인 실패");
@@ -73,6 +90,8 @@ const SignInApp = () => {
       setError("로그인 중 오류가 발생했습니다.");
     }
   };
+
+  
 
   return (
     <SafeAreaView style={styles.container}>

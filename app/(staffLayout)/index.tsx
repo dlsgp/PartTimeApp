@@ -2,7 +2,6 @@ import { StyleSheet, useColorScheme, View } from "react-native";
 import Swiper from "react-native-swiper";
 import FormBox from "./FormBox";
 import FormBoxtwo from "./FormBoxtwo";
-import EmployeeList from "./EmployeeList";
 import { StatusBar } from "expo-status-bar";
 
 function Staffindex() {
@@ -19,9 +18,6 @@ function Staffindex() {
         </View>
         <View style={StaffStyle.slide}>
           <FormBoxtwo />
-        </View>
-        <View style={StaffStyle.slide}>
-          <EmployeeList />
         </View>
       </Swiper>
     </View>
