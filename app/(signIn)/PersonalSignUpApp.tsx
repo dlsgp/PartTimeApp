@@ -20,7 +20,7 @@ import Postcode from '@actbase/react-daum-postcode';
 const { width, height } = Dimensions.get("window");
 
 const PersonalSignUpApp: React.FC = () => {
-  const [username, setUsername] = useState("");
+  const [id, setid] = useState("");
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
   const [name, setName] = useState("");
@@ -99,7 +99,7 @@ const PersonalSignUpApp: React.FC = () => {
 
   const handleSignUp = async () => {
     let newErrors: any = {};
-    if (!username) newErrors.username = "필수 입력 항목입니다.";
+    if (!id) newErrors.id = "필수 입력 항목입니다.";
     if (!password) newErrors.password = "필수 입력 항목입니다.";
     if (!confirmPassword) newErrors.confirmPassword = "필수 입력 항목입니다.";
     if (!name) newErrors.name = "필수 입력 항목입니다.";
@@ -120,11 +120,10 @@ const PersonalSignUpApp: React.FC = () => {
     if (Object.keys(newErrors).length === 0) {
       try {
         const userData = {
-          username,
+          id,
           password,
           name,
           birth,
-          postcode,
           add1,
           add2,
           email,
@@ -133,7 +132,7 @@ const PersonalSignUpApp: React.FC = () => {
         const response = await signUp(userData);
         if (response.success) {
           console.log(response); // 회원가입 성공
-          router.push("/(signIn)/SignInApp");
+          router.push("/");
         } else {
           setErrors({
             ...errors,
@@ -147,7 +146,7 @@ const PersonalSignUpApp: React.FC = () => {
   };
 
   const handleDuplicationCheck1 = () => {
-    if (username.trim() === "") {
+    if (id.trim() === "") {
       setErrors((prev: any) => ({
         ...prev,
         duplicationCheck1: "아이디를 입력하세요.",
@@ -185,18 +184,18 @@ const PersonalSignUpApp: React.FC = () => {
           <TextInput
             style={[
               styles.idinput,
-              (errors.username || errors.duplicationCheck1) &&
+              (errors.id || errors.duplicationCheck1) &&
                 styles.errorInput,
             ]}
             placeholder="아이디"
             placeholderTextColor="#aaa"
-            value={username}
+            value={id}
             onChangeText={(text) => {
-              setUsername(text);
+              setid(text);
               if (text.trim() !== "") {
                 setErrors((prev: any) => ({
                   ...prev,
-                  username: null,
+                  id: null,
                   duplicationCheck1: null,
                 }));
               }
@@ -213,8 +212,8 @@ const PersonalSignUpApp: React.FC = () => {
             </TouchableOpacity>
           </View>
         </View>
-        {errors.username && (
-          <Text style={styles.errorText}>{errors.username}</Text>
+        {errors.id && (
+          <Text style={styles.errorText}>{errors.id}</Text>
         )}
         {errors.duplicationCheck1 && (
           <Text style={styles.errorText}>{errors.duplicationCheck1}</Text>

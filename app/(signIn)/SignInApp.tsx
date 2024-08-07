@@ -7,6 +7,7 @@ import {
   TouchableOpacity,
   StyleSheet,
   Dimensions,
+  ActivityIndicator,
 } from "react-native";
 import { Checkbox } from "react-native-paper";
 import { Image } from "react-native-elements";
@@ -24,6 +25,7 @@ const SignInApp = () => {
   const [id, setId] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
+  const [loading, setLoading] = useState(true); // 로딩 상태 추가
 
   const HorizonLine = ({ text }) => {
     return (
@@ -35,10 +37,95 @@ const SignInApp = () => {
     );
   };
 
+  // useEffect(() => {
+  //   const checkLoggedIn = async () => {
+  //     const token = await AsyncStorage.getItem("userToken");
+  //     if (token) {
+  //       const userType = await AsyncStorage.getItem("userType");
+  //       if (userType === "1") {
+  //         navigation.navigate("StaffTabs");
+  //       } else if (userType === "2") {
+  //         navigation.navigate("AdminTabs");
+  //       }
+  //     }
+  //   };
+  //   checkLoggedIn();
+  // }, []);
+
+  // useFocusEffect(
+  //   React.useCallback(() => {
+  //     const resetLoginState = async () => {
+  //       const token = await AsyncStorage.getItem("userToken");
+  //       if (token) {
+  //         const userType = await AsyncStorage.getItem("userType");
+  //         if (userType === "1") {
+  //           navigation.navigate("StaffTabs");
+  //         } else if (userType === "2") {
+  //           navigation.navigate("AdminTabs");
+  //         }
+  //       }
+  //     };
+  //     resetLoginState();
+  //   }, [])
+  // );
+
+  // // const handleLogin = async () => {
+  // //   try {
+  // //     const response = await login(id, password);
+  // //     if (response.success) {
+  // //       console.log("Login successful:", response);
+  // //        if (checked) {
+  // //         await AsyncStorage.setItem("userToken", response.token);
+  // //         await AsyncStorage.setItem("userId", id);
+  // //         console.log("SignInApp.tsx - userId :",id);
+  // //         await AsyncStorage.setItem("userType", response.type.toString());
+  // //        }
+        
+  // //       if (response.userType === 1) {
+  // //         navigation.navigate("StaffTabs");
+  // //       } else if (response.userType === 2) {
+  // //         navigation.navigate("AdminTabs");
+  // //       }
+  // //     } else {
+  // //       setError(response.message || "로그인 실패");
+  // //     }
+  // //   } catch (error) {
+  // //     console.log("Login error:", error);
+  // //     setError("로그인 중 오류가 발생했습니다.");
+  // //   }
+  // // };
+
+  // const handleLogin = async () => {
+  //   try {
+  //     const response = await login(id, password);
+  //     if (response.success) {
+  //       console.log("Login successful:", response);
+  //       // 항상 userId와 userType을 저장
+  //       await AsyncStorage.setItem("userToken", response.token);
+  //       await AsyncStorage.setItem("userId", response.userId);  // 수정된 부분
+  //       await AsyncStorage.setItem("userType", response.userType.toString());
+        
+  //       if (response.userType === 1) {
+  //         navigation.navigate("StaffTabs");
+  //       } else if (response.userType === 2) {
+  //         navigation.navigate("AdminTabs");
+  //       }
+  //     } else {
+  //       setError(response.message || "로그인 실패");
+  //     }
+  //   } catch (error) {
+  //     console.log("Login error:", error);
+  //     setError("로그인 중 오류가 발생했습니다.");
+  //   }
+  // };
+
   useEffect(() => {
     const checkLoggedIn = async () => {
       const token = await AsyncStorage.getItem("userToken");
-      if (token) {
+      const tokenExpiration = await AsyncStorage.getItem("tokenExpiration");
+      const now = new Date().getTime();
+
+      if (token && (!tokenExpiration || now < parseInt(tokenExpiration, 10))) {
         const userType = await AsyncStorage.getItem("userType");
         if (userType === "1") {
           navigation.navigate("StaffTabs");
@@ -46,6 +133,7 @@ const SignInApp = () => {
           navigation.navigate("AdminTabs");
         }
       }
+      setLoading(false); // 로딩 상태 해제
     };
     checkLoggedIn();
   }, []);
@@ -54,13 +142,21 @@ const SignInApp = () => {
     React.useCallback(() => {
       const resetLoginState = async () => {
         const token = await AsyncStorage.getItem("userToken");
-        if (token) {
+        const tokenExpiration = await AsyncStorage.getItem("tokenExpiration");
+        const now = new Date().getTime();
+
+        if (token && (!tokenExpiration || now < parseInt(tokenExpiration, 10))) {
           const userType = await AsyncStorage.getItem("userType");
           if (userType === "1") {
             navigation.navigate("StaffTabs");
           } else if (userType === "2") {
             navigation.navigate("AdminTabs");
           }
+        } else {
+          await AsyncStorage.removeItem("userToken");
+          await AsyncStorage.removeItem("userId");
+          await AsyncStorage.removeItem("userType");
+          await AsyncStorage.removeItem("tokenExpiration");
         }
       };
       resetLoginState();
@@ -72,11 +168,19 @@ const SignInApp = () => {
       const response = await login(id, password);
       if (response.success) {
         console.log("Login successful:", response);
-        if (checked) {
-          await AsyncStorage.setItem("userToken", response.token);
-          await AsyncStorage.setItem("userType", response.type.toString());
+        const tokenExpiration = checked
+          ? null
+          : new Date().getTime() + 24 * 60 * 60 * 1000; // 24 hours from now
+
+        await AsyncStorage.setItem("userToken", response.token);
+        await AsyncStorage.setItem("userId", response.userId);
+        await AsyncStorage.setItem("userType", response.userType.toString());
+        if (tokenExpiration) {
+          await AsyncStorage.setItem("tokenExpiration", tokenExpiration.toString());
+        } else {
+          await AsyncStorage.removeItem("tokenExpiration");
         }
-        
+
         if (response.userType === 1) {
           navigation.navigate("StaffTabs");
         } else if (response.userType === 2) {
@@ -90,6 +194,15 @@ const SignInApp = () => {
       setError("로그인 중 오류가 발생했습니다.");
     }
   };
+
+  if (loading) {
+    return (
+      <SafeAreaView style={styles.container}>
+        <ActivityIndicator size="large" color="#0000ff" />
+      </SafeAreaView>
+    );
+  }
+
 
   
 

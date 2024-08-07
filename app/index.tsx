@@ -11,32 +11,39 @@ import Test from "./(myPage)/Test";
 const Stack = createNativeStackNavigator();
 
 const MainPage = () => {
-  const [loading, setLoading] = useState(true);
-  const [initialRoute, setInitialRoute] = useState("SignIn");
+  // const [loading, setLoading] = useState(true);
+  // const [initialRoute, setInitialRoute] = useState("SignIn");
+
+  // useEffect(() => {
+  //   const checkLoggedIn = async () => {
+  //     const token = await AsyncStorage.getItem("userToken");
+  //     if (token) {
+  //       const userType = await AsyncStorage.getItem("userType");
+  //       if (userType === "1") {
+  //         setInitialRoute("StaffTabs");
+  //       } else if (userType === "2") {
+  //         setInitialRoute("AdminTabs");
+  //       }
+  //     }
+  //     setLoading(false);
+  //   };
+  //   checkLoggedIn();
+  // }, []);
 
   useEffect(() => {
-    const checkLoggedIn = async () => {
-      const token = await AsyncStorage.getItem("userToken");
-      if (token) {
-        const userType = await AsyncStorage.getItem("userType");
-        if (userType === "1") {
-          setInitialRoute("StaffTabs");
-        } else if (userType === "2") {
-          setInitialRoute("AdminTabs");
-        }
-      }
-      setLoading(false);
-    };
-    checkLoggedIn();
-  }, []);
+    const checkTokenExpiration = async () => {
+      const tokenExpiration = await AsyncStorage.getItem("tokenExpiration");
+      const now = new Date().getTime();
 
-  if (loading) {
-    return (
-      <View style={{ flex: 1, justifyContent: "center", alignItems: "center" }}>
-        <ActivityIndicator size="large" />
-      </View>
-    );
-  }
+      if (tokenExpiration && now > parseInt(tokenExpiration, 10)) {
+        await AsyncStorage.removeItem("userToken");
+        await AsyncStorage.removeItem("userId");
+        await AsyncStorage.removeItem("userType");
+        await AsyncStorage.removeItem("tokenExpiration");
+      }
+    };
+    checkTokenExpiration();
+  }, []);
 
   return (
     <NavigationContainer independent={true}>

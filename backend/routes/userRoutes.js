@@ -8,8 +8,8 @@ const crypto = require("crypto");
 const transporter = nodemailer.createTransport({
   service: "gmail",
   auth: {
-    user: 'gusrl45612@gmail.com',
-    pass: 'jqrrthumrngyqdmv',
+    user: "gusrl45612@gmail.com",
+    pass: "jqrrthumrngyqdmv",
   },
 });
 
@@ -39,9 +39,14 @@ router.post("/login", async (req, res) => {
         success: true,
         message: "Login successful",
         userType: userType,
+        userId: id,
       });
+      console.log("userId:", id);
+
     } else {
-      res.status(401).json({ success: false, message: "잘못된 자격 증명입니다" });
+      res
+        .status(401)
+        .json({ success: false, message: "잘못된 자격 증명입니다" });
     }
   } catch (err) {
     console.error(err);
@@ -59,7 +64,7 @@ router.post("/login", async (req, res) => {
 
 // 회원가입 엔드포인트
 router.post("/signup", async (req, res) => {
-  const { username, password, name, birth, add1, email, tel } = req.body;
+  const { id, password, name, birth, add1, add2, email, tel } = req.body;
   const dbConfig = req.app.get("dbConfig");
 
   let connection;
@@ -68,9 +73,9 @@ router.post("/signup", async (req, res) => {
     connection = await oracledb.getConnection(dbConfig);
 
     const result = await connection.execute(
-      `INSERT INTO register (reg_num, type, id, pwd, name, tel, email, add1, birth)
-      VALUES (reg_num_seq.NEXTVAL, 1, :username, :password, :name, :tel, :email, :add1, birth)`,
-      [username, password, name, tel, email, add1, birth],
+      `INSERT INTO register (reg_num, type, id, pwd, name, tel, email, add1, add2, birth)
+      VALUES (reg_num_seq.NEXTVAL, 1, :id, :password, :name, :tel, :email, :add1, :add2, :birth)`,
+      [id, password, name, tel, email, add1, add2, birth],
       { autoCommit: true }
     );
 
@@ -93,8 +98,7 @@ router.post("/signup", async (req, res) => {
 
 // 사업자 회원가입 엔드포인트
 router.post("/bsignup", async (req, res) => {
-  const { username, password, name, add1, businessNumber, email, tel } =
-    req.body;
+  const { id, password, name, add1, businessNumber, email, tel } = req.body;
   const dbConfig = req.app.get("dbConfig");
 
   let connection;
@@ -104,8 +108,8 @@ router.post("/bsignup", async (req, res) => {
 
     const result = await connection.execute(
       `INSERT INTO register (reg_num, type, id, pwd, name, tel, email, add1, regNum)
-      VALUES (reg_num_seq.NEXTVAL, 2, :username, :password, :name, :tel, :email, :add1, :businessNumber)`,
-      [username, password, name, tel, email, add1, businessNumber],
+      VALUES (reg_num_seq.NEXTVAL, 2, :id, :password, :name, :tel, :email, :add1, :businessNumber)`,
+      [id, password, name, tel, email, add1, businessNumber],
       { autoCommit: true }
     );
 
@@ -144,7 +148,10 @@ router.post("/send-verification-code", async (req, res) => {
     );
 
     if (result.rows.length > 0) {
-      const verificationCode = crypto.randomBytes(3).toString("hex").toUpperCase();
+      const verificationCode = crypto
+        .randomBytes(3)
+        .toString("hex")
+        .toUpperCase();
       verificationCodes[email] = verificationCode;
 
       const mailOptions = {
@@ -157,13 +164,21 @@ router.post("/send-verification-code", async (req, res) => {
       transporter.sendMail(mailOptions, (error, info) => {
         if (error) {
           console.error(error);
-          res.status(500).json({ success: false, message: "이메일 전송에 실패했습니다." });
+          res
+            .status(500)
+            .json({ success: false, message: "이메일 전송에 실패했습니다." });
         } else {
-          res.status(200).json({ success: true, message: "인증 번호 발송에 성공하였습니다." });
+          res.status(200).json({
+            success: true,
+            message: "인증 번호 발송에 성공하였습니다.",
+          });
         }
       });
     } else {
-      res.status(400).json({ success: false, message: "잘못된 아이디 혹은 패스워드입니다." });
+      res.status(400).json({
+        success: false,
+        message: "잘못된 아이디 혹은 패스워드입니다.",
+      });
     }
   } catch (err) {
     console.error(err);
@@ -186,7 +201,9 @@ router.post("/verify-code", async (req, res) => {
   if (verificationCodes[email] === verificationCode) {
     res.status(200).json({ success: true, message: "코드 검증 완료" });
   } else {
-    res.status(400).json({ success: false, message: "잘못된 인증 코드입니다." });
+    res
+      .status(400)
+      .json({ success: false, message: "잘못된 인증 코드입니다." });
   }
 });
 
@@ -218,6 +235,50 @@ router.post("/reset-password", async (req, res) => {
   } catch (err) {
     console.error(err);
     res.status(500).json({ success: false, message: "인터넷 서버 오류 500" });
+  } finally {
+    if (connection) {
+      try {
+        await connection.close();
+      } catch (err) {
+        console.error(err);
+      }
+    }
+  }
+});
+
+router.get("/users/:userId", async (req, res) => {
+  const { userId } = req.params;
+  const dbConfig = req.app.get("dbConfig");
+
+  console.log("Fetching user info for ID:", userId); // 아이디 확인용 로그
+
+  let connection;
+
+  try {
+    connection = await oracledb.getConnection(dbConfig);
+
+    const result = await connection.execute(
+      `SELECT id, name, tel, email, add1, add2 FROM register WHERE id = :userId`,
+      [userId]
+    );
+
+    if (result.rows.length > 0) {
+      const userInfo = result.rows[0];
+      console.log("result.rows:", result.rows); // 값 확인용
+      res.status(200).json({
+        id: userInfo[0],
+        name: userInfo[1],
+        tel: userInfo[2],
+        email: userInfo[3],
+        add1: userInfo[4],
+        add2: userInfo[5]
+      });
+    } else {
+      res.status(404).json({ message: "사용자를 찾을 수 없습니다" });
+    }
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ message: "인터넷 서버 오류 500" });
   } finally {
     if (connection) {
       try {

@@ -1,5 +1,4 @@
-import * as React from "react";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import {
   Button,
   Dimensions,
@@ -13,12 +12,43 @@ import {
 } from "react-native";
 import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
 import { TextInput } from "react-native-paper";
-import { router } from "expo-router";
+import { router, useRouter } from "expo-router";
+import { getUserInfo } from "@/components/src/services/apiService";
+import AsyncStorage from "@react-native-async-storage/async-storage";
+import { SafeAreaView } from "react-native-safe-area-context";
 
 const { width, height } = Dimensions.get("window");
 
 const Mypage = () => {
+  const [userInfo, setUserInfo] = useState(null);
   const [text, setText] = useState("");
+  const router = useRouter();
+
+  useEffect(() => {
+    const fetchUserInfo = async () => {
+      const userId = await AsyncStorage.getItem("userId");
+      console.log("UserId from AsyncStorage:", userId);
+      if (userId) {
+        try {
+          const data = await getUserInfo(userId);
+          console.log("Fetched user data:", data);
+          setUserInfo(data);
+        } catch (error) {
+          console.error("Failed to fetch user info:", error);
+        }
+      }
+    };
+    fetchUserInfo();
+  }, []);
+
+  if (!userInfo) {
+    return (
+      <SafeAreaView style={RegFormStyle.container}>
+        <Text>Loading...</Text>
+      </SafeAreaView>
+    );
+  }
+
   return (
     <KeyboardAwareScrollView style={RegFormStyle.maincontainer}>
       <View style={RegFormStyle.container}>
@@ -37,68 +67,73 @@ const Mypage = () => {
             <View style={RegFormStyle.textInputContainer}>
               <TextInput
                 style={RegFormStyle.formcontainer}
-                label="이름"
-                onChangeText={(text) => setText(text)}
+                // label="이름"
+                value={userInfo.name}
                 mode="outlined"
                 outlineColor="#E5E5E5"
                 activeOutlineColor="#219BDA"
+                disabled="false"
                 theme={{ colors: { background: "white" } }}
+                // onChangeText={(text) => setUserData({ ...userData, name: text })}
               />
               <TextInput
                 style={RegFormStyle.formcontainer}
-                label="전화번호"
-                onChangeText={(text) => setText(text)}
+                // label="전화번호"
+                value={userInfo.tel}
                 mode="outlined"
                 outlineColor="#E5E5E5"
                 activeOutlineColor="#219BDA"
+                disabled="false"
                 theme={{ colors: { background: "white" } }}
+                // onChangeText={(text) => setUserData({ ...userData, tel: text })}
               />
               <TextInput
                 style={RegFormStyle.formcontainer}
-                label="이메일"
-                onChangeText={(text) => setText(text)}
+                // label="이메일"
+                value={userInfo.email}
                 mode="outlined"
                 outlineColor="#E5E5E5"
                 activeOutlineColor="#219BDA"
+                disabled="false"
                 theme={{ colors: { background: "white" } }}
+                // onChangeText={(text) => setUserData({ ...userData, email: text })}
               />
 
               <TextInput
                 style={RegFormStyle.formcontainerAad}
-                label="주소"
-                onChangeText={(text) => setText(text)}
+                // label="주소"
+                value={userInfo.add1}
                 mode="outlined"
                 outlineColor="#E5E5E5"
                 activeOutlineColor="#219BDA"
+                disabled="false"
                 theme={{ colors: { background: "white" } }}
+                // onChangeText={(text) => setUserData({ ...userData, add1: text })}
               />
               <TextInput
                 style={RegFormStyle.formcontainerAD}
                 label=""
-                onChangeText={(text) => setText(text)}
+                value={userInfo.add2}
                 mode="outlined"
                 outlineColor="#E5E5E5"
                 activeOutlineColor="#219BDA"
+                disabled="false"
                 theme={{ colors: { background: "white" } }}
+                // onChangeText={(text) => setUserData({ ...userData, add2: text })}
               />
               <View style={RegFormStyle.buttonD}>
-                {/* <Button
-                  color={"#ffffff"}
-                  title="수정하기"
-                  onPress={() => router.push("/FormBox")}
-                /> */}
                 <TouchableOpacity
-              activeOpacity={0.8}
-              style={RegFormStyle.button2}
-              onPress={() => router.push("/FormBox")}
-            >
-              <Text style={RegFormStyle.buttonText}>수정하기</Text>
-            </TouchableOpacity>
+                  activeOpacity={0.8}
+                  style={RegFormStyle.button2}
+                  onPress={() => router.push("/FormBox")}
+                >
+                  <Text style={RegFormStyle.buttonText}>수정하기</Text>
+                </TouchableOpacity>
               </View>
 
               <TextInput
                 style={RegFormStyle.formcontainerB}
-                label=""
+                label="사원번호"
                 placeholder="사원번호        0001"
                 onChangeText={(text) => setText(text)}
                 mode="outlined"
@@ -108,7 +143,7 @@ const Mypage = () => {
 
               <TextInput
                 style={RegFormStyle.formcontainerB}
-                label=""
+                label="직급"
                 placeholder="직급               알바"
                 onChangeText={(text) => setText(text)}
                 mode="outlined"
@@ -118,7 +153,7 @@ const Mypage = () => {
 
               <TextInput
                 style={RegFormStyle.formcontainerB}
-                label=""
+                label="시급"
                 placeholder="시급               7900"
                 onChangeText={(text) => setText(text)}
                 mode="outlined"
@@ -128,7 +163,7 @@ const Mypage = () => {
 
               <TextInput
                 style={RegFormStyle.formcontainerB}
-                label=""
+                label="입사일"
                 placeholder="입사일            2024-07-10"
                 onChangeText={(text) => setText(text)}
                 mode="outlined"
@@ -138,7 +173,7 @@ const Mypage = () => {
 
               <TextInput
                 style={RegFormStyle.formcontainerB}
-                label=""
+                label="수습기간"
                 placeholder="수습기간         2024-07-10~2024-10-10"
                 onChangeText={(text) => setText(text)}
                 mode="outlined"
@@ -148,7 +183,7 @@ const Mypage = () => {
 
               <TextInput
                 style={RegFormStyle.formcontainerB}
-                label=""
+                label="4대보험유무"
                 placeholder="4대보험유무    아니오"
                 onChangeText={(text) => setText(text)}
                 mode="outlined"

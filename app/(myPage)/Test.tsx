@@ -6,6 +6,7 @@ const Test = () => {
   const handleLogout = async () => {
     await AsyncStorage.removeItem("userToken");
     await AsyncStorage.removeItem("userType");
+    await AsyncStorage.removeItem("userId");
     router.push("/"); // 로그인 화면으로 이동
   };
 

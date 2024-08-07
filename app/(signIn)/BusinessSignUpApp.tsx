@@ -20,7 +20,7 @@ import Postcode from "@actbase/react-daum-postcode";
 const { width, height } = Dimensions.get("window");
 
 const BusinessSignUpApp: React.FC = () => {
-  const [username, setUsername] = useState("");
+  const [id, setid] = useState("");
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
   const [email, setEmail] = useState("");
@@ -100,7 +100,7 @@ const BusinessSignUpApp: React.FC = () => {
 
   const handleSignUp = async () => {
     let newErrors: any = {};
-    if (!username) newErrors.username = "필수 입력 항목입니다.";
+    if (!id) newErrors.id = "필수 입력 항목입니다.";
     if (!password) newErrors.password = "필수 입력 항목입니다.";
     if (!confirmPassword) newErrors.confirmPassword = "필수 입력 항목입니다.";
     if (!email) newErrors.email = "필수 입력 항목입니다.";
@@ -124,10 +124,9 @@ const BusinessSignUpApp: React.FC = () => {
       // 모든 필드가 올바르게 입력되었을 때의 처리
       try {
         const businessData = {
-          username,
+          id,
           password,
           name,
-          postcode,
           add1,
           add2,
           businessNumber,
@@ -137,7 +136,7 @@ const BusinessSignUpApp: React.FC = () => {
         const response = await bsignup(businessData);
         if (response.success) {
           console.log("사업자 회원가입 성공", response);
-          router.push("/(signIn)/SignInApp");
+          router.push("/");
         } else {
           setErrors({
             ...errors,
@@ -151,7 +150,7 @@ const BusinessSignUpApp: React.FC = () => {
   };
 
   const handleDuplicationCheck1 = () => {
-    if (username.trim() === "") {
+    if (id.trim() === "") {
       setErrors((prev: any) => ({
         ...prev,
         duplicationCheck1: "아이디를 입력하세요.",
@@ -200,18 +199,18 @@ const BusinessSignUpApp: React.FC = () => {
           <TextInput
             style={[
               styles.idinput,
-              (errors.username || errors.duplicationCheck1) &&
+              (errors.id || errors.duplicationCheck1) &&
                 styles.errorInput,
             ]}
             placeholder="아이디"
             placeholderTextColor="#aaa"
-            value={username}
+            value={id}
             onChangeText={(text) => {
-              setUsername(text);
+              setid(text);
               if (text.trim() !== "") {
                 setErrors((prev: any) => ({
                   ...prev,
-                  username: null,
+                  id: null,
                   duplicationCheck1: null,
                 }));
               }
@@ -228,8 +227,8 @@ const BusinessSignUpApp: React.FC = () => {
             </TouchableOpacity>
           </View>
         </View>
-        {errors.username && (
-          <Text style={styles.errorText}>{errors.username}</Text>
+        {errors.id && (
+          <Text style={styles.errorText}>{errors.id}</Text>
         )}
         {errors.duplicationCheck1 && (
           <Text style={styles.errorText}>{errors.duplicationCheck1}</Text>
@@ -374,7 +373,7 @@ const BusinessSignUpApp: React.FC = () => {
             }
           }}
         />
-        {errors.add2 && <Text style={styles.errorText}>{errors.add2}</Text>}
+        {errors.add1 && <Text style={styles.errorText}>{errors.add1}</Text>}
         <TextInput
           style={[styles.input, errors.add2 && styles.errorInput]}
           placeholder="상세주소"

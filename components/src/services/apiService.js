@@ -22,7 +22,7 @@ export const login = async (id, password) => {
     return response.data;
   } catch (error) {
     console.error("Login API call failed:", error);
-    throw error;
+    throw error.response ? error.response.data : error;
   }
 };
 
@@ -77,6 +77,16 @@ export const resetPassword = async (email, verificationCode, newPassword) => {
     return response.data;
   } catch (error) {
     console.error("Reset password API call failed:", error);
+    throw error.response ? error.response.data : error;
+  }
+};
+
+export const getUserInfo = async (userId) => {
+  try {
+    const response = await axios.get(`${API_URL}/users/${userId}`);
+    return response.data;
+  } catch (error) {
+    console.error('Get user info API call failed:', error);
     throw error.response ? error.response.data : error;
   }
 };
