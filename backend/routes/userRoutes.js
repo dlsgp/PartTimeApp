@@ -290,4 +290,40 @@ router.get("/users/:userId", async (req, res) => {
   }
 });
 
+router.post("/update-user", async (req, res) => {
+  const { id, tel, email, add1, add2 } = req.body;
+  const dbConfig = req.app.get("dbConfig");
+
+  let connection;
+
+  try {
+    connection = await oracledb.getConnection(dbConfig);
+
+    const result = await connection.execute(
+      `UPDATE register 
+       SET tel = :tel, email = :email, add1 = :add1, add2 = :add2 
+       WHERE id = :id`,
+      { tel, email, add1, add2, id },
+      { autoCommit: true }
+    );
+
+    if (result.rowsAffected > 0) {
+      res.status(200).json({ message: "정보가 성공적으로 수정되었습니다." });
+    } else {
+      res.status(400).json({ message: "정보 수정에 실패했습니다." });
+    }
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ success: false, message: "인터넷 서버 오류 500" });
+  } finally {
+    if (connection) {
+      try {
+        await connection.close();
+      } catch (err) {
+        console.error(err);
+      }
+    }
+  }
+});
+
 module.exports = router;

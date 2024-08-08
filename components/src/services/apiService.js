@@ -90,3 +90,16 @@ export const getUserInfo = async (userId) => {
     throw error.response ? error.response.data : error;
   }
 };
+
+export const updateUserInfo = async (userId, userInfo) => {
+  try {
+    const response = await axios.post(`${API_URL}/update-user`, {
+      id: userId,
+      ...userInfo,
+    });
+    return response.data;
+  } catch (error) {
+    console.error("Failed to update user info:", error);
+    throw error;
+  }
+};
