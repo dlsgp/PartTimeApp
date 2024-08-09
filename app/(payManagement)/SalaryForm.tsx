@@ -50,12 +50,12 @@ export default function SalaryForm() {
                 onChangeText={(text) => setName(text)}
                 style={styles.input}
               />
-              <TextInput
+              {/* <TextInput
                 label="직급"
                 value={position}
                 onChangeText={(text) => setPosition(text)}
                 style={styles.input}
-              />
+              /> */}
               <TextInput
                 label="시급"
                 value={hourwage}

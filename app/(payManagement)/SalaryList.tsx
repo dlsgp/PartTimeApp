@@ -1,97 +1,40 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import {
   Dimensions,
   StyleSheet,
   Text,
   TouchableOpacity,
   View,
+  ScrollView,
 } from "react-native";
 import { Icon } from "react-native-elements";
-import { DataTable, Provider } from "react-native-paper";
+import { Card, Provider } from "react-native-paper";
 import RNPickerSelect from "react-native-picker-select";
+import axios from "axios";
 
 const SalaryList = () => {
-  const data = [
-    {
-      num: 1,
-      staffNum: "100401",
-      name: "김리리",
-      class: "알바",
-      hourWage: "10000",
-      insurance: "O",
-      bonus: "100,000",
-      etc: "-50,000",
-      workTime: "25시간",
-      sum: "780,000",
-    },
-    {
-      num: 2,
-      staffNum: "100402",
-      name: "박미리",
-      class: "알바",
-      hourWage: "10000",
-      insurance: "O",
-      bonus: "130,000",
-      etc: "-50,000",
-      workTime: "35시간",
-      sum: "980,000",
-    },
-    {
-      num: 3,
-      staffNum: "100403",
-      name: "이진리",
-      class: "알바",
-      hourWage: "10000",
-      insurance: "O",
-      bonus: "100,000",
-      etc: "-50,000",
-      workTime: "25시간",
-      sum: "780,000",
-    },
-    {
-      num: 4,
-      staffNum: "100404",
-      name: "나시리",
-      class: "알바",
-      hourWage: "10000",
-      insurance: "O",
-      bonus: "150,000",
-      etc: "-50,000",
-      workTime: "30시간",
-      sum: "880,000",
-    },
-    {
-      num: 5,
-      staffNum: "100405",
-      name: "주피리",
-      class: "알바",
-      hourWage: "10000",
-      insurance: "O",
-      bonus: "60,000",
-      etc: "-50,000",
-      workTime: "20시간",
-      sum: "730,000",
-    },
-  ];
-
   const { width } = Dimensions.get("window");
-
   const [selectedDate, setSelectedDate] = useState<string>("2024-07");
   const [selectedWorkTimes, setSelectedWorkTimes] = useState<string>("");
   const [showPicker, setShowPicker] = useState(false);
-  const [page, setPage] = useState(0);
-  const rowsPerPage = 5;
+  const [data, setData] = useState([]);
+  const [staffNum, setStaffNum] = useState("100401"); // 예제 staffNum
+
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const response = await axios.get(`http://localhost:3000/api/salary/${staffNum}`);
+        setData([response.data]); // 데이터를 배열로 설정
+      } catch (error) {
+        console.error("데이터 가져오기 오류:", error);
+      }
+    };
+    fetchData();
+  }, [staffNum]);
 
   const togglePicker = () => {
     setShowPicker(!showPicker);
   };
-
-  const paginatedData = data.slice(
-    page * rowsPerPage,
-    (page + 1) * rowsPerPage
-  );
-
-  const totalPages = Math.ceil(data.length / rowsPerPage);
 
   return (
     <Provider>
@@ -117,101 +60,51 @@ const SalaryList = () => {
             style={styles.settingsIcon}
           />
         </View>
-        <DataTable>
-          <DataTable.Header style={styles.header}>
-            <DataTable.Title style={styles.headerCell}>
-              <Text style={styles.headerText}>번호</Text>
-            </DataTable.Title>
-            <DataTable.Title style={styles.headerCell}>
-              <Text style={styles.headerText}>사원 번호</Text>
-            </DataTable.Title>
-            <DataTable.Title style={styles.headerCell}>
-              <Text style={styles.headerText}>이름</Text>
-            </DataTable.Title>
-            <DataTable.Title style={styles.headerCell}>
-              <Text style={styles.headerText}>직급</Text>
-            </DataTable.Title>
-            <DataTable.Title style={styles.headerCell}>
-              <Text style={styles.headerText}>시급</Text>
-            </DataTable.Title>
-            <DataTable.Title style={styles.headerCell}>
-              <Text style={styles.headerText}>4대보험유무</Text>
-            </DataTable.Title>
-            <DataTable.Title style={styles.headerCell}>
-              <Text style={styles.headerText}>주휴수당</Text>
-            </DataTable.Title>
-            <DataTable.Title style={styles.headerCell}>
-              <Text style={styles.headerText}>기타</Text>
-            </DataTable.Title>
-            <DataTable.Title style={styles.headerCell}>
-              <TouchableOpacity onPress={togglePicker}>
-                <Text style={styles.headerText}>근무시간</Text>
-              </TouchableOpacity>
-              {showPicker && (
-                <View style={styles.pickerContainer}>
-                  <RNPickerSelect
-                    onValueChange={(value) => setSelectedWorkTimes(value)}
-                    items={WorkTimes}
-                    value={selectedWorkTimes}
-                    style={pickerSelectStyles}
-                    placeholder={{}}
-                  />
+
+        <ScrollView showsVerticalScrollIndicator={false}>
+          {data.map((row, index) => (
+            <Card style={styles.card} key={index}>
+              <Card.Content>
+                <View style={styles.row}>
+                  <Text style={styles.label}>번호:</Text>
+                  <Text style={styles.value}>{index + 1}</Text>
                 </View>
-              )}
-            </DataTable.Title>
-            <DataTable.Title style={styles.headerCell}>
-              <Text style={styles.headerText}>전체급여</Text>
-            </DataTable.Title>
-          </DataTable.Header>
-          {paginatedData.map((row) => (
-            <DataTable.Row key={row.num}>
-              <DataTable.Cell style={styles.cell}>{row.num}</DataTable.Cell>
-              <DataTable.Cell style={styles.cell}>
-                {row.staffNum}
-              </DataTable.Cell>
-              <DataTable.Cell style={styles.cell}>{row.name}</DataTable.Cell>
-              <DataTable.Cell style={styles.cell}>{row.class}</DataTable.Cell>
-              <DataTable.Cell style={styles.cell}>
-                {row.hourWage}
-              </DataTable.Cell>
-              <DataTable.Cell style={styles.cell}>
-                {row.insurance}
-              </DataTable.Cell>
-              <DataTable.Cell style={styles.cell}>{row.bonus}</DataTable.Cell>
-              <DataTable.Cell style={styles.cell}>{row.etc}</DataTable.Cell>
-              <DataTable.Cell style={styles.cell}>
-                {row.workTime}
-              </DataTable.Cell>
-              <DataTable.Cell style={styles.cell}>{row.sum}</DataTable.Cell>
-            </DataTable.Row>
+                <View style={styles.row}>
+                  <Text style={styles.label}>사원 번호:</Text>
+                  <Text style={styles.value}>{row.staffNum}</Text>
+                </View>
+                <View style={styles.row}>
+                  <Text style={styles.label}>이름:</Text>
+                  <Text style={styles.value}>{row.name}</Text>
+                </View>
+                <View style={styles.row}>
+                  <Text style={styles.label}>시급:</Text>
+                  <Text style={styles.value}>{row.hourWage}</Text>
+                </View>
+                <View style={styles.row}>
+                  <Text style={styles.label}>4대보험유무:</Text>
+                  <Text style={styles.value}>{row.insurance}</Text>
+                </View>
+                <View style={styles.row}>
+                  <Text style={styles.label}>주휴수당:</Text>
+                  <Text style={styles.value}>{row.holiday_pay}</Text>
+                </View>
+                <View style={styles.row}>
+                  <Text style={styles.label}>기타:</Text>
+                  <Text style={styles.value}>{row.etc}</Text>
+                </View>
+                <View style={styles.row}>
+                  <Text style={styles.label}>근무시간:</Text>
+                  <Text style={styles.value}>{row.workTime}</Text>
+                </View>
+                <View style={styles.row}>
+                  <Text style={styles.label}>전체급여:</Text>
+                  <Text style={styles.value}>{row.pay}</Text>
+                </View>
+              </Card.Content>
+            </Card>
           ))}
-          <View style={styles.pagination}>
-            <TouchableOpacity
-              disabled={page === 0}
-              onPress={() => setPage(page - 1)}
-            >
-              <Text style={styles.paginationText}>{'<'}</Text>
-            </TouchableOpacity>
-            {[...Array(totalPages)].map((_, i) => (
-              <TouchableOpacity key={i} onPress={() => setPage(i)}>
-                <Text
-                  style={[
-                    styles.paginationText,
-                    page === i && styles.activePage,
-                  ]}
-                >
-                  {i + 1}
-                </Text>
-              </TouchableOpacity>
-            ))}
-            <TouchableOpacity
-              disabled={page === totalPages - 1}
-              onPress={() => setPage(page + 1)}
-            >
-              <Text style={styles.paginationText}>{'>'}</Text>
-            </TouchableOpacity>
-          </View>
-        </DataTable>
+        </ScrollView>
       </View>
     </Provider>
   );
@@ -222,27 +115,6 @@ const styles = StyleSheet.create({
     flex: 1,
     padding: 20,
   },
-  header: {
-    backgroundColor: "#2c2c54",
-    borderTopLeftRadius: 10,
-    borderTopRightRadius: 10,
-    borderBottomLeftRadius: 10,
-    borderBottomRightRadius: 10,
-  },
-  headerCell: {
-    justifyContent: "center",
-    alignItems: "center",
-    paddingVertical: 10,
-  },
-  headerText: {
-    color: "#fff",
-    fontWeight: "bold",
-  },
-  cell: {
-    justifyContent: "center",
-    alignItems: "center",
-    paddingVertical: 10,
-  },
   headerRow: {
     flexDirection: "row",
     justifyContent: "space-between",
@@ -252,22 +124,22 @@ const styles = StyleSheet.create({
   settingsIcon: {
     marginRight: 10,
   },
-  pickerContainer: {
-    marginTop: 10,
+  card: {
+    marginBottom: 15,
+    borderRadius: 10,
+    elevation: 3,
   },
-  pagination: {
+  row: {
     flexDirection: "row",
-    justifyContent: "center",
-    alignItems: "center",
-    paddingVertical: 10,
+    justifyContent: "space-between",
+    marginBottom: 5,
   },
-  paginationText: {
-    marginHorizontal: 5,
-    fontSize: 16,
-  },
-  activePage: {
+  label: {
     fontWeight: "bold",
-    textDecorationLine: "underline",
+    color: "#333",
+  },
+  value: {
+    color: "#555",
   },
 });
 

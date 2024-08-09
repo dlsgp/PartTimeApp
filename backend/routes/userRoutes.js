@@ -258,7 +258,7 @@ router.get("/users/:userId", async (req, res) => {
     connection = await oracledb.getConnection(dbConfig);
 
     const result = await connection.execute(
-      `SELECT id, name, tel, email, add1, add2 FROM register WHERE id = :userId`,
+      `SELECT reg_num, id, name, tel, email, add1, add2 FROM register WHERE id = :userId`,
       [userId]
     );
 
@@ -266,12 +266,13 @@ router.get("/users/:userId", async (req, res) => {
       const userInfo = result.rows[0];
       console.log("result.rows:", result.rows); // 값 확인용
       res.status(200).json({
-        id: userInfo[0],
-        name: userInfo[1],
-        tel: userInfo[2],
-        email: userInfo[3],
-        add1: userInfo[4],
-        add2: userInfo[5]
+        reg_num: userInfo[0],
+        id: userInfo[1],
+        name: userInfo[2],
+        tel: userInfo[3],
+        email: userInfo[4],
+        add1: userInfo[5],
+        add2: userInfo[6]
       });
     } else {
       res.status(404).json({ message: "사용자를 찾을 수 없습니다" });
@@ -321,6 +322,94 @@ router.post("/update-user", async (req, res) => {
         await connection.close();
       } catch (err) {
         console.error(err);
+      }
+    }
+  }
+});
+
+router.post("/update-staffnum", async (req, res) => {
+  const { id, staffNum } = req.body;
+  const dbConfig = req.app.get("dbConfig");
+
+  let connection;
+
+  try {
+    connection = await oracledb.getConnection(dbConfig);
+
+    const result = await connection.execute(
+      `UPDATE register 
+       SET staff_num = :staffNum
+       WHERE id = :id`,
+      { staffNum, id },
+      { autoCommit: true }
+    );
+
+    if (result.rowsAffected > 0) {
+      res.status(200).json({ message: "사원번호가 성공적으로 저장되었습니다." });
+    } else {
+      res.status(400).json({ message: "사원번호 저장에 실패했습니다." });
+    }
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ success: false, message: "인터넷 서버 오류 500" });
+  } finally {
+    if (connection) {
+      try {
+        await connection.close();
+      } catch (err) {
+        console.error(err);
+      }
+    }
+  }
+});
+
+router.get('/api/salary/:staffNum', async (req, res) => {
+  const { staffNum } = req.params;
+  
+  let connection;
+
+  try {
+    connection = await oracledb.getConnection(dbConfig);
+    
+    // register 테이블에서 직원 기본 정보 가져오기
+    const registerResult = await connection.execute(
+      `SELECT name FROM register WHERE id = :staffNum`,
+      [staffNum]
+    );
+    
+    // commute 테이블에서 급여 정보 가져오기
+    const commuteResult = await connection.execute(
+      `SELECT hourwage, insurance, holiday_pay, etc, worktime, pay 
+       FROM commute 
+       WHERE work_id = :staffNum`,
+      [staffNum]
+    );
+
+    if (registerResult.rows.length === 0 || commuteResult.rows.length === 0) {
+      return res.status(404).json({ message: "해당 직원의 데이터를 찾을 수 없습니다." });
+    }
+
+    const employeeData = {
+      staffNum: staffNum,
+      name: registerResult.rows[0][0],
+      hourWage: commuteResult.rows[0][0],
+      insurance: commuteResult.rows[0][1],
+      holiday_pay: commuteResult.rows[0][2],
+      etc: commuteResult.rows[0][3],
+      workTime: commuteResult.rows[0][4],
+      pay: commuteResult.rows[0][5],
+    };
+
+    res.status(200).json(employeeData);
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: "서버 오류" });
+  } finally {
+    if (connection) {
+      try {
+        await connection.close();
+      } catch (error) {
+        console.error(error);
       }
     }
   }

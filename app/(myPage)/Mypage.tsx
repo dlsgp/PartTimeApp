@@ -235,7 +235,7 @@ const Mypage = () => {
                 theme={{ colors: { background: "white" } }}
               />
 
-              <TextInput
+              {/* <TextInput
                 style={RegFormStyle.formcontainerB}
                 label="직급"
                 placeholder="직급               알바"
@@ -243,7 +243,7 @@ const Mypage = () => {
                 mode="outlined"
                 disabled
                 theme={{ colors: { background: "white" } }}
-              />
+              /> */}
 
               <TextInput
                 style={RegFormStyle.formcontainerB}
