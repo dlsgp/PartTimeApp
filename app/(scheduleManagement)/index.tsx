@@ -6,11 +6,11 @@ export default function payManagementIndex() {
   const colorScheme = useColorScheme();
   return (
     <View style={style.container}>
-      <StatusBar
+      {/* <StatusBar
         style={colorScheme === "dark" ? "light" : "dark"}
         backgroundColor={colorScheme === "dark" ? "#000" : "#fff"}
       />
-      <MainCalendar />
+      <MainCalendar /> */}
     </View>
   );
 }

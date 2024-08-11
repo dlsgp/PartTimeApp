@@ -15,7 +15,8 @@ import PrivacyPolicy from "./PrivacyPolicy";
 import ServiceTerms from "./ServiceTerm";
 import { signUp } from "@/components/src/services/apiService";
 import { router } from "expo-router";
-import Postcode from '@actbase/react-daum-postcode';
+import Postcode from "@actbase/react-daum-postcode";
+import axios from "axios";
 
 const { width, height } = Dimensions.get("window");
 
@@ -145,27 +146,73 @@ const PersonalSignUpApp: React.FC = () => {
     }
   };
 
-  const handleDuplicationCheck1 = () => {
+  const handleDuplicationCheck1 = async () => {
     if (id.trim() === "") {
       setErrors((prev: any) => ({
         ...prev,
         duplicationCheck1: "아이디를 입력하세요.",
       }));
-    } else {
-      setDuplicationCheck1(true);
-      setErrors((prev: any) => ({ ...prev, duplicationCheck1: null }));
+      return;
+    }
+
+    try {
+      const response = await axios.get(
+        `http://localhost:3000/api/check-id/${id}`
+      );
+      if (response.data.duplicated) {
+        setErrors((prev: any) => ({
+          ...prev,
+          duplicationCheck1: "이미 사용 중인 아이디입니다.",
+        }));
+        setDuplicationCheck1(false);
+      } else {
+        setErrors((prev: any) => ({
+          ...prev,
+          duplicationCheck1: null,
+        }));
+        setDuplicationCheck1(true);
+      }
+    } catch (error) {
+      console.error("아이디 중복 확인 실패:", error);
+      setErrors((prev: any) => ({
+        ...prev,
+        duplicationCheck1: "아이디 중복 확인 중 오류가 발생했습니다.",
+      }));
     }
   };
 
-  const handleDuplicationCheck2 = () => {
+  const handleDuplicationCheck2 = async () => {
     if (email.trim() === "") {
       setErrors((prev: any) => ({
         ...prev,
         duplicationCheck2: "이메일을 입력하세요.",
       }));
-    } else {
-      setDuplicationCheck2(true);
-      setErrors((prev: any) => ({ ...prev, duplicationCheck2: null }));
+      return;
+    }
+
+    try {
+      const response = await axios.get(
+        `http://localhost:3000/api/check-email/${email}`
+      );
+      if (response.data.duplicated) {
+        setErrors((prev: any) => ({
+          ...prev,
+          duplicationCheck2: "이미 사용 중인 이메일입니다.",
+        }));
+        setDuplicationCheck2(false);
+      } else {
+        setErrors((prev: any) => ({
+          ...prev,
+          duplicationCheck2: null,
+        }));
+        setDuplicationCheck2(true);
+      }
+    } catch (error) {
+      console.error("이메일 중복 확인 실패:", error);
+      setErrors((prev: any) => ({
+        ...prev,
+        duplicationCheck2: "이메일 중복 확인 중 오류가 발생했습니다.",
+      }));
     }
   };
 
@@ -184,8 +231,7 @@ const PersonalSignUpApp: React.FC = () => {
           <TextInput
             style={[
               styles.idinput,
-              (errors.id || errors.duplicationCheck1) &&
-                styles.errorInput,
+              (errors.id || errors.duplicationCheck1) && styles.errorInput,
             ]}
             placeholder="아이디"
             placeholderTextColor="#aaa"
@@ -212,9 +258,10 @@ const PersonalSignUpApp: React.FC = () => {
             </TouchableOpacity>
           </View>
         </View>
-        {errors.id && (
-          <Text style={styles.errorText}>{errors.id}</Text>
+        {duplicationCheck1 && !errors.duplicationCheck1 && (
+          <Text style={styles.successText}>사용 가능한 아이디입니다.</Text>
         )}
+        {errors.id && <Text style={styles.errorText}>{errors.id}</Text>}
         {errors.duplicationCheck1 && (
           <Text style={styles.errorText}>{errors.duplicationCheck1}</Text>
         )}
@@ -379,6 +426,9 @@ const PersonalSignUpApp: React.FC = () => {
             </TouchableOpacity>
           </View>
         </View>
+        {duplicationCheck2 && !errors.duplicationCheck2 && (
+          <Text style={styles.successText}>사용 가능한 이메일입니다.</Text>
+        )}
         {errors.email && <Text style={styles.errorText}>{errors.email}</Text>}
         {errors.duplicationCheck2 && (
           <Text style={styles.errorText}>{errors.duplicationCheck2}</Text>
@@ -446,18 +496,25 @@ const PersonalSignUpApp: React.FC = () => {
         </View>
       </Modal>
 
-      <Modal visible={postcodeModalVisible} animationType="slide" transparent={true}>
+      <Modal
+        visible={postcodeModalVisible}
+        animationType="slide"
+        transparent={true}
+      >
         <View style={styles.modalContainer2}>
           <View style={styles.modalContent2}>
             <Postcode
-              style={{ width: '100%', height: '100%' }}
+              style={{ width: "100%", height: "100%" }}
               jsOptions={{ animation: true }}
               onSelected={handlePostcodeComplete}
             />
             <View>
-            <TouchableOpacity onPress={() => setPostcodeModalVisible(false)} style={styles.closeButton}>
-              <Text style={styles.closeButtonText}>닫기</Text>
-            </TouchableOpacity>
+              <TouchableOpacity
+                onPress={() => setPostcodeModalVisible(false)}
+                style={styles.closeButton}
+              >
+                <Text style={styles.closeButtonText}>닫기</Text>
+              </TouchableOpacity>
             </View>
           </View>
         </View>
@@ -620,6 +677,12 @@ const styles = StyleSheet.create({
     backgroundColor: "#fff",
     borderRadius: 10,
     padding: 20,
+  },
+  successText: {
+    color: "green",
+    alignSelf: "flex-start",
+    marginBottom: 10,
+    marginLeft: 10,
   },
 });
 

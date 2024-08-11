@@ -1,3 +1,5 @@
+/* exerd 시작 */
+
 ALTER TABLE register
 	DROP
 		CONSTRAINT FK_positiontype_TO_register
@@ -8,9 +10,14 @@ ALTER TABLE commute
 		CONSTRAINT FK_register_TO_commute
 		CASCADE;
 
-ALTER TABLE scheduler
+ALTER TABLE commute
 	DROP
-		CONSTRAINT FK_register_TO_scheduler
+		CONSTRAINT FK_employ_TO_commute
+		CASCADE;
+
+ALTER TABLE schedule
+	DROP
+		CONSTRAINT FK_register_TO_schedule
 		CASCADE;
 
 ALTER TABLE resume
@@ -36,12 +43,29 @@ ALTER TABLE commute
 		CASCADE
 		KEEP INDEX;
 
-ALTER TABLE scheduler
+ALTER TABLE myPage
 	DROP
 		PRIMARY KEY
 		CASCADE
 		KEEP INDEX;
 
+ALTER TABLE payManager
+	DROP
+		PRIMARY KEY
+		CASCADE
+		KEEP INDEX;
+
+ALTER TABLE schedule
+	DROP
+		PRIMARY KEY
+		CASCADE
+		KEEP INDEX;
+
+ALTER TABLE registerCeo
+	DROP
+		PRIMARY KEY
+		CASCADE
+		KEEP INDEX;
 
 ALTER TABLE resume
 	DROP
@@ -49,715 +73,498 @@ ALTER TABLE resume
 		CASCADE
 		KEEP INDEX;
 
-/* 회원가입 테이블 삭제*/
+ALTER TABLE company
+	DROP
+		PRIMARY KEY
+		CASCADE
+		KEEP INDEX;
+
+ALTER TABLE employ
+	DROP
+		PRIMARY KEY
+		CASCADE
+		KEEP INDEX;
+
+/* 회원가입 */
 DROP TABLE register 
 	CASCADE CONSTRAINTS;
 
-/* 직책유형 테이블 삭제*/
+/* 직책유형 */
 DROP TABLE positiontype 
 	CASCADE CONSTRAINTS;
 
-/* 출퇴근 테이블 삭제*/
+/* 출퇴근 */
 DROP TABLE commute 
 	CASCADE CONSTRAINTS;
 
-/* 스케줄관리 테이블 삭제*/
-DROP TABLE scheduler 
+/* 마이페이지 */
+DROP TABLE myPage 
 	CASCADE CONSTRAINTS;
 
-/* 알바 이력 테이블 삭제*/
+/* 급여관리 */
+DROP TABLE payManager 
+	CASCADE CONSTRAINTS;
+
+/* 스케줄관리 */
+DROP TABLE schedule 
+	CASCADE CONSTRAINTS;
+
+/* 업주회원가입 */
+DROP TABLE registerCeo 
+	CASCADE CONSTRAINTS;
+
+/* 알바 이력 */
 DROP TABLE resume 
 	CASCADE CONSTRAINTS;
 
-/* 회원가입 테이블 삭제*/
+/* 기업 */
+DROP TABLE company 
+	CASCADE CONSTRAINTS;
+
+/* 고용 */
+DROP TABLE employ 
+	CASCADE CONSTRAINTS;
+
+/* 회원가입 */
 CREATE TABLE register (
 	reg_num NUMBER NOT NULL, /* 번호 */
-	type NUMBER NOT NULL, /* 분류 */
-	staff_num VARCHAR2(50) NOT NULL, /* 사원번호 */
-	name VARCHAR(30) NOT NULL, /* 이름/대표자이름 */
-	id VARCHAR2(50) NOT NULL, /* 아이디 */
-	pwd VARCHAR2(50) NOT NULL, /* 비밀번호 */
-	tel VARCHAR2(30) NOT NULL, /* 전화번호/대표자전번 */
-	regNum VARCHAR2(50) NOT NULL, /* 주민/사업자등록번호 */
-	email VARCHAR2(100), /* 이메일 */
-	address VARCHAR2(200) NOT NULL, /* 주소 */
-	join_date TIMESTAMP , /* 입사일 */
-	hourWage DECIMAL(6) , /* 시급 */
-	insurance CHAR(1)  /* 4대보험유무 */
-    );
+	type_num NUMBER NOT NULL, /* 분류 */
+	name VARCHAR2(30), /* 이름/대표자이름 */
+	id VARCHAR2(30), /* 아이디 */
+	pwd VARCHAR2(50), /* 비밀번호 */
+	jobNum VARCHAR2(50), /* 사업자등록번호 */
+	email VARCHAR(50), /* 이메일 */
+	tel VARCHAR2(30), /* 전화번호 */
+	phoneNum VARCHAR2(30), /* 대표자 전화번호 */
+	birth VARCHAR2(30), /* 생년월일 */
+	birthNum VARCHAR2(30), /* 주민번호 */
+	add1 VARCHAR2(100), /* 주소 */
+	add2 VARCHAR2(100), /* 상세주소 */
+	reg_date DATE /* 가입일 */
+);
+
+COMMENT ON TABLE register IS '회원가입';
+
+COMMENT ON COLUMN register.reg_num IS '번호';
+
+COMMENT ON COLUMN register.type_num IS '분류';
+
+COMMENT ON COLUMN register.name IS '이름/대표자이름';
+
+COMMENT ON COLUMN register.id IS '아이디';
+
+COMMENT ON COLUMN register.pwd IS '비밀번호';
+
+COMMENT ON COLUMN register.jobNum IS '사업자등록번호';
+
+COMMENT ON COLUMN register.email IS '이메일';
+
+COMMENT ON COLUMN register.tel IS '전화번호';
+
+COMMENT ON COLUMN register.phoneNum IS '대표자 전화번호';
+
+COMMENT ON COLUMN register.birth IS '생년월일';
+
+COMMENT ON COLUMN register.birthNum IS '주민번호';
+
+COMMENT ON COLUMN register.add1 IS '주소';
+
+COMMENT ON COLUMN register.add2 IS '상세주소';
+
+COMMENT ON COLUMN register.reg_date IS '가입일';
 
 ALTER TABLE register
 	ADD
 		CONSTRAINT PK_register
 		PRIMARY KEY (
 			reg_num,
-			type
+			type_num
 		);
 
 /* 직책유형 */
 CREATE TABLE positiontype (
-	type NUMBER NOT NULL, /* 분류 */
+	type_num NUMBER NOT NULL, /* 분류 */
 	type_name VARCHAR2(30) NOT NULL /* 분류이름 */
 );
+
+COMMENT ON TABLE positiontype IS '직책유형';
+
+COMMENT ON COLUMN positiontype.type_num IS '분류';
+
+COMMENT ON COLUMN positiontype.type_name IS '분류이름';
 
 ALTER TABLE positiontype
 	ADD
 		CONSTRAINT PK_positiontype
 		PRIMARY KEY (
-			type
+			type_num
 		);
 
 /* 출퇴근 */
 CREATE TABLE commute (
 	reg_num NUMBER NOT NULL, /* 번호 */
-	type NUMBER NOT NULL, /* 분류 */
-	workIn TIMESTAMP NOT NULL, /* 출근시간 */
-	workOut TIMESTAMP NOT NULL, /* 퇴근시간 */
-	restTime TIMESTAMP NOT NULL, /* 휴게시간 */
-	etc DECIMAL(7) /* 기타 */
+	type_num NUMBER NOT NULL, /* 분류 */
+	ceo_id VARCHAR2(50) NOT NULL, /* 기업 아이디 */
+	work_id VARCHAR2(50) NOT NULL, /* 고용자 아이디 */
+	workIn TIMESTAMP, /* 출근시간 */
+	workOut TIMESTAMP, /* 퇴근시간 */
+	restTime_start TIMESTAMP, /* 휴게시작시간 */
+	restTime_end TIMESTAMP, /* 휴게끝시간 */
+	workTime1 NUMBER, /* 1주차 근무시간 */
+	workTime2 NUMBER, /* 2주차 근무시간 */
+	workTime3 NUMBER, /* 3주차 근무시간 */
+	workTime4 NUMBER, /* 4주차 근무시간 */
+	workTime5 NUMBER, /* 5주차 근무시간 */
+	workTime NUMBER, /* 총 근무시간 */
+	hourWage NUMBER, /* 시급 */
+	holiday_pay NUMBER, /* 주휴수당 */
+	insurance VARCHAR2(10), /* 4대보험유무 */
+	etc NUMBER, /* 기타급여 */
+	pay1 NUMBER, /* 1주차 급여 */
+	pay2 NUMBER, /* 2주차 급여 */
+	pay3 NUMBER, /* 3주차 급여 */
+	pay4 NUMBER, /* 4주차 급여 */
+	pay5 NUMBER, /* 5주차 급여 */
+	pay NUMBER /* 총 급여 */
 );
+
+COMMENT ON TABLE commute IS '출퇴근';
+
+COMMENT ON COLUMN commute.reg_num IS '번호';
+
+COMMENT ON COLUMN commute.type_num IS '분류';
+
+COMMENT ON COLUMN commute.ceo_id IS '기업 아이디';
+
+COMMENT ON COLUMN commute.work_id IS '고용자 아이디';
+
+COMMENT ON COLUMN commute.workIn IS '출근시간';
+
+COMMENT ON COLUMN commute.workOut IS '퇴근시간';
+
+COMMENT ON COLUMN commute.restTime_start IS '휴게시작시간';
+
+COMMENT ON COLUMN commute.restTime_end IS '휴게끝시간';
+
+COMMENT ON COLUMN commute.workTime1 IS '1주차 근무시간';
+
+COMMENT ON COLUMN commute.workTime2 IS '2주차 근무시간';
+
+COMMENT ON COLUMN commute.workTime3 IS '3주차 근무시간';
+
+COMMENT ON COLUMN commute.workTime4 IS '4주차 근무시간';
+
+COMMENT ON COLUMN commute.workTime5 IS '5주차 근무시간';
+
+COMMENT ON COLUMN commute.workTime IS '총 근무시간';
+
+COMMENT ON COLUMN commute.hourWage IS '시급';
+
+COMMENT ON COLUMN commute.holiday_pay IS '주휴수당';
+
+COMMENT ON COLUMN commute.insurance IS '4대보험유무';
+
+COMMENT ON COLUMN commute.etc IS '기타급여';
+
+COMMENT ON COLUMN commute.pay1 IS '1주차 급여';
+
+COMMENT ON COLUMN commute.pay2 IS '2주차 급여';
+
+COMMENT ON COLUMN commute.pay3 IS '3주차 급여';
+
+COMMENT ON COLUMN commute.pay4 IS '4주차 급여';
+
+COMMENT ON COLUMN commute.pay5 IS '5주차 급여';
+
+COMMENT ON COLUMN commute.pay IS '총 급여';
 
 ALTER TABLE commute
 	ADD
 		CONSTRAINT PK_commute
 		PRIMARY KEY (
 			reg_num,
-			type
+			type_num,
+			ceo_id,
+			work_id
 		);
 
-
-/* 스케줄관리 */
-CREATE TABLE scheduler (
-    schedule_num NUMBER NOT NULL, /* 번호 */
-    reg_num NUMBER NOT NULL, /* 번호2 */
-    type NUMBER NOT NULL, /* 분류 */
-    name VARCHAR2(30) NOT NULL, /* 이름 */
-    workDate DATE NOT NULL, /* 근무날짜 */
-    workTime TIMESTAMP NOT NULL, /* 근무시간 */
-    restTime TIMESTAMP NOT NULL, /* 휴게시간 */
-    color VARCHAR2(20) NOT NULL, /* 일정색상 */
-    memo VARCHAR2(2000) NOT NULL, /* 메모 */
-    restDate CHAR(1) NOT NULL /* 휴무일 */
+/* 마이페이지 */
+CREATE TABLE myPage (
+	staff_num VARCHAR2(20) NOT NULL, /* 사원번호 */
+	name VARCHAR(20) NOT NULL, /* 이름 */
+	class VARCHAR(10) NOT NULL, /* 직급 */
+	tel INT(11) NOT NULL, /* 전화번호 */
+	regNum INT(25) NOT NULL, /* 주민/사업자등록번호 */
+	email VARCHAR(50), /* 이메일 */
+	address VARCHAR(100) NOT NULL, /* 주소 */
+	joinDate DATE NOT NULL, /* 입사일 */
+	insurance CHAR(1) NOT NULL, /* 4대보험유무 */
+	workTime TIMESTAMP NOT NULL, /* 근무시간 */
+	restTime TIMESTAMP NOT NULL, /* 휴게시간 */
+	etc DECIMAL(7), /* 기타 */
+	restDate CHAR(1) NOT NULL, /* 휴무일 */
+	totalWorkTime TIMESTAMP NOT NULL, /* 총근무시간 */
+	expectSum DECIMAL(8) NOT NULL /* 예상급여금액 */
 );
 
+COMMENT ON TABLE myPage IS '마이페이지';
 
-ALTER TABLE scheduler
+COMMENT ON COLUMN myPage.staff_num IS '사원번호';
+
+COMMENT ON COLUMN myPage.name IS '이름';
+
+COMMENT ON COLUMN myPage.class IS '직급';
+
+COMMENT ON COLUMN myPage.tel IS '전화번호';
+
+COMMENT ON COLUMN myPage.regNum IS '주민/사업자등록번호';
+
+COMMENT ON COLUMN myPage.email IS '이메일';
+
+COMMENT ON COLUMN myPage.address IS '주소';
+
+COMMENT ON COLUMN myPage.joinDate IS '입사일';
+
+COMMENT ON COLUMN myPage.insurance IS '4대보험유무';
+
+COMMENT ON COLUMN myPage.workTime IS '근무시간';
+
+COMMENT ON COLUMN myPage.restTime IS '휴게시간';
+
+COMMENT ON COLUMN myPage.etc IS '기타';
+
+COMMENT ON COLUMN myPage.restDate IS '휴무일';
+
+COMMENT ON COLUMN myPage.totalWorkTime IS '총근무시간';
+
+COMMENT ON COLUMN myPage.expectSum IS '예상급여금액';
+
+ALTER TABLE myPage
 	ADD
-		CONSTRAINT PK_scheduler
+		CONSTRAINT PK_myPage
+		PRIMARY KEY (
+			staff_num
+		);
+
+/* 급여관리 */
+CREATE TABLE payManager (
+	pay_num INT(255) NOT NULL, /* 번호 */
+	staff_num INT(255) NOT NULL, /* 사원번호 */
+	hourWage DECIMAL(6) NOT NULL, /* 시급 */
+	insurance CHAR(1) NOT NULL, /* 4대보험유무 */
+	bonus DECIMAL(7) NOT NULL, /* 주휴수당 */
+	etc DECIMAL(7), /* 기타 */
+	weekWork1 TIMESTAMP NOT NULL, /* 1주근무시간(분) */
+	weekWork2 TIMESTAMP NOT NULL, /* 2주근무시간(분) */
+	weekWork3 TIMESTAMP NOT NULL, /* 3주근무시간(분) */
+	weekWork4 TIMESTAMP NOT NULL, /* 4주근무시간(분) */
+	weekWork5 TIMESTAMP, /* 5주근무시간(분) */
+	sum DECIMAL(8) NOT NULL /* 전체급여 */
+);
+
+COMMENT ON TABLE payManager IS '급여관리';
+
+COMMENT ON COLUMN payManager.pay_num IS '번호';
+
+COMMENT ON COLUMN payManager.staff_num IS '사원번호';
+
+COMMENT ON COLUMN payManager.hourWage IS '시급';
+
+COMMENT ON COLUMN payManager.insurance IS '4대보험유무';
+
+COMMENT ON COLUMN payManager.bonus IS '주휴수당';
+
+COMMENT ON COLUMN payManager.etc IS '기타';
+
+COMMENT ON COLUMN payManager.weekWork1 IS '1주근무시간(분)';
+
+COMMENT ON COLUMN payManager.weekWork2 IS '2주근무시간(분)';
+
+COMMENT ON COLUMN payManager.weekWork3 IS '3주근무시간(분)';
+
+COMMENT ON COLUMN payManager.weekWork4 IS '4주근무시간(분)';
+
+COMMENT ON COLUMN payManager.weekWork5 IS '5주근무시간(분)';
+
+COMMENT ON COLUMN payManager.sum IS '전체급여';
+
+ALTER TABLE payManager
+	ADD
+		CONSTRAINT PK_payManager
+		PRIMARY KEY (
+			pay_num,
+			staff_num
+		);
+
+/* 스케줄관리 */
+CREATE TABLE schedule (
+	schedule_num NUMBER NOT NULL, /* 스케줄 관리 번호 */
+	reg_num NUMBER NOT NULL, /* 번호 */
+	type_num NUMBER NOT NULL, /* 분류 */
+	name VARCHAR(20), /* 이름 */
+	sch_workDate DATE, /* 근무날짜 */
+	sch_workTime TIMESTAMP, /* 근무시간 */
+	sch_restTime VARCHAR2(50), /* 휴게시간 */
+	color VARCHAR(20), /* 일정색상 */
+	memo VARCHAR2(2000), /* 메모 */
+	restDate VARCHAR2(20) /* 휴무일 */
+);
+
+COMMENT ON TABLE schedule IS '스케줄관리';
+
+COMMENT ON COLUMN schedule.schedule_num IS '스케줄 관리 번호';
+
+COMMENT ON COLUMN schedule.reg_num IS '번호';
+
+COMMENT ON COLUMN schedule.type_num IS '분류';
+
+COMMENT ON COLUMN schedule.name IS '이름';
+
+COMMENT ON COLUMN schedule.sch_workDate IS '근무날짜';
+
+COMMENT ON COLUMN schedule.sch_workTime IS '근무시간';
+
+COMMENT ON COLUMN schedule.sch_restTime IS '휴게시간';
+
+COMMENT ON COLUMN schedule.color IS '일정색상';
+
+COMMENT ON COLUMN schedule.memo IS '메모';
+
+COMMENT ON COLUMN schedule.restDate IS '휴무일';
+
+ALTER TABLE schedule
+	ADD
+		CONSTRAINT PK_schedule
 		PRIMARY KEY (
 			schedule_num,
 			reg_num,
-			type
+			type_num
+		);
+
+/* 업주회원가입 */
+CREATE TABLE registerCeo (
+	num INT(255) NOT NULL, /* 번호 */
+	id VARCHAR(30) NOT NULL, /* 아이디 */
+	pwd VARCHAR(30) NOT NULL, /* 비밀번호 */
+	tel INT(11) NOT NULL, /* 전화번호 */
+	ceoName VARCHAR(20) NOT NULL, /* 대표자명 */
+	ceoTel INT(11), /* 대표자전화번호 */
+	regNum INT(25) NOT NULL, /* 사업자등록번호 */
+	email VARCHAR(50) NOT NULL, /* 이메일 */
+	address VARCHAR(100) NOT NULL /* 주소 */
+);
+
+COMMENT ON TABLE registerCeo IS '업주회원가입';
+
+COMMENT ON COLUMN registerCeo.num IS '번호';
+
+COMMENT ON COLUMN registerCeo.id IS '아이디';
+
+COMMENT ON COLUMN registerCeo.pwd IS '비밀번호';
+
+COMMENT ON COLUMN registerCeo.tel IS '전화번호';
+
+COMMENT ON COLUMN registerCeo.ceoName IS '대표자명';
+
+COMMENT ON COLUMN registerCeo.ceoTel IS '대표자전화번호';
+
+COMMENT ON COLUMN registerCeo.regNum IS '사업자등록번호';
+
+COMMENT ON COLUMN registerCeo.email IS '이메일';
+
+COMMENT ON COLUMN registerCeo.address IS '주소';
+
+ALTER TABLE registerCeo
+	ADD
+		CONSTRAINT PK_registerCeo
+		PRIMARY KEY (
+			num
 		);
 
 /* 알바 이력 */
 CREATE TABLE resume (
 	history_num NUMBER NOT NULL, /* 이력 번호 */
-	type NUMBER NOT NULL, /* 분류 */
+	type_num NUMBER NOT NULL, /* 분류 */
 	reg_num NUMBER NOT NULL, /* 번호 */
-	comName varchar2(50) NOT NULL, /* 직장명 */
-	comAdd VARCHAR2(200) NOT NULL, /* 직장주소 */
-	todo VARCHAR2(60) NOT NULL, /* 직무 */
-	past_joinDate DATE NOT NULL, /* 입사일 */
-	past_leaveDate DATE NOT NULL /* 퇴사일 */
+	comName varchar2(50), /* 직장명 */
+	comAdd VARCHAR2(100), /* 직장주소 */
+	todo VARCHAR(60), /* 직무 */
+	past_join_date DATE, /* 입사일 */
+	past_leaveDate DATE /* 퇴사일 */
 );
 
+COMMENT ON TABLE resume IS '알바 이력';
 
-/* 기본키 외래키 제약 */
+COMMENT ON COLUMN resume.history_num IS '이력 번호';
+
+COMMENT ON COLUMN resume.type_num IS '분류';
+
+COMMENT ON COLUMN resume.reg_num IS '번호';
+
+COMMENT ON COLUMN resume.comName IS '직장명';
+
+COMMENT ON COLUMN resume.comAdd IS '직장주소';
+
+COMMENT ON COLUMN resume.todo IS '직무';
+
+COMMENT ON COLUMN resume.past_join_date IS '입사일';
+
+COMMENT ON COLUMN resume.past_leaveDate IS '퇴사일';
 
 ALTER TABLE resume
 	ADD
 		CONSTRAINT PK_resume
 		PRIMARY KEY (
 			history_num,
-			type,
+			type_num,
 			reg_num
 		);
 
-ALTER TABLE register
+/* 기업 */
+CREATE TABLE company (
+	com_order NUMBER, /* 번호 */
+	ceo_id VARCHAR2(50) NOT NULL /* 기업 아이디 */
+);
+
+COMMENT ON TABLE company IS '기업';
+
+COMMENT ON COLUMN company.com_order IS '번호';
+
+COMMENT ON COLUMN company.ceo_id IS '기업 아이디';
+
+ALTER TABLE company
 	ADD
-		CONSTRAINT FK_positiontype_TO_register
-		FOREIGN KEY (
-			type
-		)
-		REFERENCES positiontype (
-			type
-		);
-
-ALTER TABLE commute
-	ADD
-		CONSTRAINT FK_register_TO_commute
-		FOREIGN KEY (
-			reg_num,
-			type
-		)
-		REFERENCES register (
-			reg_num,
-			type
-		);
-
-ALTER TABLE scheduler
-	ADD
-		CONSTRAINT FK_register_TO_scheduler
-		FOREIGN KEY (
-			reg_num,
-			type
-		)
-		REFERENCES register (
-			reg_num,
-			type
-		);
-
-ALTER TABLE resume
-	ADD
-		CONSTRAINT FK_register_TO_resume
-		FOREIGN KEY (
-			reg_num,
-			type
-		)
-		REFERENCES register (
-			reg_num,
-			type
-		);
-		
-		
-		/* register 테이블 auto increment */
-		create sequence reg_num_seq
-		start with 1
-		increment by 1
-		minvalue 1;
-		
-		
-		/* 데이터 삽입*/
-		insert into register values (1, 2, '000', '관리자', 'admin', '1234', '01055552222', '12345-6789101245572',
-		'admin@gmail.com', '대구광역시 수성구', null,null, null, null, null, '01012345678', null);
-        
-        insert into register values (2, 1, '001', '이지니', 'wlsl', '33333', '01055552222', 'null',
-		'ewlwlwlel@gmail.com', '대구광역시 수성구', null,10000, 1, '980521-2452897', 980521, '01012345678', null);
-        
-        insert into register (reg_num, type_num, name, id, pwd, tel, jobNum, email, join_date, birthNum, birth, phoneNum, add1)
-        values (reg_seq.nextVal, 1,  '이철수', 'aaa', 'aaa', '01033332222', 'null',
-		'aaa@gmail.com', '24/07/01 00:00:00.000000000', '', '','', '대구광역시 북구'  );
-        
-        insert into register (reg_num, type_num, name, id, pwd, tel, jobNum, email, join_date, birthNum, birth, phoneNum, add1)
-        values (reg_seq.nextVal, 1,  '김철수', 'bbb', 'bbb', '01033332222', 'null',
-		'bbb@gmail.com', '24/07/01 00:00:00.000000000', '', '','', '대구광역시 북구'  );
-        
-        insert into register (reg_num, type_num, name, id, pwd, tel, jobNum, email, join_date, birthNum, birth, phoneNum, add1)
-        values (reg_seq.nextVal, 1,  '홍길동', 'ccc', 'ccc', '01033332222', 'null',
-		'ccc@gmail.com', '24/07/01 00:00:00.000000000', '', '','', '대구광역시 북구'  );
-        
-        CREATE SEQUENCE reg_seq
-        start with 1
-        increment by 1
-        minvalue 1;
-        
-        
-				
-		
-		insert into positiontype values (1, '개인회원');
-		insert into positiontype values (2, '기업회원');
-		
-		/* 입력값 확인 */
-		select * from register;
-		select * from positiontype;
-		select * from commute;
-		select * from resume;
-		select * from scheduler;
-        
-       alter table register RENAME COLUMN type TO typeName;
-       alter table register RENAME COLUMN regNum To jobNum;
-       alter table register modify staff_num NULL;
-        alter table register modify jobNum NULL;
-        alter table register modify staff_num NULL;
-       
-       desc register ;
-       desc commute;
-       desc scheduler;
-       desc positiontype;
-       
-       alter table register drop column hourWage;
-       alter table register drop column insurance;
-       alter table commute add hourWage number;
-       alter table commute rename column type to type_num;
-       alter table commute add workTime timestamp;
-       alter table commute add holiday_pay number;
-       alter table commute add insurance char(1);
-       alter table commute add pay number;
-       alter table scheduler rename column type to type_num;
-       alter table scheduler rename column workDate to sch_workDate;
-       alter table scheduler rename column workTime to sch_workTime;
-       alter table scheduler rename column restTime to sch_restTime;
-       
-       select * from register;
-       
-       select * from commute;
-       
-       alter table register RENAME COLUMN type TO typeName;
-       
-     alter table register add birthNum varchar2(30);
-     alter table register add birth varchar2(30);
-     alter table register add birthNum varchar2(30);
-     alter table register add phoneNum varchar2(30);
-      alter table register modify address NULL;
-      
-       alter table register RENAME COLUMN address TO add1;
-        alter table register add add2 varchar2(200);
-        
-        alter table register drop column add2;
-        alter table register add add1 varchar2(200);
-        alter table register add add2 varchar2(200);
-        
-        alter table register rename column typeName to type_num;
-        
-        alter table positiontype rename column type to type_num;
-        alter table positiontype rename column type to type_name;
-        alter table commute rename column resttime to resttime_start;
-        ALTER TABLE commute ADD (resttime_end TIMESTAMP);
-
-        alter table commute drop column worktime;
-        alter table commute add worktime NUMBER; 
- 
-     
-    private int reg_num;
-	private int typeName;
-	private String name;
-	private String id;
-	private String pwd;
-	private String pwd2;
-	private String tel;
-	private String phoneNum;
-	private String birthNum;
-	private String birth;
-	private String jobNum;
-	private String email;
-	private String address;
-	private int user_manager;
-	private boolean userIdExist; 
-	private boolean userLogin;   
-    
-    select * from register;
-    select * from commute;
-    desc commute;
-    desc register;
-    desc positiontype;
-    
- delete from commute;   
-    
-    
-select r.reg_num, r.staff_num, r.name, p.type_name, c.hourWage, c.insurance, c.holiday_pay, c.etc, c.workTime, c.pay  	
-from register r, positiontype p, commute c
-where r.reg_num = c.reg_num and p.type_num = r.type_num 
-and r.reg_num = 1
-order by r.reg_num asc;
-
-
-
-INSERT INTO commute VALUES (
-    63,
-    1,
-    TO_TIMESTAMP('2024-08-02 09:00:00.000000', 'YYYY-MM-DD HH24:MI:SS.FF'),
-    TO_TIMESTAMP('2024-08-02 13:00:00.000000', 'YYYY-MM-DD HH24:MI:SS.FF'),
-    TO_TIMESTAMP('2024-08-02 11:00:00.000000', 'YYYY-MM-DD HH24:MI:SS.FF'),
-    0,
-    10000,
-    100000,
-    1,
-    300000,
-    TO_TIMESTAMP('2024-08-02 12:00:00.000000', 'YYYY-MM-DD HH24:MI:SS.FF'),
-    800,
-    'Mainadmin',
-    'wlsl'
-    
-);
-
-select * from register;
-
-INSERT INTO commute VALUES (
-    43,
-    1,
-    TO_TIMESTAMP('2024-08-03 09:00:00.000000', 'YYYY-MM-DD HH24:MI:SS.FF'),
-    TO_TIMESTAMP('2024-08-03 13:00:00.000000', 'YYYY-MM-DD HH24:MI:SS.FF'),
-    TO_TIMESTAMP('2024-08-03 11:00:00.000000', 'YYYY-MM-DD HH24:MI:SS.FF'),
-    0,
-    10000,
-    100000,
-    1,
-    300000,
-    TO_TIMESTAMP('2024-08-03 12:00:00.000000', 'YYYY-MM-DD HH24:MI:SS.FF'),
-    800,
-    'Mainadmin',
-    'bbb'
-);
-
- alter table commute drop column ceo_id;
-  alter table commute drop column work_id;
-alter table commute add ceo_id varchar2(50);
-alter table commute add work_id varchar2(50);
-
-
-select * from commute;
-select * from register;
-desc commute;
-
-
-INSERT INTO commute VALUES (
-    1,
-    1,
-    TO_TIMESTAMP('2024-08-04 09:00:00.000000', 'YYYY-MM-DD HH24:MI:SS.FF'),
-    TO_TIMESTAMP('2024-08-04 13:00:00.000000', 'YYYY-MM-DD HH24:MI:SS.FF'),
-    TO_TIMESTAMP('2024-08-04 11:00:00.000000', 'YYYY-MM-DD HH24:MI:SS.FF'),
-    0,
-    10000,
-    100000,
-    1,
-    300000,
-    TO_TIMESTAMP('2024-08-04 12:00:00.000000', 'YYYY-MM-DD HH24:MI:SS.FF'),
-    800
-);
-
-INSERT INTO commute VALUES (
-    commute_seq.NEXTVAL,
-    1,
-    TO_TIMESTAMP('2024-08-02 09:30:00.000000', 'YYYY-MM-DD HH24:MI:SS.FF'),
-    TO_TIMESTAMP('2024-08-02 13:30:00.000000', 'YYYY-MM-DD HH24:MI:SS.FF'),
-    TO_TIMESTAMP('2024-08-02 11:30:00.000000', 'YYYY-MM-DD HH24:MI:SS.FF'),
-    0,
-    10000,
-    100000,
-    1,
-    300000,
-    TO_TIMESTAMP('2024-08-02 12:30:00.000000', 'YYYY-MM-DD HH24:MI:SS.FF'),
-    800
-);
-
-INSERT INTO commute VALUES (
-    1,
-    1,
-    TO_TIMESTAMP('2024-08-03 09:30:00.000000', 'YYYY-MM-DD HH24:MI:SS.FF'),
-    TO_TIMESTAMP('2024-08-03 13:30:00.000000', 'YYYY-MM-DD HH24:MI:SS.FF'),
-    TO_TIMESTAMP('2024-08-03 11:30:00.000000', 'YYYY-MM-DD HH24:MI:SS.FF'),
-    0,
-    10000,
-    100000,
-    1,
-    300000,
-    TO_TIMESTAMP('2024-08-03 12:30:00.000000', 'YYYY-MM-DD HH24:MI:SS.FF'),
-    800
-);
-
-INSERT INTO commute VALUES (
-    63,
-    1,
-    TO_TIMESTAMP('2024-08-04 09:30:00.000000', 'YYYY-MM-DD HH24:MI:SS.FF'),
-    TO_TIMESTAMP('2024-08-04 13:30:00.000000', 'YYYY-MM-DD HH24:MI:SS.FF'),
-    TO_TIMESTAMP('2024-08-04 11:30:00.000000', 'YYYY-MM-DD HH24:MI:SS.FF'),
-    0,
-    10000,
-    100000,
-    1,
-    300000,
-    TO_TIMESTAMP('2024-08-04 12:30:00.000000', 'YYYY-MM-DD HH24:MI:SS.FF'),
-    800,
-    'Mainadmin',
-    'wlsl'
-);
-
-alter table 
-
-desc commute;
-select * from register;
-
-
-drop table comopany;
-drop table employ;
-
-create table company(
-com_order number,
-ceo_id number not null);
-
-alter table company ADD
 		CONSTRAINT PK_company
 		PRIMARY KEY (
 			ceo_id
 		);
-                
 
-create table employ(
-em_num number,
-work_id number
+/* 고용 */
+CREATE TABLE employ (
+	em_num NUMBER, /* 순번 */
+	staff_number NUMBER, /* 사원번호 */
+	ceo_id VARCHAR2(50) NOT NULL, /* 기업 아이디 */
+	work_id VARCHAR2(50) NOT NULL, /* 고용자 아이디 */
+	employ_date DATE, /* 입사일 */
+	exp_periodStart DATE, /* 수습기간 시작 */
+	exp_periodEnd DATE /* 수습기간 끝 */
 );
 
-alter table employ add ceo_id number not null;
+COMMENT ON TABLE employ IS '고용';
 
-ALTER TABLE employ
-ADD CONSTRAINT fk_company_to_employ
-FOREIGN KEY (ceo_id)
-REFERENCES company(ceo_id);
+COMMENT ON COLUMN employ.em_num IS '순번';
 
-alter table employ add reg_num number;
-alter table employ add type_num number;
+COMMENT ON COLUMN employ.staff_number IS '사원번호';
 
-ALTER TABLE employ
-ADD CONSTRAINT fk_register_to_employ
-FOREIGN KEY (reg_num)
-REFERENCES register (reg_num);
+COMMENT ON COLUMN employ.ceo_id IS '기업 아이디';
 
-ALTER TABLE employ
-ADD CONSTRAINT fk_register_to_employ
-FOREIGN KEY (type_num)
-REFERENCES register (type_num);
+COMMENT ON COLUMN employ.work_id IS '고용자 아이디';
 
-SELECT acc.table_name AS referenced_table, acc.column_name AS referenced_column
-FROM user_constraints uc
-JOIN user_cons_columns acc
-  ON uc.constraint_name = acc.constraint_name
-WHERE uc.constraint_name = (
-  SELECT r_constraint_name
-  FROM user_constraints
-  WHERE constraint_name = 'FK_REGISTER_TO_EMPLOY'
-);
+COMMENT ON COLUMN employ.employ_date IS '입사일';
 
+COMMENT ON COLUMN employ.exp_periodStart IS '수습기간 시작';
 
-
-ALTER TABLE register
-ADD CONSTRAINT uk_register_type_num UNIQUE (type_num);
-
-SELECT type_num, COUNT(*)
-FROM register
-GROUP BY type_num
-HAVING COUNT(*) > 1;
-
-DELETE FROM register
-WHERE rowid NOT IN (
-  SELECT MIN(rowid)
-  FROM register
-  GROUP BY type_num
-);
-
--- 고유 키 제약 조건 추가
-ALTER TABLE register
-ADD CONSTRAINT uk_register_type_num UNIQUE (type_num);
-
-ALTER TABLE employ
-ADD CONSTRAINT fk_register_to_employ
-FOREIGN KEY (type_num)
-REFERENCES register (type_num);
-
-
-desc employ;
-desc company;
-
-insert into company values(
-company_seq.NEXTVAL, 1
-);
-
-CREATE SEQUENCE company_seq
-start with 1
-increment by 1
-minvalue 1;
-
-GRANT SELECT ON company_seq TO system;
-
-insert into employ values (
-employ.NEXTVAL, 2, 1
-);
-
----
-INSERT INTO employ (em_num, work_id, ceo_id)
-VALUES (employ_seq.NEXTVAL, 2, 1);
-Insert Into employ values(employ_seq.NextVAL, 11, 1);
-Insert Into employ values(employ_seq.NextVAL, 13, 1);
-
-
-CREATE SEQUENCE employ_seq
-start with 1
-increment by 1
-minvalue 1;
-
-GRANT SELECT ON employ_seq TO system;
-
-select * from employ;
-
-
-SELECT constraint_name
-FROM user_constraints
-WHERE table_name = 'REGISTER'
-  AND constraint_type = 'U';
-
-ALTER TABLE register
-DROP CONSTRAINT UK_REGISTER_REG_NUM;
-
-desc employ;
-
-ALTER TABLE employ
-ADD CONSTRAINT FK_employ_register
-FOREIGN KEY (reg_num, type_num)
-REFERENCES register (reg_num, type_num);
-
-select name, tel, email, add1 from register where id='wlsl';
-
-select * from company;
-select * from employ;
-select * from register;
-
-
-ALTER TABLE commute ADD ceo_id NUMBER;
-
-ALTER TABLE commute
-ADD CONSTRAINT fk_ceo
-FOREIGN KEY (ceo_id) REFERENCES company(ceo_id);
-
-desc commute;
-
-
-    
-    create sequence employ_seq
-		start with 1
-		increment by 1
-		minvalue 1;
-
-alter table register drop column staff_num;         --staff_num register에서 빼기
-
-alter table employ add staff_number number;
-alter table employ drop column reg_num;
-alter table employ drop column type_num;
-alter table employ drop constraint FK_COMPANY_TO_EMPLOY;    --fk 제약조건 삭제
-alter table employ drop constraint FK_EMPLOY_REGISTER;
-
-desc register;
-
-drop table employ;
-
-create table employ(
-em_num number,
-ceo_id varchar2(50),
-work_id varchar2(50),
-staff_number varchar2(50)
-);
-
-
-
-insert into employ ( em_num, ceo_id, work_id, staff_number)
-	values (employ_seq.nextVAL ,'Mainadmin','wlsl', '001');
-      
-
-select r.reg_num, r.name, c.hourWage, c.insurance, c.holiday_pay, c.etc, c.workTime, c.pay  	
-			from register r, positiontype p, commute c
-			where r.reg_num = c.reg_num and p.type_num = r.type_num 
-			and r.reg_num = #{reg_num}
-			order by r.reg_num asc;
-
-select * from positiontype;
-select * from commute;
-select * from register;
-select * from employ;
-
-
-
-alter table register add add2 varchar2(200);
-
-delete from register where reg_num = 45;
-delete from register where reg_num = 46;
-delete from register where reg_num = 47;
-
-select r.reg_num, r.name, c.hourWage, c.insurance, c.holiday_pay, c.etc, c.workTime, c.pay  	
-			from  c.insurance, c.holiday_pay, c.etc, c.workTime, c.pay  
-			where r.reg_num = c.reg_num and p.type_num = r.type_num 
-			and r.reg_num = 1
-			order by r.reg_num asc;
-            
-select e.staff_number, r.name, c.hourWage,  c.insurance, c.holiday_pay, c.etc, c.workTime, c.pay  
-from employ e, register r, commute c
-where e.ceo_id = '1';
-
-select e.staff_number, r.name, c.hourWage,  c.insurance, c.holiday_pay, c.etc, c.workTime, c.pay  
-			from employ e, register r, commute c
-			where r.id = e.work_id
-			and e.ceo_id = (
-            select id from register where reg_num = 1
-            );
-            
-insert into employ staff_number values (2) = (
-select em_num, ceo_id, work_id from employ where id='wlsl');           
-
-
-
-
- 	insert into employ (em_num, ceo_id, work_id, staff_number)
-	values (employ_seq.nextVAL , 'Mainadmin' , 'ccc', '1000' );
-	
-UPDATE commute c
-SET 
-    hourWage = 30000, 
-    insurance = '1',
-    holiday_pay = 20000, 
-    etc = 10000, 
-    workTime = 2000, 
-    pay = 50000
-WHERE c.reg_num IN (
-    SELECT r.reg_num
-    FROM register r
-    WHERE r.reg_num = 2
-);
-
-update commute
-		set c.hourWage = 30000, c.insurance = '1', c.holiday_pay = 20000, c.etc = 10000, c.workTime = 2000, c.pay=50000
-		join commute c on r.reg_num = c.reg_num
-		where r.id = 'wlsl';
-
-commit;
-
-SELECT r.id, r.name, c.hourWage, c.insurance, c.holiday_pay, c.etc, c.workTime, c.pay  
-        FROM register r
-        JOIN commute c ON r.reg_num = c.reg_num
-        WHERE r.id = 'wlsl';
-        
-desc register; 
-
-update employ set employ_date = '2024-03-03', exp_period='2024-09-30' where work_id='wlsl';
-
-select r.id, r.name, c.hourWage, c.insurance, c.holiday_pay, c.etc, c.workTime, c.pay  
-        from register r
-        join commute c on r.reg_num = c.reg_num
-        where r.id = 'bbb';
-        
-select e.staff_number, r.name, e.hourWage,  c.insurance, c.holiday_pay, c.etc, c.workTime, c.pay, r.id  
-			from employ e, register r, commute c
-			where r.id = e.work_id
-			and e.ceo_id = (
-            select id from register where reg_num = 2;       
-commit;
-
-select * from commute;
-
-select * from register;
-        
-INSERT INTO register VALUES (
-    1, 
-    1, 
-    'aaa', 
-    'aaa', 
-    'aaa', 
-    '010-3232-3232', 
-    NULL, 
-    'aaa@email.com', 
-    NULL, 
-    '010101-4386787', 
-    '010101', 
-    NULL, 
-    '대구 수성구', 
-    NULL, 
-    NULL, 
-);
-
-
-        
-desc register;     
-        
-commit;
-desc employ;
-    
+COMMENT ON COLUMN employ.exp_periodEnd IS '수습기간 끝';
 
 ALTER TABLE employ
 	ADD
@@ -766,21 +573,135 @@ ALTER TABLE employ
 			ceo_id,
 			work_id
 		);
-ALTER TABLE employ
-    ADD CONSTRAINT PK_employ
-    PRIMARY KEY (ceo_id, work_id);
 
-select * from commute;
+ALTER TABLE register
+	ADD
+		CONSTRAINT FK_positiontype_TO_register
+		FOREIGN KEY (
+			type_num
+		)
+		REFERENCES positiontype (
+			type_num
+		);
 
-desc commute;
+ALTER TABLE commute
+	ADD
+		CONSTRAINT FK_register_TO_commute
+		FOREIGN KEY (
+			reg_num,
+			type_num
+		)
+		REFERENCES register (
+			reg_num,
+			type_num
+		);
+
+ALTER TABLE commute
+	ADD
+		CONSTRAINT FK_employ_TO_commute
+		FOREIGN KEY (
+			ceo_id,
+			work_id
+		)
+		REFERENCES employ (
+			ceo_id,
+			work_id
+		);
+
+ALTER TABLE schedule
+	ADD
+		CONSTRAINT FK_register_TO_schedule
+		FOREIGN KEY (
+			reg_num,
+			type_num
+		)
+		REFERENCES register (
+			reg_num,
+			type_num
+		);
+
+ALTER TABLE resume
+	ADD
+		CONSTRAINT FK_register_TO_resume
+		FOREIGN KEY (
+			reg_num,
+			type_num
+		)
+		REFERENCES register (
+			reg_num,
+			type_num
+		);
+        
+/* exerd 끝 */
 
 commit;
 
-ALTER TABLE commute DROP COLUMN ceo_id;
+CREATE SEQUENCE register_seq start with 1 increment by 1 minvalue 1;  --sequence 생성
+CREATE SEQUENCE employ_seq start with 1 increment by 1 minvalue 1; 
+CREATE SEQUENCE commute_seq start with 1 increment by 1 minvalue 1; 
+CREATE SEQUENCE company_seq start with 1 increment by 1 minvalue 1; 
+CREATE SEQUENCE schedule_seq start with 1 increment by 1 minvalue 1; 
+CREATE SEQUENCE resume_seq start with 1 increment by 1 minvalue 1; 
 
-ALTER TABLE commute ADD ceo_id VARCHAR(50);
-ALTER TABLE commute ADD work_id VARCHAR(50);
+insert into positiontype values (1, '개인회원');    -- positiontype insert into
+insert into positiontype values (2, '기업회원');
+
+
+insert into register values(register_seq.NEXTVAL, 2, '관리자a', 'admina', '1234', '123456789-123453', 'admina@email.com', '053-234-4839', '010-5345-4837',
+'851223', NULL, '대구 수성구 고모로 31', '앞', TO_DATE(SYSDATE, 'YYYY-MM-DD') ); -- SYSDATE는 오늘 날짜 기입할때 사용 / register insert into 관리자
+insert into register values(register_seq.NEXTVAL, 1, 'aaa', 'aaa','aaa', NULL, 'aaa@email.com', '010-3927-5843', NULL, --register insert into 직원 aaa
+'020418', '020418-4283823', '대구 중구 경상감영길 2', '길', TO_DATE('2024-08-10', 'YYYY-MM-DD') );
+insert into register values(register_seq.NEXTVAL, 1, 'bbb', 'bbb','bbb', NULL, 'bbb@email.com', '010-7346-2243', NULL,
+'010924', '010924-4386132', '대구 동구 동촌로 46-9', '뒤', TO_DATE('2024-08-10', 'YYYY-MM-DD') );
+insert into register values(register_seq.NEXTVAL, 1, 'ccc', 'ccc','ccc', NULL, 'ccc@email.com', '010-9482-4810', NULL,
+'000722', '000722-3214207', '대구 달성군 구지면 가천1길 43', '옆', TO_DATE('2024-08-10', 'YYYY-MM-DD') );
+insert into register values(register_seq.NEXTVAL, 1, 'ddd', 'ddd','ddd', NULL, 'ddd@email.com', '010-1284-3264', NULL,
+'970320', '970320-3940291', '대구 군위군 의흥면 가지골길 34-9', '위', TO_DATE('2024-08-11', 'YYYY-MM-DD') );
+
+insert into register values(register_seq.NEXTVAL, 2, '관리자b', 'adminb', '1234', '4930284-12382453', 'adminb@email.com', '02-482-3954', '010-3843-4920',
+'901209', NULL, '서울 종로구 북촌로 31-6', '앞', TO_DATE('2024-08-11', 'YYYY-MM-DD') );
+insert into register values(register_seq.NEXTVAL, 1, 'eee', 'eee','eee', NULL, 'eee@email.com', '010-9382-5839', NULL,
+'990328', '990328-1837242', '서울 강남구 가로수길 5', '길', TO_DATE('2024-08-11', 'YYYY-MM-DD') );
+insert into register values(register_seq.NEXTVAL, 1, 'fff', 'fff','fff', NULL, 'fff@email.com', '010-4829-2910', NULL,
+'000823', '000823-4289370', '서울 은평구 갈현로 181', '뒤', TO_DATE('2024-08-11', 'YYYY-MM-DD') );
+insert into register values(register_seq.NEXTVAL, 1, 'ggg', 'ggg','ggg', NULL, 'ggg@email.com', '010-4189-1242', NULL,
+'980204', '980204-1327483', '서울 동대문구 서울시립대로 5', '옆', TO_DATE('2024-08-12', 'YYYY-MM-DD') );
+insert into register values(register_seq.NEXTVAL, 1, 'hhh', 'hhh','hhh', NULL, 'hhh@email.com', '010-6434-5628', NULL,
+'970826', '970826-2324644', '경기 부천시 소사구 경인로 4', '위', TO_DATE('2024-08-12', 'YYYY-MM-DD') );
+
+
+insert into employ values(1, 001, 'admina', 'aaa', TO_DATE('2024-08-11', 'YYYY-MM-DD' ), TO_DATE('2024-08-11', 'YYYY-MM-DD' ), TO_DATE('2024-11-10', 'YYYY-MM-DD' ) ); --employ insert into
+insert into employ values(2, 002, 'admina', 'bbb', TO_DATE('2024-08-11', 'YYYY-MM-DD' ), TO_DATE('2024-08-11', 'YYYY-MM-DD' ), TO_DATE('2024-11-10', 'YYYY-MM-DD' ) );
+insert into employ values(3, 003, 'admina', 'ccc', TO_DATE('2024-08-11', 'YYYY-MM-DD' ), TO_DATE('2024-08-11', 'YYYY-MM-DD' ), TO_DATE('2024-11-10', 'YYYY-MM-DD' ) );
+insert into employ values(4, 004, 'admina', 'ddd', TO_DATE('2024-08-12', 'YYYY-MM-DD' ), TO_DATE('2024-08-11', 'YYYY-MM-DD' ), TO_DATE('2024-11-11', 'YYYY-MM-DD' ) );
+
+insert into employ values(1, 0010, 'adminb', 'eee', TO_DATE('2024-08-11', 'YYYY-MM-DD' ), TO_DATE('2024-08-11', 'YYYY-MM-DD' ), TO_DATE('2024-09-10', 'YYYY-MM-DD' ) );
+insert into employ values(2, 0020, 'adminb', 'fff', TO_DATE('2024-08-12', 'YYYY-MM-DD' ), TO_DATE('2024-08-11', 'YYYY-MM-DD' ), TO_DATE('2024-09-11', 'YYYY-MM-DD' ) );
+insert into employ values(3, 0030, 'adminb', 'ggg', TO_DATE('2024-08-12', 'YYYY-MM-DD' ), TO_DATE('2024-08-11', 'YYYY-MM-DD' ), TO_DATE('2024-09-11', 'YYYY-MM-DD' ) );
+insert into employ values(4, 0040, 'adminb', 'hhh', TO_DATE('2024-08-14', 'YYYY-MM-DD' ), TO_DATE('2024-08-11', 'YYYY-MM-DD' ), TO_DATE('2024-09-13', 'YYYY-MM-DD' ) );
+
+
+insert into commute values(2, 1, 'admina', 'aaa', TO_TIMESTAMP('2024-08-11 09:00:00', 'YYYY-MM-DD HH24'), TO_TIMESTAMP('2024-08-11 14:00:00.000000','YYYY-MM-DD HH24:MI:SS.FF'), --commute insert into
+NULL, NULL, NULL, 300, NULL, NULL, NULL, 300, 9860,NULL, 1, 0, NULL, NULL, NULL, NULL, NULL, 49300 ); 
+insert into commute values(3, 1, 'admina', 'bbb', TO_TIMESTAMP('2024-08-11 09:00:00', 'YYYY-MM-DD HH24:MI:SS'), TO_TIMESTAMP('2024-08-11 14:00:00','YYYY-MM-DD HH24:MI:SS'), 
+NULL, NULL, NULL, 300, NULL, NULL, NULL, 300, 9860,NULL, 1, 0, NULL, NULL, NULL, NULL, NULL, 49300 ); 
+insert into commute values(4, 1, 'admina', 'ccc', TO_TIMESTAMP('2024-08-11 14:00:00', 'YYYY-MM-DD HH24:MI:SS'), TO_TIMESTAMP('2024-08-11 22:00:00','YYYY-MM-DD HH24:MI:SS'), 
+TO_TIMESTAMP('2024-08-11 17:00:00','YYYY-MM-DD HH24:MI:SS'),  TO_TIMESTAMP('2024-08-11 17:30:00','YYYY-MM-DD HH24:MI:SS'), 
+NULL, 300, NULL, NULL, NULL, 300, 9860,NULL, 1, 0, NULL, NULL, NULL, NULL, NULL, 49300 ); 
+insert into commute values(5, 1, 'admina', 'ddd', TO_TIMESTAMP('2024-08-12 09:00:00', 'YYYY-MM-DD HH24:MI:SS'), TO_TIMESTAMP('2024-08-12 14:00:00','YYYY-MM-DD HH24:MI:SS'), 
+NULL, NULL, NULL, 300, NULL, NULL, NULL, 300, 9860,NULL, 1, 0, NULL, NULL, NULL, NULL, NULL, 49300 );
+
+insert into commute values(7, 1, 'adminb', 'eee', TO_TIMESTAMP('2024-08-11 09:00:00', 'YYYY-MM-DD HH24:MI:SS'), TO_TIMESTAMP('2024-08-11 14:00:00','YYYY-MM-DD HH24:MI:SS'), 
+NULL, NULL, NULL, 300, NULL, NULL, NULL, 300, 9860,NULL, 1, 0, NULL, NULL, NULL, NULL, NULL, 49300 ); 
+insert into commute values(8, 1, 'adminb', 'fff', TO_TIMESTAMP('2024-08-12 09:00:00', 'YYYY-MM-DD HH24:MI:SS'), TO_TIMESTAMP('2024-08-12 14:00:00','YYYY-MM-DD HH24:MI:SS'), 
+NULL, NULL, NULL, 300, NULL, NULL, NULL, 300, 9860,NULL, 1, 0, NULL, NULL, NULL, NULL, NULL, 49300 ); 
+insert into commute values(9, 1, 'adminb', 'ggg', TO_TIMESTAMP('2024-08-12 14:00:00', 'YYYY-MM-DD HH24:MI:SS'), TO_TIMESTAMP('2024-08-12 22:00:00','YYYY-MM-DD HH24:MI:SS'), 
+TO_TIMESTAMP('2024-08-11 17:00:00','YYYY-MM-DD HH24:MI:SS'),  TO_TIMESTAMP('2024-08-11 17:30:00','YYYY-MM-DD HH24:MI:SS'), 
+NULL, 300, NULL, NULL, NULL, 300, 9860,NULL, 1, 0, NULL, NULL, NULL, NULL, NULL, 49300 ); 
+insert into commute values(10, 1, 'adminb', 'hhh', TO_TIMESTAMP('2024-08-14 09:00:00', 'YYYY-MM-DD HH24:MI:SS'), TO_TIMESTAMP('2024-08-14 14:00:00','YYYY-MM-DD HH24:MI:SS'), 
+NULL, NULL, NULL, 300, NULL, NULL, NULL, 300, 9860,NULL, 1, 0, NULL, NULL, NULL, NULL, NULL, 49300 ); 
+
+insert into company values(company_seq.NEXTVAL, 'admina'); --insert into company
+insert into company values(company_seq.NEXTVAL, 'adminb');
 
 commit;
-
-
