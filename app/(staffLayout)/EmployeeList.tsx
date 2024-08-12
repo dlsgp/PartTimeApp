@@ -1,12 +1,11 @@
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import React, { useState, useEffect } from "react";
-import { Dimensions, StyleSheet, Text, View, ScrollView, TouchableOpacity } from "react-native";
+import { Dimensions, StyleSheet, Text, View, ScrollView } from "react-native";
 import { Card, Provider } from "react-native-paper";
 import RNPickerSelect from "react-native-picker-select";
 import axios from "axios";
-import { router } from "expo-router";
 
-const SalaryList = () => {
+const EmployeeList = () => {
   const { width } = Dimensions.get("window");
   const [selectedDate, setSelectedDate] = useState<string>("2024-07");
   const [data, setData] = useState([]);
@@ -54,38 +53,20 @@ const SalaryList = () => {
             <Card style={styles.card} key={index}>
               <Card.Content>
                 <View style={styles.row}>
-                  <Text style={styles.label}>번호:</Text>
-                  <Text style={styles.value}>{row.REG_NUM}</Text>
-                </View>
-                <View style={styles.row}>
                   <Text style={styles.label}>사원번호:</Text>
                   <Text style={styles.value}>{row.STAFF_NUMBER}</Text>
                 </View>
                 <View style={styles.row}>
                   <Text style={styles.label}>이름:</Text>
-                  <TouchableOpacity onPress={() => router.push('/SalaryForm')}>
                   <Text style={styles.value}>{row.NAME}</Text>
-                  </TouchableOpacity>
                 </View>
                 <View style={styles.row}>
                   <Text style={styles.label}>시급:</Text>
                   <Text style={styles.value}>{row.HOURWAGE}</Text>
                 </View>
                 <View style={styles.row}>
-                  <Text style={styles.label}>4대보험유무:</Text>
-                  <Text style={styles.value}>{row.INSURANCE}</Text>
-                </View>
-                <View style={styles.row}>
-                  <Text style={styles.label}>기타:</Text>
-                  <Text style={styles.value}>{row.ETC}</Text>
-                </View>
-                <View style={styles.row}>
-                  <Text style={styles.label}>총 근무시간:</Text>
-                  <Text style={styles.value}>{row.WORKTIME}</Text>
-                </View>
-                <View style={styles.row}>
-                  <Text style={styles.label}>전체급여:</Text>
-                  <Text style={styles.value}>{row.PAY}</Text>
+                  <Text style={styles.label}>입사일:</Text>
+                  <Text style={styles.value}>{row.EMPLOY_DATE}</Text>
                 </View>
               </Card.Content>
             </Card>
@@ -149,4 +130,4 @@ const pickerSelectStyles = StyleSheet.create({
   },
 });
 
-export default SalaryList;
+export default EmployeeList;

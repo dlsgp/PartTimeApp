@@ -3,12 +3,35 @@ const express = require("express");
 const cors = require("cors");
 const oracledb = require("oracledb");
 const userRoutes = require('./routes/userRoutes');
+const session = require('express-session');
 
 const app = express();
 const port = 3000;
+const allowedOrigins = ['http://localhost:8081', 'https://mufxcd4-gusrl45612-8081.exp.direct'];
+
+
+// 세션 설정
+app.use(session({
+  secret: '12345', // 강력한 비밀 키를 사용하세요
+  resave: false,
+  saveUninitialized: true,
+  cookie: { secure: false } // HTTPS를 사용할 경우 true로 설정
+}));
 
 // CORS 설정
-app.use(cors());
+app.use(cors({
+  origin: function (origin, callback) {
+    if (!origin || allowedOrigins.indexOf(origin) !== -1) {
+      callback(null, true);
+    } else {
+      callback(new Error('Not allowed by CORS'));
+    }
+  },
+  credentials: true
+}));
+
+// CORS 설정
+// app.use(cors());
 
 // JSON 바디 파싱
 app.use(express.json());

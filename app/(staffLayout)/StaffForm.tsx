@@ -5,33 +5,21 @@ import {
   Text,
   Image,
   StyleSheet,
-  Button,
   KeyboardAvoidingView,
   Platform,
   TouchableOpacity,
   Dimensions,
 } from "react-native";
-import { RadioButton, TextInput, useTheme } from "react-native-paper";
-// import FontAwesome from "@expo/vector-icons/FontAwesome";
-// import DatePicker from "../(staffLayout)/ModalCalendar";
+import { RadioButton, TextInput } from "react-native-paper";
+import FontAwesome from "@expo/vector-icons/FontAwesome";
+import DatePicker from "../(staffLayout)/ModalCalendar";
 import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
-import { router } from "expo-router";
 import axios from "axios";
 
 const { width, height } = Dimensions.get("window");
 
 const StaffForm = () => {
   const [text, setText] = useState("");
-  // const { colors } = useTheme();
-  // const [selectedDate, setSelectedDate] = useState();
-  // const [checked, setChecked] = React.useState("first");
-  // const [date1, setDate1] = useState<string | null>(null);
-  // const [date2, setDate2] = useState<string | null>(null);
-  // const [date3, setDate3] = useState<string | null>(null);
-  // const [showDatePicker1, setShowDatePicker1] = useState(false);
-  // const [showDatePicker2, setShowDatePicker2] = useState(false);
-  // const [showDatePicker3, setShowDatePicker3] = useState(false);
-
   const [userData, setUserData] = useState({
     name: "",
     tel: "",
@@ -41,36 +29,18 @@ const StaffForm = () => {
   });
   const [error, setError] = useState("");
   const [staffNum, setStaffNum] = useState("");
-
-
-
-  // function handleChange1(propDate: string) {
-  //   setDate1(propDate);
-  // }
-
-  // function handleChange2(propDate: string) {
-  //   setDate2(propDate);
-  // }
-
-  // function handleChange3(propDate: string) {
-  //   setDate3(propDate);
-  // }
-
-  // function toggleDatePicker1() {
-  //   setShowDatePicker1((prevState) => !prevState);
-  // }
-
-  // function toggleDatePicker2() {
-  //   setShowDatePicker2((prevState) => !prevState);
-  // }
-
-  // function toggleDatePicker3() {
-  //   setShowDatePicker3((prevState) => !prevState);
-  // }
+  const [date1, setDate1] = useState<string | null>(null); // 입사일
+  const [date2, setDate2] = useState<string | null>(null); // 수습기간 시작
+  const [date3, setDate3] = useState<string | null>(null); // 수습기간 종료
+  const [showDatePicker1, setShowDatePicker1] = useState(false);
+  const [showDatePicker2, setShowDatePicker2] = useState(false);
+  const [showDatePicker3, setShowDatePicker3] = useState(false);
 
   const handleSearch = async () => {
     try {
-      const response = await axios.get(`http://localhost:3000/api/users/${text}`);
+      const response = await axios.get(
+        `http://localhost:3000/api/users/${text}`
+      );
       if (response.data) {
         setUserData(response.data);
         setError("");
@@ -98,11 +68,17 @@ const StaffForm = () => {
 
   const handleSave = async () => {
     try {
-      const response = await axios.post("http://localhost:3000/api/update-staffnum", {
-        id: text,
-        staffNum,
-      });
-      
+      const response = await axios.post(
+        "http://localhost:3000/api/update-staffnum",
+        {
+          id: text, // 검색된 아이디 (work_id)
+          staffNum, // 입력된 사원번호
+          employDate: date1, // 입력된 입사일
+          expPeriodStart: date2, // 수습기간 시작일
+          expPeriodEnd: date3, // 수습기간 종료일
+        }, {
+          withCredentials: true // 세션 쿠키를 보내기 위해 필요
+        });
 
       if (response.data.message) {
         alert(response.data.message);
@@ -112,6 +88,30 @@ const StaffForm = () => {
     } catch (error) {
       alert("저장 중 오류가 발생했습니다.");
     }
+  };
+
+  const handleChange1 = (propDate: string) => {
+    setDate1(propDate);
+  };
+
+  const handleChange2 = (propDate: string) => {
+    setDate2(propDate);
+  };
+
+  const handleChange3 = (propDate: string) => {
+    setDate3(propDate);
+  };
+
+  const toggleDatePicker1 = () => {
+    setShowDatePicker1((prevState) => !prevState);
+  };
+
+  const toggleDatePicker2 = () => {
+    setShowDatePicker2((prevState) => !prevState);
+  };
+
+  const toggleDatePicker3 = () => {
+    setShowDatePicker3((prevState) => !prevState);
   };
 
   return (
@@ -146,26 +146,28 @@ const StaffForm = () => {
           >
             <View style={RegFormStyle.textInputContainer}>
               <View style={RegFormStyle.textInputContainer1}>
-            <TextInput
-                style={RegFormStyle.formcontainer1}
-                label="아이디"
-                onChangeText={(text) => setText(text)}
-                mode="outlined"
-                outlineColor="#E5E5E5"
-                activeOutlineColor="#219BDA"
-                theme={{ colors: { background: "white" } }}
-              />
-              <View style={RegFormStyle.buttonD1}>
-                <TouchableOpacity
-                  activeOpacity={0.8}
-                  style={RegFormStyle.button2}
-                  onPress={handleSearch}
-                >
-                  <Text style={RegFormStyle.buttonText2}>검색</Text>
-                </TouchableOpacity>
+                <TextInput
+                  style={RegFormStyle.formcontainer1}
+                  label="아이디"
+                  onChangeText={(text) => setText(text)}
+                  mode="outlined"
+                  outlineColor="#E5E5E5"
+                  activeOutlineColor="#219BDA"
+                  theme={{ colors: { background: "white" } }}
+                />
+                <View style={RegFormStyle.buttonD1}>
+                  <TouchableOpacity
+                    activeOpacity={0.8}
+                    style={RegFormStyle.button2}
+                    onPress={handleSearch}
+                  >
+                    <Text style={RegFormStyle.buttonText2}>검색</Text>
+                  </TouchableOpacity>
+                </View>
               </View>
-              </View>
-              {error ? <Text style={RegFormStyle.errorText}>{error}</Text> : null}
+              {error ? (
+                <Text style={RegFormStyle.errorText}>{error}</Text>
+              ) : null}
               <TextInput
                 style={RegFormStyle.formcontainer}
                 label="사원번호"
@@ -187,16 +189,6 @@ const StaffForm = () => {
                 theme={{ colors: { background: "white" } }}
                 disabled
               />
-              
-              {/* <TextInput
-                style={RegFormStyle.formcontainer}
-                label="직급"
-                onChangeText={(text) => setText(text)}
-                mode="outlined"
-                outlineColor="#E5E5E5"
-                activeOutlineColor="#219BDA"
-                theme={{ colors: { background: "white" } }}
-              /> */}
               <TextInput
                 style={RegFormStyle.formcontainer}
                 label="전화번호"
@@ -241,17 +233,9 @@ const StaffForm = () => {
                 theme={{ colors: { background: "white" } }}
                 disabled
               />
-              {/* <TextInput
-                style={RegFormStyle.formcontainer}
-                label="시급"
-                onChangeText={(text) => setText(text)}
-                mode="outlined"
-                outlineColor="#E5E5E5"
-                activeOutlineColor="#219BDA"
-                theme={{ colors: { background: "white" } }}
-              /> */}
 
-              {/* <View style={RegFormStyle.TextIcon}>
+              {/* 입사일 */}
+              <View style={RegFormStyle.TextIcon}>
                 <TextInput
                   style={RegFormStyle.formcontainerIcon}
                   label="입사일"
@@ -277,97 +261,65 @@ const StaffForm = () => {
                     visible={showDatePicker1}
                   />
                 )}
-              </View> */}
-
-              <View>
-                {/* <View style={RegFormStyle.TextIconE}>
-                  <TextInput
-                    style={RegFormStyle.formcontainerIconC}
-                    label="수습기간"
-                    value={date2 || ""}
-                    onChangeText={(text) => setDate2(text)}
-                    mode="outlined"
-                    outlineColor="#E5E5E5"
-                    activeOutlineColor="#219BDA"
-                    theme={{ colors: { background: "white" } }}
-                  />
-                  <TouchableOpacity
-                    activeOpacity={0.8}
-                    onPress={toggleDatePicker2}
-                    style={RegFormStyle.calendarButton}
-                  >
-                    <FontAwesome name="calendar-o" size={24} color="e5e5e5" />
-                  </TouchableOpacity>
-                  {showDatePicker2 && (
-                    <DatePicker
-                      mode="calendar"
-                      selected={date2 || ""}
-                      onDateChange={handleChange2}
-                      visible={showDatePicker2}
-                    />
-                  )}
-                </View> */}
-
-                {/* <Text style={RegFormStyle.dateText}>~</Text> */}
-
-                {/* <View style={RegFormStyle.TextIconE}>
-                  <TextInput
-                    style={RegFormStyle.formcontainerIconC}
-                    label="수습기간 종료"
-                    value={date3 || ""}
-                    onChangeText={(text) => setDate3(text)}
-                    mode="outlined"
-                    outlineColor="#E5E5E5"
-                    activeOutlineColor="#219BDA"
-                    theme={{ colors: { background: "white" } }}
-                  />
-                  <TouchableOpacity
-                    activeOpacity={0.8}
-                    onPress={toggleDatePicker3}
-                    style={RegFormStyle.calendarButton}
-                  >
-                    <FontAwesome name="calendar-o" size={24} color="e5e5e5" />
-                  </TouchableOpacity>
-                  {showDatePicker3 && (
-                    <DatePicker
-                      mode="calendar"
-                      selected={date3 || ""}
-                      onDateChange={handleChange3}
-                      visible={showDatePicker3}
-                    />
-                  )}
-                </View> */}
               </View>
 
-              {/* 4대보험 유무 */}
-              {/* <View
-                style={{
-                  flexDirection: "row",
-                  display: "flex",
-                  marginVertical: "6%",
-                  justifyContent: "center",
-                  alignItems: "center",
-                }}
-              >
-                <Text style={RegFormStyle.insurance}>4대보험유무</Text>
-                <View style={RegFormStyle.radio}>
-                  <RadioButton
-                    value="yes"
-                    status={checked === "yes" ? "checked" : "unchecked"}
-                    onPress={() => setChecked("yes")}
+              {/* 수습기간 시작 */}
+              <View style={RegFormStyle.TextIconE}>
+                <TextInput
+                  style={RegFormStyle.formcontainerIconC}
+                  label="수습기간 시작"
+                  value={date2 || ""}
+                  onChangeText={(text) => setDate2(text)}
+                  mode="outlined"
+                  outlineColor="#E5E5E5"
+                  activeOutlineColor="#219BDA"
+                  theme={{ colors: { background: "white" } }}
+                />
+                <TouchableOpacity
+                  activeOpacity={0.8}
+                  onPress={toggleDatePicker2}
+                  style={RegFormStyle.calendarButton}
+                >
+                  <FontAwesome name="calendar-o" size={24} color="e5e5e5" />
+                </TouchableOpacity>
+                {showDatePicker2 && (
+                  <DatePicker
+                    mode="calendar"
+                    selected={date2 || ""}
+                    onDateChange={handleChange2}
+                    visible={showDatePicker2}
                   />
-                </View>
-                <Text style={RegFormStyle.checktext}>예</Text>
+                )}
+              </View>
 
-                <View style={RegFormStyle.radio}>
-                  <RadioButton
-                    value="no"
-                    status={checked === "no" ? "checked" : "unchecked"}
-                    onPress={() => setChecked("no")}
+              {/* 수습기간 종료 */}
+              <View style={RegFormStyle.TextIconE}>
+                <TextInput
+                  style={RegFormStyle.formcontainerIconC}
+                  label="수습기간 종료"
+                  value={date3 || ""}
+                  onChangeText={(text) => setDate3(text)}
+                  mode="outlined"
+                  outlineColor="#E5E5E5"
+                  activeOutlineColor="#219BDA"
+                  theme={{ colors: { background: "white" } }}
+                />
+                <TouchableOpacity
+                  activeOpacity={0.8}
+                  onPress={toggleDatePicker3}
+                  style={RegFormStyle.calendarButton}
+                >
+                  <FontAwesome name="calendar-o" size={24} color="e5e5e5" />
+                </TouchableOpacity>
+                {showDatePicker3 && (
+                  <DatePicker
+                    mode="calendar"
+                    selected={date3 || ""}
+                    onDateChange={handleChange3}
+                    visible={showDatePicker3}
                   />
-                </View>
-                <Text style={RegFormStyle.checktext}>아니요</Text>
-              </View> */}
+                )}
+              </View>
 
               <View style={RegFormStyle.buttonD}>
                 <TouchableOpacity
@@ -407,7 +359,7 @@ const RegFormStyle = StyleSheet.create({
     marginLeft: 10,
   },
   textInputContainer1: {
-    flexDirection: 'row',
+    flexDirection: "row",
   },
   checkyesorno: {
     alignItems: "center",
@@ -419,29 +371,17 @@ const RegFormStyle = StyleSheet.create({
     marginVertical: "auto",
   },
   buttonD: {
-    // borderWidth: 1,
     borderRadius: 30,
     padding: 0.5,
     alignSelf: "flex-end",
     textAlign: "center",
-    // backgroundColor: "#2E294E",
-    // marginTop: 30,
-    // marginBottom: 20,
-    // width: 100,
-    // height: 38,
   },
   buttonD1: {
-    // borderWidth: 1,
     borderRadius: 30,
     padding: 0.5,
     alignSelf: "center",
-    // textAlign: "center",
-    // backgroundColor: "#2E294E",
     marginTop: 5,
     marginLeft: 15,
-    // marginBottom: 20,
-    // width: 100,
-    // height: 38,
   },
   formcontainer: {
     width: width * 0.64,
@@ -462,7 +402,6 @@ const RegFormStyle = StyleSheet.create({
   TextIcon: {
     flexDirection: "row",
     alignItems: "center",
-    // justifyContent: "space-between",
   },
   dateText: {
     fontSize: 18,
@@ -472,7 +411,6 @@ const RegFormStyle = StyleSheet.create({
   TextIconE: {
     flexDirection: "row",
     alignItems: "center",
-    //justifyContent: "space-between",
   },
   icon: {
     justifyContent: "space-between",

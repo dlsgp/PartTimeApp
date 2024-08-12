@@ -27,11 +27,13 @@ router.post("/login", async (req, res) => {
     connection = await oracledb.getConnection(dbConfig);
 
     const result = await connection.execute(
-      `SELECT type FROM register WHERE id = :id AND pwd = :password`,
+      `SELECT type_num FROM register WHERE id = :id AND pwd = :password`,
       [id, password]
     );
 
     if (result.rows.length > 0) {
+      req.session.userId = id;
+      // console.log("Login - userID :", userId);
       const userType = result.rows[0][0];
       console.log("User type:", userType);
       console.log(result.rows);
@@ -42,7 +44,6 @@ router.post("/login", async (req, res) => {
         userId: id,
       });
       console.log("userId:", id);
-
     } else {
       res
         .status(401)
@@ -73,7 +74,7 @@ router.post("/signup", async (req, res) => {
     connection = await oracledb.getConnection(dbConfig);
 
     const result = await connection.execute(
-      `INSERT INTO register (reg_num, type, id, pwd, name, tel, email, add1, add2, birth)
+      `INSERT INTO register (reg_num, type_num, id, pwd, name, tel, email, add1, add2, birth)
       VALUES (reg_num_seq.NEXTVAL, 1, :id, :password, :name, :tel, :email, :add1, :add2, :birth)`,
       [id, password, name, tel, email, add1, add2, birth],
       { autoCommit: true }
@@ -98,7 +99,7 @@ router.post("/signup", async (req, res) => {
 
 // 사업자 회원가입 엔드포인트
 router.post("/bsignup", async (req, res) => {
-  const { id, password, name, add1, businessNumber, email, tel } = req.body;
+  const { id, password, name, add1, jobnum, email, tel } = req.body;
   const dbConfig = req.app.get("dbConfig");
 
   let connection;
@@ -107,9 +108,9 @@ router.post("/bsignup", async (req, res) => {
     connection = await oracledb.getConnection(dbConfig);
 
     const result = await connection.execute(
-      `INSERT INTO register (reg_num, type, id, pwd, name, tel, email, add1, regNum)
-      VALUES (reg_num_seq.NEXTVAL, 2, :id, :password, :name, :tel, :email, :add1, :businessNumber)`,
-      [id, password, name, tel, email, add1, businessNumber],
+      `INSERT INTO register (reg_num, type_num, id, pwd, name, tel, email, add1, jobnum)
+      VALUES (reg_num_seq.NEXTVAL, 2, :id, :password, :name, :tel, :email, :add1, :jobnum)`,
+      [id, password, name, tel, email, add1, jobnum],
       { autoCommit: true }
     );
 
@@ -272,7 +273,7 @@ router.get("/users/:userId", async (req, res) => {
         tel: userInfo[3],
         email: userInfo[4],
         add1: userInfo[5],
-        add2: userInfo[6]
+        add2: userInfo[6],
       });
     } else {
       res.status(404).json({ message: "사용자를 찾을 수 없습니다" });
@@ -328,8 +329,13 @@ router.post("/update-user", async (req, res) => {
 });
 
 router.post("/update-staffnum", async (req, res) => {
-  const { id, staffNum } = req.body;
+  const { id, staffNum, employDate, expPeriodStart, expPeriodEnd } = req.body;
+  const ceoId = req.session.userId; // 세션에서 ceoId 가져오기
   const dbConfig = req.app.get("dbConfig");
+
+  if (!ceoId) {
+    return res.status(401).json({ message: "로그인이 필요합니다." });
+  }
 
   let connection;
 
@@ -337,10 +343,10 @@ router.post("/update-staffnum", async (req, res) => {
     connection = await oracledb.getConnection(dbConfig);
 
     const result = await connection.execute(
-      `UPDATE register 
-       SET staff_num = :staffNum
-       WHERE id = :id`,
-      { staffNum, id },
+      `INSERT INTO employ (em_num, staff_number, ceo_id, work_id, employ_date, exp_periodstart, exp_periodend)
+       VALUES (em_num_seq.NEXTVAL, :staffNum, :ceoId, :id, TO_DATE(:employDate, 'YYYY-MM-DD'), 
+       TO_DATE(:expPeriodStart, 'YYYY-MM-DD'), TO_DATE(:expPeriodEnd, 'YYYY-MM-DD'))`,
+      { staffNum, ceoId, id, employDate, expPeriodStart, expPeriodEnd },
       { autoCommit: true }
     );
 
@@ -363,44 +369,183 @@ router.post("/update-staffnum", async (req, res) => {
   }
 });
 
-router.get('/api/salary/:staffNum', async (req, res) => {
-  const { staffNum } = req.params;
-  
+
+router.get("/salary", async (req, res) => {
+  const ceoId = req.session.userId; // 세션에서 ceoId 가져오기
+  const dbConfig = req.app.get("dbConfig");
+
   let connection;
 
   try {
     connection = await oracledb.getConnection(dbConfig);
-    
-    // register 테이블에서 직원 기본 정보 가져오기
-    const registerResult = await connection.execute(
-      `SELECT name FROM register WHERE id = :staffNum`,
-      [staffNum]
-    );
-    
-    // commute 테이블에서 급여 정보 가져오기
-    const commuteResult = await connection.execute(
-      `SELECT hourwage, insurance, holiday_pay, etc, worktime, pay 
-       FROM commute 
-       WHERE work_id = :staffNum`,
-      [staffNum]
-    );
 
-    if (registerResult.rows.length === 0 || commuteResult.rows.length === 0) {
-      return res.status(404).json({ message: "해당 직원의 데이터를 찾을 수 없습니다." });
+    const result = await connection.execute(
+      `SELECT 
+        c.reg_num, c.type_num, c.ceo_id, c.work_id, c.workin, c.workout, 
+        c.resttime_start, c.resttime_end, c.worktime1, c.worktime2, c.worktime3, 
+        c.worktime4, c.worktime5, c.worktime, c.hourwage, c.holiday_pay, 
+        c.insurance, c.etc, c.pay1, c.pay2, c.pay3, c.pay4, c.pay5, c.pay,
+        r.name, e.staff_number, e.employ_date
+       FROM COMMUTE c
+       JOIN REGISTER r ON c.work_id = r.id
+       LEFT JOIN EMPLOY e ON c.ceo_id = e.ceo_id AND c.work_id = e.work_id
+       WHERE c.ceo_id = :ceoId`,
+      [ceoId]
+    );
+    
+    const formattedResult = result.rows.map((row) => ({
+      REG_NUM: row[0],
+      TYPE_NUM: row[1],
+      CEO_ID: row[2],
+      WORK_ID: row[3],
+      WORKIN: row[4],
+      WORKOUT: row[5],
+      RESTTIME_START: row[6],
+      RESTTIME_END: row[7],
+      WORKTIME1: row[8],
+      WORKTIME2: row[9],
+      WORKTIME3: row[10],
+      WORKTIME4: row[11],
+      WORKTIME5: row[12],
+      WORKTIME: row[13],
+      HOURWAGE: row[14],
+      HOLIDAY_PAY: row[15],
+      INSURANCE: row[16],
+      ETC: row[17],
+      PAY1: row[18],
+      PAY2: row[19],
+      PAY3: row[20],
+      PAY4: row[21],
+      PAY5: row[22],
+      PAY: row[23],
+      NAME: row[24],
+      STAFF_NUMBER: row[25],
+      EMPLOY_DATE: row[26],
+    }));
+
+    res.status(200).json(formattedResult);
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: "서버 오류" });
+  } finally {
+    if (connection) {
+      try {
+        await connection.close();
+      } catch (error) {
+        console.error(error);
+      }
     }
+  }
+});
 
-    const employeeData = {
-      staffNum: staffNum,
-      name: registerResult.rows[0][0],
-      hourWage: commuteResult.rows[0][0],
-      insurance: commuteResult.rows[0][1],
-      holiday_pay: commuteResult.rows[0][2],
-      etc: commuteResult.rows[0][3],
-      workTime: commuteResult.rows[0][4],
-      pay: commuteResult.rows[0][5],
-    };
+// 아이디 중복 확인
+router.get("/check-id/:id", async (req, res) => {
+  const { id } = req.params;
+  const dbConfig = req.app.get("dbConfig");
 
-    res.status(200).json(employeeData);
+  let connection;
+
+  try {
+    connection = await oracledb.getConnection(dbConfig);
+
+    const result = await connection.execute(
+      `SELECT COUNT(*) FROM register WHERE id = :id`,
+      [id]
+    );
+
+    const isDuplicated = result.rows[0][0] > 0;
+
+    if (isDuplicated) {
+      res
+        .status(200)
+        .json({ duplicated: true, message: "이미 사용 중인 아이디입니다." });
+    } else {
+      res
+        .status(200)
+        .json({ duplicated: false, message: "사용 가능한 아이디입니다." });
+    }
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: "서버 오류" });
+  } finally {
+    if (connection) {
+      try {
+        await connection.close();
+      } catch (error) {
+        console.error(error);
+      }
+    }
+  }
+});
+
+// 이메일 중복 확인
+router.get("/check-email/:email", async (req, res) => {
+  const { email } = req.params;
+  const dbConfig = req.app.get("dbConfig");
+
+  let connection;
+
+  try {
+    connection = await oracledb.getConnection(dbConfig);
+
+    const result = await connection.execute(
+      `SELECT COUNT(*) FROM register WHERE email = :email`,
+      [email]
+    );
+
+    const isDuplicated = result.rows[0][0] > 0;
+
+    if (isDuplicated) {
+      res
+        .status(200)
+        .json({ duplicated: true, message: "이미 사용 중인 이메일입니다." });
+    } else {
+      res
+        .status(200)
+        .json({ duplicated: false, message: "사용 가능한 이메일입니다." });
+    }
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: "서버 오류" });
+  } finally {
+    if (connection) {
+      try {
+        await connection.close();
+      } catch (error) {
+        console.error(error);
+      }
+    }
+  }
+});
+
+// 사업자등록번호 중복 확인
+router.get("/check-jobnum/:jobnum", async (req, res) => {
+  const { jobnum } = req.params;
+  const dbConfig = req.app.get("dbConfig");
+
+  let connection;
+
+  try {
+    connection = await oracledb.getConnection(dbConfig);
+
+    const result = await connection.execute(
+      `SELECT COUNT(*) FROM register WHERE jobnum = :jobnum`,
+      [jobnum]
+    );
+
+    const isDuplicated = result.rows[0][0] > 0;
+
+    if (isDuplicated) {
+      res.status(200).json({
+        duplicated: true,
+        message: "이미 사용 중인 사업자등록번호입니다.",
+      });
+    } else {
+      res.status(200).json({
+        duplicated: false,
+        message: "사용 가능한 사업자등록번호입니다.",
+      });
+    }
   } catch (error) {
     console.error(error);
     res.status(500).json({ message: "서버 오류" });

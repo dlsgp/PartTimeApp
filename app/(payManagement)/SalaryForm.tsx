@@ -9,6 +9,7 @@ import { Stack } from "expo-router";
 
 export default function SalaryForm() {
   const [name, setName] = React.useState("");
+  const [id, setId] = React.useState("");
   const [position, setPosition] = React.useState("");
   const [hourwage, setHourwage] = React.useState("");
   const [bonuswage, setBonuswage] = React.useState("");
@@ -44,6 +45,12 @@ export default function SalaryForm() {
               <Text style={styles.title}>급여관리</Text>
             </View>
             <View style={styles.inputContainer}>
+              <TextInput
+                label="아이디"
+                value={id}
+                onChangeText={(text) => setId(text)}
+                style={styles.input}
+              />
               <TextInput
                 label="이름"
                 value={name}

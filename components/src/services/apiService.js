@@ -17,13 +17,28 @@ export const signUp = async (userData) => {
 
 export const login = async (id, password) => {
   try {
-    const response = await axios.post(`${API_URL}/login`, { id, password });
+    const response = await axios.post(
+      `${API_URL}/login`,
+      { id, password },
+      {
+        withCredentials: true,
+      }
+    );
+    if (response.data.success) {
+      await AsyncStorage.setItem('accessToken', response.data.accessToken);
+      await AsyncStorage.setItem('refreshToken', response.data.refreshToken);
+    }
     console.log("Login successful:", response.data);
     return response.data;
   } catch (error) {
     console.error("Login API call failed:", error);
     throw error.response ? error.response.data : error;
   }
+};
+
+export const logout = async () => {
+  await AsyncStorage.removeItem('userId');
+  // 필요 시 서버에 로그아웃 요청을 보냅니다.
 };
 
 export const bsignup = async (businessData) => {
@@ -53,7 +68,10 @@ export const fetchData = async (endpoint) => {
 
 export const sendVerificationCode = async (id, email) => {
   try {
-    const response = await axios.post(`${API_URL}/send-verification-code`, { id, email });
+    const response = await axios.post(`${API_URL}/send-verification-code`, {
+      id,
+      email,
+    });
     return response.data;
   } catch (error) {
     console.error("Send verification code API call failed:", error);
@@ -63,7 +81,10 @@ export const sendVerificationCode = async (id, email) => {
 
 export const verifyCode = async (email, verificationCode) => {
   try {
-    const response = await axios.post(`${API_URL}/verify-code`, { email, verificationCode });
+    const response = await axios.post(`${API_URL}/verify-code`, {
+      email,
+      verificationCode,
+    });
     return response.data;
   } catch (error) {
     console.error("Verify code API call failed:", error);
@@ -73,7 +94,11 @@ export const verifyCode = async (email, verificationCode) => {
 
 export const resetPassword = async (email, verificationCode, newPassword) => {
   try {
-    const response = await axios.post(`${API_URL}/reset-password`, { email, verificationCode, newPassword });
+    const response = await axios.post(`${API_URL}/reset-password`, {
+      email,
+      verificationCode,
+      newPassword,
+    });
     return response.data;
   } catch (error) {
     console.error("Reset password API call failed:", error);
@@ -86,7 +111,7 @@ export const getUserInfo = async (userId) => {
     const response = await axios.get(`${API_URL}/users/${userId}`);
     return response.data;
   } catch (error) {
-    console.error('Get user info API call failed:', error);
+    console.error("Get user info API call failed:", error);
     throw error.response ? error.response.data : error;
   }
 };
