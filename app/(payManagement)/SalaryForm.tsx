@@ -1,33 +1,85 @@
-import EditScreenInfo from "@/components/EditScreenInfo";
+import React, { useState, useEffect } from "react";
+import {
+  Platform,
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+  View,
+} from "react-native";
 import { FontAwesome } from "@expo/vector-icons";
 import { StatusBar } from "expo-status-bar";
-import React, { useState } from "react";
-import { Platform, StyleSheet, Text, View } from "react-native";
-import { Checkbox, RadioButton, TextInput } from "react-native-paper";
+import { RadioButton, TextInput } from "react-native-paper";
 import DropDownPicker from "react-native-dropdown-picker";
-import { Stack } from "expo-router";
+import axios from "axios";
 
-export default function SalaryForm() {
-  const [name, setName] = React.useState("");
-  const [id, setId] = React.useState("");
-  const [position, setPosition] = React.useState("");
-  const [hourwage, setHourwage] = React.useState("");
-  const [bonuswage, setBonuswage] = React.useState("");
-  const [etcwage, setEtcwage] = React.useState("");
-  const [checked, setChecked] = React.useState("first");
+export default function SalaryForm({ selectedCard, onClose }) {
+  const [id, setId] = useState("");
+  const [name, setName] = useState("");
+  const [hourwage, setHourwage] = useState("");
+  const [bonuswage, setBonuswage] = useState("");
+  const [etcwage, setEtcwage] = useState("");
+  const [checked, setChecked] = useState("yes");
+  const [workTime, setWorkTime] = useState("");
 
   const [open, setOpen] = useState(false);
-  const [value, setValue] = useState(null);
+  const [week, setWeek] = useState(null);
   const [items, setItems] = useState([
-    { label: "첫째주", value: "첫째주" },
-    { label: "둘째주", value: "둘째주" },
-    { label: "셋째주", value: "셋째주" },
-    { label: "넷째주", value: "넷째주" },
-    { label: "다섯째주", value: "다섯째주" },
+    { label: "첫째주", value: "worktime1" },
+    { label: "둘째주", value: "worktime2" },
+    { label: "셋째주", value: "worktime3" },
+    { label: "넷째주", value: "worktime4" },
+    { label: "다섯째주", value: "worktime5" },
   ]);
 
+  useEffect(() => {
+    if (selectedCard) {
+      setId(selectedCard.WORK_ID);
+      setName(selectedCard.NAME);
+      setHourwage(selectedCard.HOURWAGE);
+      setBonuswage(selectedCard.HOLIDAY_PAY);
+      setEtcwage(selectedCard.ETC);
+      setChecked(selectedCard.INSURANCE === 1 ? "no" : "yes");
+      setWorkTime(selectedCard.WORKTIME);
+    }
+  }, [selectedCard]);
+
+  const handleSave = async () => {
+    try {
+      const data = {
+        id,
+        name,
+        hourwage,
+        bonuswage,
+        etcwage,
+        insurance: checked === "yes" ? 1 : 0,
+        // worktime1: week === "worktime1" ? workTime : null,
+        // worktime2: week === "worktime2" ? workTime : null,
+        // worktime3: week === "worktime3" ? workTime : null,
+        // worktime4: week === "worktime4" ? workTime : null,
+        // worktime5: week === "worktime5" ? workTime : null,
+        workTime,
+      };
+
+      const response = await axios.post(
+        "http://localhost:3000/api/update-salary",
+        data,
+        {
+          withCredentials: true,
+        }
+      );
+
+      if (response.status === 200) {
+        alert("저장되었습니다.");
+        onClose(); // 저장 후 모달을 닫음
+      }
+    } catch (error) {
+      console.error("저장 오류:", error);
+      alert("저장에 실패했습니다.");
+    }
+  };
+
   return (
-    <View style={[styles.container]}>
+    <View style={styles.container}>
       <StatusBar style={Platform.OS === "ios" ? "light" : "auto"} />
       <View style={styles.subContainer}>
         <View style={styles.barContainer}>
@@ -48,53 +100,34 @@ export default function SalaryForm() {
               <TextInput
                 label="아이디"
                 value={id}
-                onChangeText={(text) => setId(text)}
                 style={styles.input}
+                disabled
               />
               <TextInput
                 label="이름"
                 value={name}
-                onChangeText={(text) => setName(text)}
                 style={styles.input}
+                disabled
               />
-              {/* <TextInput
-                label="직급"
-                value={position}
-                onChangeText={(text) => setPosition(text)}
-                style={styles.input}
-              /> */}
               <TextInput
                 label="시급"
                 value={hourwage}
-                onChangeText={(text) => setHourwage(text)}
+                onChangeText={setHourwage}
                 style={styles.input}
               />
               <Text style={styles.checkText}>4대보험유무</Text>
-              <View
-                style={{
-                  display: "flex",
-                  flexDirection: "row",
-                  justifyContent: "flex-start",
-                  alignItems: "center",
-                }}
-              >
-                
-                <View style={styles.radioGroup}>
+              <View style={styles.radioGroup}>
+                <RadioButton.Group
+                  onValueChange={(newValue) => setChecked(newValue)}
+                  value={checked}
+                >
                   <View style={styles.radio}>
                     <Text style={styles.checktext1}>예</Text>
-                    <RadioButton
-                      value="yes"
-                      status={checked === "yes" ? "checked" : "unchecked"}
-                      onPress={() => setChecked("yes")}
-                    />
+                    <RadioButton value="yes" />
                     <Text style={styles.checktext1}>아니요</Text>
-                    <RadioButton
-                      value="no"
-                      status={checked === "no" ? "checked" : "unchecked"}
-                      onPress={() => setChecked("no")}
-                    />
+                    <RadioButton value="no" />
                   </View>
-                </View>
+                </RadioButton.Group>
               </View>
             </View>
           </View>
@@ -102,33 +135,47 @@ export default function SalaryForm() {
           <TextInput
             label="주휴수당"
             value={bonuswage}
-            onChangeText={(text) => setBonuswage(text)}
+            onChangeText={setBonuswage}
             style={styles.input}
           />
           <TextInput
             label="기타수당"
             value={etcwage}
-            onChangeText={(text) => setEtcwage(text)}
+            onChangeText={setEtcwage}
             style={styles.input}
           />
           <View style={styles.checkContainer}>
+            <Text style={styles.time}>근무시간</Text>
             <View style={styles.timeContainer}>
-              <View style={{ justifyContent: "center" }}>
-                <Text style={styles.time}>근무시간</Text>
-              </View>
-              <View>
-                <DropDownPicker
-                  open={open}
-                  value={value}
-                  items={items}
-                  setOpen={setOpen}
-                  setValue={setValue}
-                  setItems={setItems}
-                  placeholder="주 선택"
-                  style={styles.dropdown}
-                />
-              </View>
+              <DropDownPicker
+                open={open}
+                value={week}
+                items={items}
+                setOpen={setOpen}
+                setValue={setWeek}
+                setItems={setItems}
+                placeholder="주 선택"
+                style={[styles.dropdown, { zIndex: 1000, elevation: 1000 }]}
+                dropDownContainerStyle={[
+                  styles.dropdownContainer,
+                  { zIndex: 1000, elevation: 1000 },
+                ]}
+              />
             </View>
+            <TextInput
+              label="근무시간 입력"
+              value={workTime}
+              onChangeText={setWorkTime}
+              style={styles.input}
+            />
+          </View>
+          <View style={styles.buttonContainer}>
+            <TouchableOpacity style={styles.button} onPress={handleSave}>
+              <Text style={styles.buttonText}>저장하기</Text>
+            </TouchableOpacity>
+            <TouchableOpacity style={styles.button} onPress={onClose}>
+              <Text style={styles.buttonText}>취소하기</Text>
+            </TouchableOpacity>
           </View>
         </View>
       </View>
@@ -152,7 +199,7 @@ const styles = StyleSheet.create({
   },
   barContainer: {
     backgroundColor: "#2E294E",
-    width: "30%",
+    width: "15%",
     height: "100%",
     flexDirection: "column",
     justifyContent: "flex-start",
@@ -167,15 +214,12 @@ const styles = StyleSheet.create({
     borderTopRightRadius: 30,
     borderBottomEndRadius: 30,
     borderWidth: 1,
-    width: "70%",
+    width: "85%",
     height: "100%",
     backgroundColor: "white",
   },
   containSub: {
     margin: "4%",
-  },
-  textContainer: {
-    display: "flex",
   },
   title: {
     fontSize: 18,
@@ -186,6 +230,7 @@ const styles = StyleSheet.create({
   },
   input: {
     backgroundColor: "white",
+    marginBottom: 10,
   },
   checkContainer: {
     marginTop: "6%",
@@ -194,7 +239,7 @@ const styles = StyleSheet.create({
     fontSize: 16,
     color: "#454545",
     marginRight: "6%",
-    
+    marginTop: 15,
   },
   radioGroup: {
     flexDirection: "row",
@@ -212,19 +257,48 @@ const styles = StyleSheet.create({
   time: {
     fontSize: 16,
     color: "#454545",
-    marginTop: "2%",
+    marginLeft: "5%",
+    marginTop: 5,
   },
   timeContainer: {
     flexDirection: "row",
     marginLeft: "8%",
     justifyContent: "space-between",
+    marginTop: "-12%",
+    zIndex: 10000,
   },
   dropdown: {
     backgroundColor: "#fff",
     borderColor: "#2E294E",
     borderWidth: 1,
-    marginHorizontal: "6%",
-    width: "70%",
+    width: "50%",
+    alignSelf: "flex-end",
+    marginRight: "10%",
+    zIndex: 100,
+  },
+  dropdownContainer: {
+    borderColor: "#2E294E",
+    alignSelf: "flex-end",
+    maxWidth: "50%",
+    marginRight: "10%",
+    zIndex: 100,
+  },
+  buttonContainer: {
+    flexDirection: "row",
+    justifyContent: "center",
+    marginTop: "20%",
+    zIndex: -1000,
+  },
+  button: {
+    borderRadius: 30,
+    backgroundColor: "#2E294E",
+    paddingVertical: 10,
+    paddingHorizontal: 20,
+    marginLeft: 15,
+    zIndex: -1000,
+  },
+  buttonText: {
+    color: "#fff",
+    fontWeight: "700",
   },
 });
-

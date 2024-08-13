@@ -1,15 +1,18 @@
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import React, { useState, useEffect } from "react";
-import { Dimensions, StyleSheet, Text, View, ScrollView, TouchableOpacity } from "react-native";
+import { Dimensions, StyleSheet, Text, View, ScrollView, TouchableOpacity, Modal } from "react-native";
 import { Card, Provider } from "react-native-paper";
 import RNPickerSelect from "react-native-picker-select";
 import axios from "axios";
-import { router } from "expo-router";
+import { FontAwesome } from "@expo/vector-icons";
+import SalaryForm from "./SalaryForm"; // 모달로 띄울 SalaryForm
 
 const SalaryList = () => {
   const { width } = Dimensions.get("window");
   const [selectedDate, setSelectedDate] = useState<string>("2024-07");
   const [data, setData] = useState([]);
+  const [modalVisible, setModalVisible] = useState(false);
+  const [selectedCard, setSelectedCard] = useState(null);
 
   const fetchData = async () => {
     try {
@@ -29,6 +32,17 @@ const SalaryList = () => {
   useEffect(() => {
     fetchData();
   }, [selectedDate]);
+
+  const openModal = (card) => {
+    setSelectedCard(card);
+    setModalVisible(true);
+  };
+
+  const closeModal = () => {
+    setModalVisible(false);
+    setSelectedCard(null);
+    fetchData(); // 데이터 재조회
+  };
 
   return (
     <Provider>
@@ -52,45 +66,55 @@ const SalaryList = () => {
         <ScrollView showsVerticalScrollIndicator={false}>
           {data.map((row, index) => (
             <Card style={styles.card} key={index}>
-              <Card.Content>
+              <TouchableOpacity style={styles.iconButton} onPress={() => openModal(row)}>
+                <FontAwesome name="cog" size={24} color="black" />
+              </TouchableOpacity>
+              <Card.Content style={styles.cardContent}>
                 <View style={styles.row}>
                   <Text style={styles.label}>번호:</Text>
                   <Text style={styles.value}>{row.REG_NUM}</Text>
                 </View>
                 <View style={styles.row}>
                   <Text style={styles.label}>사원번호:</Text>
-                  <Text style={styles.value}>{row.STAFF_NUMBER}</Text>
+                  <Text style={styles.value}>{row.STAFF_NUMBER || "N/A"}</Text>
                 </View>
                 <View style={styles.row}>
                   <Text style={styles.label}>이름:</Text>
-                  <TouchableOpacity onPress={() => router.push('/SalaryForm')}>
                   <Text style={styles.value}>{row.NAME}</Text>
-                  </TouchableOpacity>
                 </View>
                 <View style={styles.row}>
                   <Text style={styles.label}>시급:</Text>
-                  <Text style={styles.value}>{row.HOURWAGE}</Text>
+                  <Text style={styles.value}>{row.HOURWAGE || "N/A"}</Text>
                 </View>
                 <View style={styles.row}>
                   <Text style={styles.label}>4대보험유무:</Text>
-                  <Text style={styles.value}>{row.INSURANCE}</Text>
+                  <Text style={styles.value}>{row.INSURANCE === 1 ? "아니요" : "예"}</Text>
                 </View>
                 <View style={styles.row}>
                   <Text style={styles.label}>기타:</Text>
-                  <Text style={styles.value}>{row.ETC}</Text>
+                  <Text style={styles.value}>{row.ETC || "N/A"}</Text>
                 </View>
                 <View style={styles.row}>
                   <Text style={styles.label}>총 근무시간:</Text>
-                  <Text style={styles.value}>{row.WORKTIME}</Text>
+                  <Text style={styles.value}>{row.WORKTIME || "N/A"}</Text>
                 </View>
                 <View style={styles.row}>
                   <Text style={styles.label}>전체급여:</Text>
-                  <Text style={styles.value}>{row.PAY}</Text>
+                  <Text style={styles.value}>{row.PAY || "N/A"}</Text>
                 </View>
               </Card.Content>
             </Card>
           ))}
         </ScrollView>
+
+        {/* 모달 컴포넌트 */}
+        <Modal
+          visible={modalVisible}
+          animationType="slide"
+          onRequestClose={closeModal}
+        >
+          <SalaryForm selectedCard={selectedCard} onClose={closeModal} />
+        </Modal>
       </View>
     </Provider>
   );
@@ -111,6 +135,10 @@ const styles = StyleSheet.create({
     marginBottom: 15,
     borderRadius: 10,
     elevation: 3,
+    position: "relative",
+  },
+  cardContent: {
+    paddingTop: 10, // 패딩 추가로 아이콘과의 겹침 방지
   },
   row: {
     flexDirection: "row",
@@ -123,6 +151,12 @@ const styles = StyleSheet.create({
   },
   value: {
     color: "#555",
+  },
+  iconButton: {
+    alignSelf: 'flex-end',
+    top: 10,
+    right: 10,
+    marginBottom: 10,
   },
 });
 

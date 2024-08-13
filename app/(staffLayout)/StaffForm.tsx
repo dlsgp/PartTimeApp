@@ -251,7 +251,7 @@ const StaffForm = () => {
                   onPress={toggleDatePicker1}
                   style={RegFormStyle.calendarButton}
                 >
-                  <FontAwesome name="calendar-o" size={24} color="e5e5e5" />
+                  <FontAwesome name="calendar-o" size={20} color="e5e5e5" />
                 </TouchableOpacity>
                 {showDatePicker1 && (
                   <DatePicker
@@ -280,7 +280,7 @@ const StaffForm = () => {
                   onPress={toggleDatePicker2}
                   style={RegFormStyle.calendarButton}
                 >
-                  <FontAwesome name="calendar-o" size={24} color="e5e5e5" />
+                  <FontAwesome name="calendar-o" size={20} color="e5e5e5" />
                 </TouchableOpacity>
                 {showDatePicker2 && (
                   <DatePicker
@@ -309,7 +309,7 @@ const StaffForm = () => {
                   onPress={toggleDatePicker3}
                   style={RegFormStyle.calendarButton}
                 >
-                  <FontAwesome name="calendar-o" size={24} color="e5e5e5" />
+                  <FontAwesome name="calendar-o" size={20} color="e5e5e5" />
                 </TouchableOpacity>
                 {showDatePicker3 && (
                   <DatePicker

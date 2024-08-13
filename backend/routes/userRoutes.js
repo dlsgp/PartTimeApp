@@ -328,6 +328,47 @@ router.post("/update-user", async (req, res) => {
   }
 });
 
+// router.post("/update-staffnum", async (req, res) => {
+//   const { id, staffNum, employDate, expPeriodStart, expPeriodEnd } = req.body;
+//   const ceoId = req.session.userId; // 세션에서 ceoId 가져오기
+//   const dbConfig = req.app.get("dbConfig");
+
+//   if (!ceoId) {
+//     return res.status(401).json({ message: "로그인이 필요합니다." });
+//   }
+
+//   let connection;
+
+//   try {
+//     connection = await oracledb.getConnection(dbConfig);
+
+//     const result = await connection.execute(
+//       `INSERT INTO employ (em_num, staff_number, ceo_id, work_id, employ_date, exp_periodstart, exp_periodend)
+//        VALUES (em_num_seq.NEXTVAL, :staffNum, :ceoId, :id, TO_DATE(:employDate, 'YYYY-MM-DD'), 
+//        TO_DATE(:expPeriodStart, 'YYYY-MM-DD'), TO_DATE(:expPeriodEnd, 'YYYY-MM-DD'))`,
+//       { staffNum, ceoId, id, employDate, expPeriodStart, expPeriodEnd },
+//       { autoCommit: true }
+//     );
+
+//     if (result.rowsAffected > 0) {
+//       res.status(200).json({ message: "사원번호가 성공적으로 저장되었습니다." });
+//     } else {
+//       res.status(400).json({ message: "사원번호 저장에 실패했습니다." });
+//     }
+//   } catch (err) {
+//     console.error(err);
+//     res.status(500).json({ success: false, message: "인터넷 서버 오류 500" });
+//   } finally {
+//     if (connection) {
+//       try {
+//         await connection.close();
+//       } catch (err) {
+//         console.error(err);
+//       }
+//     }
+//   }
+// });
+
 router.post("/update-staffnum", async (req, res) => {
   const { id, staffNum, employDate, expPeriodStart, expPeriodEnd } = req.body;
   const ceoId = req.session.userId; // 세션에서 ceoId 가져오기
@@ -342,18 +383,101 @@ router.post("/update-staffnum", async (req, res) => {
   try {
     connection = await oracledb.getConnection(dbConfig);
 
+    // employ 테이블에 데이터 삽입
     const result = await connection.execute(
       `INSERT INTO employ (em_num, staff_number, ceo_id, work_id, employ_date, exp_periodstart, exp_periodend)
        VALUES (em_num_seq.NEXTVAL, :staffNum, :ceoId, :id, TO_DATE(:employDate, 'YYYY-MM-DD'), 
        TO_DATE(:expPeriodStart, 'YYYY-MM-DD'), TO_DATE(:expPeriodEnd, 'YYYY-MM-DD'))`,
       { staffNum, ceoId, id, employDate, expPeriodStart, expPeriodEnd },
-      { autoCommit: true }
+      { autoCommit: false } // 이 시점에 커밋하지 않음
     );
 
     if (result.rowsAffected > 0) {
-      res.status(200).json({ message: "사원번호가 성공적으로 저장되었습니다." });
+      // register 테이블에서 reg_num과 type_num 조회
+      const regCheck = await connection.execute(
+        `SELECT reg_num, type_num FROM register WHERE id = :id`,
+        { id }
+      );
+
+      if (regCheck.rows.length > 0) {
+        const regNum = regCheck.rows[0][0];
+        const typeNum = regCheck.rows[0][1];
+
+        // commute 테이블에 데이터 삽입
+        const commuteResult = await connection.execute(
+          `INSERT INTO commute (reg_num, type_num, ceo_id, work_id)
+           VALUES (:regNum, :typeNum, :ceoId, :id)`,
+          { regNum, typeNum, ceoId, id },
+          { autoCommit: true } // 이 시점에서 커밋
+        );
+
+        if (commuteResult.rowsAffected > 0) {
+          res.status(200).json({ message: "사원번호와 출퇴근 정보가 성공적으로 저장되었습니다." });
+        } else {
+          throw new Error("출퇴근 정보 저장에 실패했습니다.");
+        }
+      } else {
+        throw new Error("해당 ID에 대한 등록 정보가 없습니다.");
+      }
     } else {
       res.status(400).json({ message: "사원번호 저장에 실패했습니다." });
+    }
+  } catch (err) {
+    console.error(err);
+    await connection.rollback(); // 오류 발생 시 롤백
+    res.status(500).json({ success: false, message: "인터넷 서버 오류 500" });
+  } finally {
+    if (connection) {
+      try {
+        await connection.close();
+      } catch (err) {
+        console.error(err);
+      }
+    }
+  }
+});
+
+router.post("/update-salary", async (req, res) => {
+  const { id, name, hourwage, bonuswage, etcwage, insurance, worktime, worktime1, worktime2, worktime3, worktime4, worktime5 } = req.body;
+  const ceoId = req.session.userId; // 세션에서 ceoId 가져오기
+  const dbConfig = req.app.get("dbConfig");
+
+  if (!ceoId) {
+    return res.status(401).json({ message: "로그인이 필요합니다." });
+  }
+
+  let connection;
+
+  try {
+    connection = await oracledb.getConnection(dbConfig);
+
+    // commute 테이블에 데이터 업데이트
+    const commuteUpdate = await connection.execute(
+      `UPDATE commute
+       SET hourwage = :hourwage, holiday_pay = :bonuswage, etc = :etcwage, insurance = :insurance, 
+              workTime = :worktime
+       WHERE ceo_id = :ceoId AND work_id = :id`,
+      {
+        hourwage,
+        bonuswage,
+        etcwage,
+        insurance,
+        // worktime1: worktime1 || null,
+        // worktime2: worktime2 || null,
+        // worktime3: worktime3 || null,
+        // worktime4: worktime4 || null,
+        // worktime5: worktime5 || null,
+        worktime,
+        ceoId,
+        id,
+      },
+      { autoCommit: true }
+    );
+
+    if (commuteUpdate.rowsAffected > 0) {
+      res.status(200).json({ message: "급여 정보가 성공적으로 업데이트되었습니다." });
+    } else {
+      res.status(400).json({ message: "급여 정보 업데이트에 실패했습니다." });
     }
   } catch (err) {
     console.error(err);
@@ -368,6 +492,7 @@ router.post("/update-staffnum", async (req, res) => {
     }
   }
 });
+
 
 
 router.get("/salary", async (req, res) => {
