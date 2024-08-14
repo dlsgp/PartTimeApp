@@ -37,6 +37,8 @@ PartTimeApp\backend> node server.js
 만약 dotenv 에러가 난다 -> PartTimeApp에서 yarn install 후 다시 backend에서 node server.js 할것.
 
 
+** 테스트시 꼭 해야하는 항목 **
+
 PartTimeApp/components/src/service/apiService.js에서
 
 const API_URL = "http://192.168.0.84:3000/api";
