@@ -33,3 +33,21 @@ yarn install 로 backend 폴더에 node_modules 생성
 PartTimeApp\backend> node server.js
 
 서버가 포트 3000에서 실행 중입니다. 뜨면 성공
+
+만약 dotenv 에러가 난다 -> PartTimeApp에서 yarn install 후 다시 backend에서 node server.js 할것.
+
+
+** 테스트시 꼭 해야하는 항목 **
+
+PartTimeApp/components/src/service/apiService.js에서
+
+const API_URL = "http://192.168.0.84:3000/api";
+부분에서 본인 ip주소:3000 적을것.
+
+PartTimeApp/backend/server.js 에서
+const allowedOrigins = ['http://localhost:8081', 'https://mufxcd4-gusrl45612-8081.exp.direct', 'http://192.168.0.84:8081']; 부분에서 본인 ip주소:8081 추가할것.
+
+PartTimeApp/config.js 에서
+const API_BASE_URL = "http://192.168.0.84"; 부분에서 본인 아이피만 적을것. 포트번호 X
+
+
