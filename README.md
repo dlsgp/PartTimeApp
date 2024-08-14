@@ -45,4 +45,7 @@ const API_URL = "http://192.168.0.84:3000/api";
 PartTimeApp/backend/server.js 에서
 const allowedOrigins = ['http://localhost:8081', 'https://mufxcd4-gusrl45612-8081.exp.direct', 'http://192.168.0.84:8081']; 부분에서 본인 ip주소:8081 추가할것.
 
+PartTimeApp/config.js 에서
+const API_BASE_URL = "http://192.168.0.84"; 부분에서 본인 아이피만 적을것. 포트번호 X
+
 
