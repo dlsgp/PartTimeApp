@@ -2,18 +2,8 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 import axios from "axios";
 
 // Expo 터널 URL을 사용
-const API_URL = "http://localhost:3000/api";
+const API_URL = "http://192.168.0.84:3000/api";
 
-export const signUp = async (userData) => {
-  try {
-    const response = await axios.post(`${API_URL}/signup`, userData);
-    console.log("Signup successful:", response.data);
-    return response.data;
-  } catch (error) {
-    console.error("Signup API call failed:", error);
-    throw error;
-  }
-};
 
 export const login = async (id, password) => {
   try {
@@ -24,12 +14,22 @@ export const login = async (id, password) => {
         withCredentials: true,
       }
     );
+
     if (response.data.success) {
-      await AsyncStorage.setItem('accessToken', response.data.accessToken);
-      await AsyncStorage.setItem('refreshToken', response.data.refreshToken);
+      const { accessToken, refreshToken } = response.data;
+
+      if (accessToken && refreshToken) {
+        await AsyncStorage.setItem('accessToken', accessToken);
+        await AsyncStorage.setItem('refreshToken', refreshToken);
+      } else {
+        console.error("Login API response did not include tokens.");
+      }
+
+      console.log("Login successful:", response.data);
+      return response.data;
+    } else {
+      throw new Error(response.data.message || "Login failed");
     }
-    console.log("Login successful:", response.data);
-    return response.data;
   } catch (error) {
     console.error("Login API call failed:", error);
     throw error.response ? error.response.data : error;
@@ -53,7 +53,7 @@ export const bsignup = async (businessData) => {
 };
 
 export const getAuthToken = async () => {
-  return await AsyncStorage.getItem("userToken");
+  return await AsyncStorage.getItem("accessToken");
 };
 
 export const fetchData = async (endpoint) => {

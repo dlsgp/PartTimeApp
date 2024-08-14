@@ -11,6 +11,7 @@ import { StatusBar } from "expo-status-bar";
 import { RadioButton, TextInput } from "react-native-paper";
 import DropDownPicker from "react-native-dropdown-picker";
 import axios from "axios";
+import API_BASE_URL from "../../config";
 
 export default function SalaryForm({ selectedCard, onClose }) {
   const [id, setId] = useState("");
@@ -61,7 +62,7 @@ export default function SalaryForm({ selectedCard, onClose }) {
       };
 
       const response = await axios.post(
-        "http://localhost:3000/api/update-salary",
+        `${API_BASE_URL}:3000/api/update-salary`,
         data,
         {
           withCredentials: true,

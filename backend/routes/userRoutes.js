@@ -16,6 +16,9 @@ const transporter = nodemailer.createTransport({
 //인증번호 저장을 위한 객체
 const verificationCodes = {};
 
+// jwt 토큰 생성
+const jwt = require("jsonwebtoken");
+
 // 로그인 엔드포인트
 router.post("/login", async (req, res) => {
   const { id, password } = req.body;
@@ -32,18 +35,28 @@ router.post("/login", async (req, res) => {
     );
 
     if (result.rows.length > 0) {
-      req.session.userId = id;
-      // console.log("Login - userID :", userId);
       const userType = result.rows[0][0];
-      console.log("User type:", userType);
-      console.log(result.rows);
+
+      req.session.userId = id;
+      
+      // JWT 토큰 생성
+      const accessToken = jwt.sign(
+        { userId: id, userType: userType },
+        "12345", // 비밀키 추후 변경
+        { expiresIn: "1h" }
+      );
+      const refreshToken = jwt.sign({ userId: id }, "12345", { // 비밀키 추후 변경
+        expiresIn: "7d",
+      });
+
       res.status(200).json({
         success: true,
         message: "Login successful",
         userType: userType,
         userId: id,
+        accessToken, // accessToken 추가
+        refreshToken, // refreshToken 추가
       });
-      console.log("userId:", id);
     } else {
       res
         .status(401)
@@ -62,6 +75,8 @@ router.post("/login", async (req, res) => {
     }
   }
 });
+
+
 
 // 회원가입 엔드포인트
 router.post("/signup", async (req, res) => {
@@ -344,7 +359,7 @@ router.post("/update-user", async (req, res) => {
 
 //     const result = await connection.execute(
 //       `INSERT INTO employ (em_num, staff_number, ceo_id, work_id, employ_date, exp_periodstart, exp_periodend)
-//        VALUES (em_num_seq.NEXTVAL, :staffNum, :ceoId, :id, TO_DATE(:employDate, 'YYYY-MM-DD'), 
+//        VALUES (em_num_seq.NEXTVAL, :staffNum, :ceoId, :id, TO_DATE(:employDate, 'YYYY-MM-DD'),
 //        TO_DATE(:expPeriodStart, 'YYYY-MM-DD'), TO_DATE(:expPeriodEnd, 'YYYY-MM-DD'))`,
 //       { staffNum, ceoId, id, employDate, expPeriodStart, expPeriodEnd },
 //       { autoCommit: true }
@@ -412,7 +427,9 @@ router.post("/update-staffnum", async (req, res) => {
         );
 
         if (commuteResult.rowsAffected > 0) {
-          res.status(200).json({ message: "사원번호와 출퇴근 정보가 성공적으로 저장되었습니다." });
+          res.status(200).json({
+            message: "사원번호와 출퇴근 정보가 성공적으로 저장되었습니다.",
+          });
         } else {
           throw new Error("출퇴근 정보 저장에 실패했습니다.");
         }
@@ -438,7 +455,20 @@ router.post("/update-staffnum", async (req, res) => {
 });
 
 router.post("/update-salary", async (req, res) => {
-  const { id, name, hourwage, bonuswage, etcwage, insurance, worktime, worktime1, worktime2, worktime3, worktime4, worktime5 } = req.body;
+  const {
+    id,
+    name,
+    hourwage,
+    bonuswage,
+    etcwage,
+    insurance,
+    worktime,
+    worktime1,
+    worktime2,
+    worktime3,
+    worktime4,
+    worktime5,
+  } = req.body;
   const ceoId = req.session.userId; // 세션에서 ceoId 가져오기
   const dbConfig = req.app.get("dbConfig");
 
@@ -475,7 +505,9 @@ router.post("/update-salary", async (req, res) => {
     );
 
     if (commuteUpdate.rowsAffected > 0) {
-      res.status(200).json({ message: "급여 정보가 성공적으로 업데이트되었습니다." });
+      res
+        .status(200)
+        .json({ message: "급여 정보가 성공적으로 업데이트되었습니다." });
     } else {
       res.status(400).json({ message: "급여 정보 업데이트에 실패했습니다." });
     }
@@ -492,8 +524,6 @@ router.post("/update-salary", async (req, res) => {
     }
   }
 });
-
-
 
 router.get("/salary", async (req, res) => {
   const ceoId = req.session.userId; // 세션에서 ceoId 가져오기
@@ -517,7 +547,7 @@ router.get("/salary", async (req, res) => {
        WHERE c.ceo_id = :ceoId`,
       [ceoId]
     );
-    
+
     const formattedResult = result.rows.map((row) => ({
       REG_NUM: row[0],
       TYPE_NUM: row[1],
@@ -684,5 +714,194 @@ router.get("/check-jobnum/:jobnum", async (req, res) => {
     }
   }
 });
+
+// 일정 조회
+router.get("/schedules", async (req, res) => {
+  const ceoId = req.session.userId;
+  const dbConfig = req.app.get("dbConfig");
+  let connection;
+
+  try {
+    connection = await oracledb.getConnection(dbConfig);
+    const result = await connection.execute(
+      `SELECT S.SCHEDULE_NUM, S.REG_NUM, S.TYPE_NUM, S.NAME, S.SCH_WORKDATE, S.SCH_WORKTIME, S.SCH_RESTTIME, S.COLOR, S.MEMO, S.RESTDATE, C.WORK_ID, R.NAME
+           FROM SCHEDULE S
+           JOIN COMMUTE C ON S.REG_NUM = C.REG_NUM
+           JOIN REGISTER R ON C.WORK_ID = R.ID
+           WHERE C.CEO_ID = :ceoId`,
+      [ceoId]
+    );
+    res.json(result.rows);
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: "Database error" });
+  } finally {
+    if (connection) {
+      await connection.close();
+    }
+  }
+});
+
+// 일정 추가
+router.post("/schedules", async (req, res) => {
+  const {
+    name,
+    sch_workdate,
+    sch_worktime,
+    sch_resttime,
+    color,
+    memo,
+    restdate,
+    workId,
+  } = req.body;
+  const ceoId = req.session.userId;
+  const dbConfig = req.app.get("dbConfig");
+  let connection;
+
+  try {
+    connection = await oracledb.getConnection(dbConfig);
+
+    const regResult = await connection.execute(
+      `SELECT REG_NUM, TYPE_NUM FROM REGISTER WHERE ID = :workId`,
+      { workId }
+    );
+
+    if (regResult.rows.length === 0) {
+      return res.status(400).json({ message: "유효한 직원 ID가 아닙니다." });
+    }
+
+    const { REG_NUM, TYPE_NUM } = regResult.rows[0];
+
+    const result = await connection.execute(
+      `INSERT INTO SCHEDULE (SCHEDULE_NUM, REG_NUM, TYPE_NUM, NAME, SCH_WORKDATE, SCH_WORKTIME, SCH_RESTTIME, COLOR, MEMO, RESTDATE)
+           VALUES (SCHEDULE_SEQ.NEXTVAL, :regNum, :typeNum, :name, TO_DATE(:sch_workdate, 'YYYY-MM-DD'), TO_TIMESTAMP(:sch_worktime, 'YYYY-MM-DD HH24:MI:SS.FF'), :sch_resttime, :color, :memo, :restdate)`,
+      {
+        REG_NUM,  // 클라이언트에서 전달된 regNum을 사용
+        typeNum: TYPE_NUM,
+        name,
+        sch_workdate,
+        sch_worktime,
+        sch_resttime,
+        color,
+        memo,
+        restdate,
+      },
+      { autoCommit: true }
+    );
+
+    if (result.rowsAffected > 0) {
+      res.status(200).json({ message: "일정이 추가되었습니다." });
+    } else {
+      res.status(400).json({ message: "일정 추가에 실패했습니다." });
+    }
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: "Database error" });
+  } finally {
+    if (connection) {
+      await connection.close();
+    }
+  }
+});
+
+// 값 가져오기
+router.get("/work-ids", async (req, res) => {
+  const ceoId = req.session.userId;
+  console.log("ceoId:", ceoId); // 로그로 ceoId 확인
+
+  if (!ceoId) {
+    return res.status(400).json({ error: "ceoId is missing from session" });
+  }
+
+  const dbConfig = req.app.get("dbConfig");
+  let connection;
+
+  try {
+    connection = await oracledb.getConnection(dbConfig);
+    const result = await connection.execute(
+      `SELECT c.work_id, r.name
+       FROM SYSTEM.COMMUTE c
+       JOIN SYSTEM.REGISTER r ON c.reg_num = r.reg_num
+       WHERE c.ceo_id = :ceoId`,
+      [ceoId]
+    );
+    console.log("Database result:", result.rows); // 데이터베이스 결과 확인
+    res.json(result.rows);
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: "Database error" });
+  } finally {
+    if (connection) {
+      await connection.close();
+    }
+  }
+});
+
+// router.get("/work-ids", async (req, res) => {
+//   const ceoId = req.session.userId; // 세션에서 ceoId 가져오기
+//   const dbConfig = req.app.get("dbConfig");
+//   console.log("ceoId:", ceoId);
+//   let connection;
+
+//   try {
+//     connection = await oracledb.getConnection(dbConfig);
+
+//     // commute 테이블에서 ceoId로 검색하여 모든 work_id와 name 가져오기
+//     const result = await connection.execute(
+//       `SELECT c.WORK_ID, r.NAME
+//        FROM COMMUTE c
+//        JOIN REGISTER r ON c.WORK_ID = r.ID
+//        WHERE c.CEO_ID = :ceoId`,
+//       [ceoId]
+//     );
+//     console.log("Database result:", result.rows);
+
+//     const workIds = result.rows.map((row) => ({
+//       work_id: row[0],
+//       name: row[1],
+//     }));
+
+//     res.json(workIds);
+//   } catch (err) {
+//     console.error(err);
+//     res.status(500).json({ error: "Database error" });
+//   } finally {
+//     if (connection) {
+//       await connection.close();
+//     }
+//   }
+// });
+
+// router.get('/work-ids', async (req, res) => {
+//     const ceoId = req.session.userId; // 로그인한 사용자의 ID 가져오기
+//     const dbConfig = req.app.get('dbConfig');
+//     let connection;
+
+//     try {
+//         connection = await oracledb.getConnection(dbConfig);
+//         const result = await connection.execute(
+//             `SELECT WORK_ID, NAME FROM COMMUTE WHERE CEO_ID = :ceoId`,
+//             [ceoId]
+//         );
+
+//         if (result.rows.length > 0) {
+//             // 데이터가 있을 때만 응답
+//             const workIds = result.rows.map(row => ({
+//                 work_id: row[0],
+//                 name: row[1]
+//             }));
+//             res.json(workIds);
+//         } else {
+//             res.json([]); // 데이터가 없을 경우 빈 배열 반환
+//         }
+//     } catch (err) {
+//         console.error(err);
+//         res.status(500).json({ error: 'Database error' });
+//     } finally {
+//         if (connection) {
+//             await connection.close();
+//         }
+//     }
+// });
 
 module.exports = router;

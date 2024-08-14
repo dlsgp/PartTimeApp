@@ -15,6 +15,7 @@ import FontAwesome from "@expo/vector-icons/FontAwesome";
 import DatePicker from "../(staffLayout)/ModalCalendar";
 import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
 import axios from "axios";
+import API_BASE_URL from "@/config";
 
 const { width, height } = Dimensions.get("window");
 
@@ -39,7 +40,7 @@ const StaffForm = () => {
   const handleSearch = async () => {
     try {
       const response = await axios.get(
-        `http://localhost:3000/api/users/${text}`
+        `${API_BASE_URL}:3000/api/users/${text}`
       );
       if (response.data) {
         setUserData(response.data);
@@ -69,7 +70,7 @@ const StaffForm = () => {
   const handleSave = async () => {
     try {
       const response = await axios.post(
-        "http://localhost:3000/api/update-staffnum",
+        `${API_BASE_URL}:3000/api/update-staffnum`,
         {
           id: text, // 검색된 아이디 (work_id)
           staffNum, // 입력된 사원번호
@@ -321,10 +322,10 @@ const StaffForm = () => {
                 )}
               </View>
 
-              <View style={RegFormStyle.buttonD}>
+              <View style={RegFormStyle.buttonD2}>
                 <TouchableOpacity
                   activeOpacity={0.8}
-                  style={RegFormStyle.button2}
+                  style={RegFormStyle.button3}
                   onPress={handleSave}
                 >
                   <Text style={RegFormStyle.buttonText2}>등록하기</Text>
@@ -346,6 +347,7 @@ const RegFormStyle = StyleSheet.create({
   container: {
     marginHorizontal: "4%",
     marginBottom: "4%",
+    marginTop: "10%",
   },
   titleContainer: {
     flexDirection: "row",
@@ -380,8 +382,15 @@ const RegFormStyle = StyleSheet.create({
     borderRadius: 30,
     padding: 0.5,
     alignSelf: "center",
-    marginTop: 5,
-    marginLeft: 15,
+    marginTop: "2%",
+    marginLeft: 10,
+  },
+  buttonD2: {
+    borderRadius: 30,
+    padding: 0.5,
+    alignSelf: "center",
+    marginTop: "2%",
+    marginLeft: 10,
   },
   formcontainer: {
     width: width * 0.64,
@@ -389,7 +398,7 @@ const RegFormStyle = StyleSheet.create({
     marginVertical: "6%",
   },
   formcontainer1: {
-    width: width * 0.35,
+    width: width * 0.40,
     height: height * 0.04,
     marginVertical: "6%",
   },
@@ -449,6 +458,15 @@ const RegFormStyle = StyleSheet.create({
     alignItems: "center",
   },
   button2: {
+    width: 60,
+    height: 30,
+    borderRadius: 30,
+    backgroundColor: "#2E294E",
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  button3: {
     width: 110,
     height: 34,
     borderRadius: 30,

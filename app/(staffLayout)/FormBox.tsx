@@ -293,6 +293,7 @@ const FormBoxStyle = StyleSheet.create({
     alignSelf: "flex-start",
     backgroundColor: "#2E294E",
     padding: "2%",
+    width: "25%",
   },
   title: {
     fontSize: 18,

@@ -6,6 +6,7 @@ import RNPickerSelect from "react-native-picker-select";
 import axios from "axios";
 import { FontAwesome } from "@expo/vector-icons";
 import SalaryForm from "./SalaryForm"; // 모달로 띄울 SalaryForm
+import API_BASE_URL from "@/config";
 
 const SalaryList = () => {
   const { width } = Dimensions.get("window");
@@ -17,7 +18,7 @@ const SalaryList = () => {
   const fetchData = async () => {
     try {
       const accessToken = await AsyncStorage.getItem("accessToken");
-      const response = await axios.get(`http://localhost:3000/api/salary`, {
+      const response = await axios.get(`${API_BASE_URL}:3000/api/salary`, {
         headers: {
           Authorization: `Bearer ${accessToken}`,
         },
@@ -124,18 +125,22 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     padding: 20,
+    backgroundColor: "#fff",
+    
   },
   headerRow: {
     flexDirection: "row",
     justifyContent: "space-between",
     alignItems: "center",
     marginBottom: 10,
+    marginTop: "10%",
   },
   card: {
     marginBottom: 15,
     borderRadius: 10,
     elevation: 3,
     position: "relative",
+    backgroundColor: "#fff",
   },
   cardContent: {
     paddingTop: 10, // 패딩 추가로 아이콘과의 겹침 방지

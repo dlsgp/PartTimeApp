@@ -15,7 +15,7 @@ const Test = () => {
       <TouchableOpacity onPress={handleLogout} style={styles.button}>
         <Text>로그아웃</Text>
       </TouchableOpacity>
-      <TouchableOpacity onPress={() => router.push("/(myPage)/QRCodeScanner")}>
+      <TouchableOpacity style={styles.button} onPress={() => router.push("/(myPage)/QRCodeScanner")}>
         <Text>QRScanner</Text>
       </TouchableOpacity>
     </View>
@@ -27,8 +27,12 @@ const styles = StyleSheet.create({
     flex: 1,
     flexDirection: "column",
     justifyContent: "center",
+    backgroundColor: "#fff",
   },
-  button: {},
+  button: {
+    justifyContent: 'center',
+    flexDirection: 'row',
+  },
 });
 
 export default Test;

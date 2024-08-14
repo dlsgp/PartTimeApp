@@ -4,6 +4,7 @@ import { Dimensions, StyleSheet, Text, View, ScrollView } from "react-native";
 import { Card, Provider } from "react-native-paper";
 import RNPickerSelect from "react-native-picker-select";
 import axios from "axios";
+import API_BASE_URL from "@/config";
 
 const EmployeeList = () => {
   const { width } = Dimensions.get("window");
@@ -13,7 +14,7 @@ const EmployeeList = () => {
   const fetchData = async () => {
     try {
       const accessToken = await AsyncStorage.getItem("accessToken");
-      const response = await axios.get(`http://localhost:3000/api/salary`, {
+      const response = await axios.get(`${API_BASE_URL}:3000/api/salary`, {
         headers: {
           Authorization: `Bearer ${accessToken}`,
         },

@@ -163,27 +163,66 @@ const SignInApp = () => {
     }, [])
   );
 
+  // const handleLogin = async () => {
+  //   try {
+  //     const response = await login(id, password);
+  //     if (response.success) {
+  //       console.log("Login successful:", response);
+  //       const tokenExpiration = checked
+  //         ? null
+  //         : new Date().getTime() + 24 * 60 * 60 * 1000; // 24 hours from now
+
+  //       await AsyncStorage.setItem("userToken", response.token);
+  //       await AsyncStorage.setItem("userId", response.userId);
+  //       await AsyncStorage.setItem("userType", response.userType.toString());
+  //       if (tokenExpiration) {
+  //         await AsyncStorage.setItem("tokenExpiration", tokenExpiration.toString());
+  //       } else {
+  //         await AsyncStorage.removeItem("tokenExpiration");
+  //       }
+
+  //       if (response.userType === 1) {
+  //         navigation.navigate("StaffTabs");
+  //       } else if (response.userType === 2) {
+  //         navigation.navigate("AdminTabs");
+  //       }
+  //     } else {
+  //       setError(response.message || "로그인 실패");
+  //     }
+  //   } catch (error) {
+  //     console.log("Login error:", error);
+  //     setError("로그인 중 오류가 발생했습니다.");
+  //   }
+  // };
   const handleLogin = async () => {
     try {
       const response = await login(id, password);
       if (response.success) {
         console.log("Login successful:", response);
+        
+        const { accessToken, refreshToken, userId, userType } = response;
         const tokenExpiration = checked
           ? null
           : new Date().getTime() + 24 * 60 * 60 * 1000; // 24 hours from now
-
-        await AsyncStorage.setItem("userToken", response.token);
-        await AsyncStorage.setItem("userId", response.userId);
-        await AsyncStorage.setItem("userType", response.userType.toString());
+  
+        if (accessToken && refreshToken) {
+          await AsyncStorage.setItem('accessToken', accessToken);
+          await AsyncStorage.setItem('refreshToken', refreshToken);
+        } else {
+          console.error("Login API response did not include tokens.");
+        }
+  
+        await AsyncStorage.setItem("userId", userId);
+        await AsyncStorage.setItem("userType", userType.toString());
         if (tokenExpiration) {
           await AsyncStorage.setItem("tokenExpiration", tokenExpiration.toString());
         } else {
           await AsyncStorage.removeItem("tokenExpiration");
         }
-
-        if (response.userType === 1) {
+  
+        if (userType === 1) {
           navigation.navigate("StaffTabs");
-        } else if (response.userType === 2) {
+        } else if (userType === 2) {
           navigation.navigate("AdminTabs");
         }
       } else {

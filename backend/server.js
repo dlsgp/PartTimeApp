@@ -7,14 +7,14 @@ const session = require('express-session');
 
 const app = express();
 const port = 3000;
-const allowedOrigins = ['http://localhost:8081', 'https://mufxcd4-gusrl45612-8081.exp.direct'];
+const allowedOrigins = ['http://localhost:8081', 'https://mufxcd4-gusrl45612-8081.exp.direct', 'http://192.168.0.84:8081'];
 
 
 // 세션 설정
 app.use(session({
-  secret: '12345', // 강력한 비밀 키를 사용하세요
+  secret: '12345', // 비밀키 추후 변경
   resave: false,
-  saveUninitialized: true,
+  saveUninitialized: false, // 초기화되지 않은 세션을 저장하지 않음
   cookie: { secure: false } // HTTPS를 사용할 경우 true로 설정
 }));
 

@@ -17,6 +17,7 @@ import { bsignup } from "../../components/src/services/apiService";
 import { router } from "expo-router";
 import Postcode from "@actbase/react-daum-postcode";
 import axios from "axios";
+import API_BASE_URL from "@/config";
 
 const { width, height } = Dimensions.get("window");
 
@@ -161,7 +162,7 @@ const BusinessSignUpApp: React.FC = () => {
 
     try {
       const response = await axios.get(
-        `http://localhost:3000/api/check-id/${id}`
+        `${API_BASE_URL}:3000/api/check-id/${id}`
       );
       if (response.data.duplicated) {
         setErrors((prev: any) => ({

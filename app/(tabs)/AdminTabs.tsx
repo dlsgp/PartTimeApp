@@ -6,6 +6,7 @@ import SalaryForm from "../(payManagement)/SalaryForm";
 import SalaryList from "../(payManagement)/SalaryList";
 import Test from "../(myPage)/Test";
 import { FontAwesome, MaterialIcons, AntDesign } from "@expo/vector-icons";
+import ScheduleCalendar from "../(scheduleManagement)/ScheduleCalendar";
 
 const Tab = createBottomTabNavigator();
 
@@ -30,15 +31,15 @@ export default function AdminTabs() {
           tabBarIcon: ({ color }) => <AntDesign name="addusergroup" size={25} color={color} /> 
         }} 
       />
-      {/* <Tab.Screen 
-        name="SalaryForm" 
-        component={SalaryForm} 
+      <Tab.Screen 
+        name="ScheduleCalendar" 
+        component={ScheduleCalendar} 
         options={{ 
-          tabBarLabel: 'SalaryForm', 
+          tabBarLabel: '캘린더', 
           headerShown: false, 
-          tabBarIcon: ({ color }) => <MaterialIcons name="attach-money" size={25} color={color} /> 
+          tabBarIcon: ({ color }) => <AntDesign name="calendar" size={25} color={color} /> 
         }} 
-      /> */}
+      />
       <Tab.Screen 
         name="SalaryList" 
         component={SalaryList} 
