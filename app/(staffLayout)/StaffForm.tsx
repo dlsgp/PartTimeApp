@@ -72,11 +72,11 @@ const StaffForm = () => {
       const response = await axios.post(
         `${API_BASE_URL}:3000/api/update-staffnum`,
         {
-          id: text, // 검색된 아이디 (work_id)
-          staffNum, // 입력된 사원번호
-          employDate: date1, // 입력된 입사일
-          expPeriodStart: date2, // 수습기간 시작일
-          expPeriodEnd: date3, // 수습기간 종료일
+          id: text, 
+          staffNum, 
+          employDate: date1, 
+          expPeriodStart: date2, 
+          expPeriodEnd: date3, 
         }, {
           withCredentials: true // 세션 쿠키를 보내기 위해 필요
         });
@@ -260,6 +260,7 @@ const StaffForm = () => {
                     selected={date1 || ""}
                     onDateChange={handleChange1}
                     visible={showDatePicker1}
+                    
                   />
                 )}
               </View>
@@ -286,9 +287,13 @@ const StaffForm = () => {
                 {showDatePicker2 && (
                   <DatePicker
                     mode="calendar"
+                    locale="ko"
                     selected={date2 || ""}
                     onDateChange={handleChange2}
                     visible={showDatePicker2}
+                    renderHeader={(date) => (
+                      <Text>{moment(date).format('YYYY년 M월')}</Text>
+                    )}
                   />
                 )}
               </View>
@@ -318,6 +323,9 @@ const StaffForm = () => {
                     selected={date3 || ""}
                     onDateChange={handleChange3}
                     visible={showDatePicker3}
+                    renderHeader={(date) => (
+                      <Text>{moment(date).format('YYYY년 M월')}</Text>
+                    )}
                   />
                 )}
               </View>

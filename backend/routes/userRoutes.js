@@ -193,7 +193,7 @@ router.post("/send-verification-code", async (req, res) => {
     } else {
       res.status(400).json({
         success: false,
-        message: "잘못된 아이디 혹은 패스워드입니다.",
+        message: "잘못된 아이디 혹은 이메일입니다.",
       });
     }
   } catch (err) {
@@ -306,6 +306,87 @@ router.get("/users/:userId", async (req, res) => {
     }
   }
 });
+
+router.get("/user-and-commute-info/:userId", async (req, res) => {
+  const { userId } = req.params;
+  const dbConfig = req.app.get("dbConfig");
+
+  console.log("Fetching user and commute info for ID:", userId);
+
+  let connection;
+
+  try {
+    connection = await oracledb.getConnection(dbConfig);
+
+    // 사용자 정보를 가져옵니다.
+    const userResult = await connection.execute(
+      `SELECT reg_num, id, name, tel, email, add1, add2 FROM register WHERE id = :userId`,
+      [userId]
+    );
+
+    if (userResult.rows.length === 0) {
+      return res.status(404).json({ message: "사용자를 찾을 수 없습니다" });
+    }
+
+    const userInfo = userResult.rows[0];
+    console.log("User Info:", userInfo);
+
+    // 근무 정보를 가져옵니다.
+    const commuteResult = await connection.execute(
+      `SELECT hourwage, workin, workout, insurance 
+       FROM commute 
+       WHERE work_id = :userId`,
+      [userId]
+    );
+
+    console.log("Commute Info:", commuteResult.rows);
+
+    // 사원번호, 입사일, 수습기간 정보를 가져옵니다.
+    const employResult = await connection.execute(
+      `SELECT staff_number, employ_date, exp_periodstart, exp_periodend 
+       FROM employ 
+       WHERE work_id = :userId`,
+      [userId]
+    );
+
+    console.log("Employ Info:", employResult.rows);
+
+    const commuteInfo = commuteResult.rows.length > 0 ? commuteResult.rows[0] : {};
+    const employInfo = employResult.rows.length > 0 ? employResult.rows[0] : {};
+
+    res.status(200).json({
+      reg_num: userInfo[0],
+      id: userInfo[1],
+      name: userInfo[2],
+      tel: userInfo[3],
+      email: userInfo[4],
+      add1: userInfo[5],
+      add2: userInfo[6],
+      hourwage: commuteInfo[0] || null,
+      workin: commuteInfo[1] || null,
+      workout: commuteInfo[2] || null,
+      insurance: commuteInfo[3] === '1' ? '예' : commuteInfo[3] === '0' ? '아니오' : null,
+      staff_number: employInfo[0] || null,
+      employ_date: employInfo[1] || null,
+      exp_periodstart: employInfo[2] || null,
+      exp_periodend: employInfo[3] || null,
+    });
+  } catch (err) {
+    console.error("Error fetching user and commute info:", err);
+    res.status(500).json({ message: "인터넷 서버 오류 500" });
+  } finally {
+    if (connection) {
+      try {
+        await connection.close();
+      } catch (err) {
+        console.error(err);
+      }
+    }
+  }
+});
+
+
+
 
 router.post("/update-user", async (req, res) => {
   const { id, tel, email, add1, add2 } = req.body;
@@ -457,17 +538,17 @@ router.post("/update-staffnum", async (req, res) => {
 router.post("/update-salary", async (req, res) => {
   const {
     id,
-    name,
+    // name,
     hourwage,
     bonuswage,
     etcwage,
     insurance,
     worktime,
-    worktime1,
-    worktime2,
-    worktime3,
-    worktime4,
-    worktime5,
+    // worktime1,
+    // worktime2,
+    // worktime3,
+    // worktime4,
+    // worktime5,
   } = req.body;
   const ceoId = req.session.userId; // 세션에서 ceoId 가져오기
   const dbConfig = req.app.get("dbConfig");
@@ -761,6 +842,7 @@ router.post("/schedules", async (req, res) => {
   try {
     connection = await oracledb.getConnection(dbConfig);
 
+    // REGISTER 테이블에서 REG_NUM과 TYPE_NUM을 가져옵니다.
     const regResult = await connection.execute(
       `SELECT REG_NUM, TYPE_NUM FROM REGISTER WHERE ID = :workId`,
       { workId }
@@ -770,14 +852,18 @@ router.post("/schedules", async (req, res) => {
       return res.status(400).json({ message: "유효한 직원 ID가 아닙니다." });
     }
 
-    const { REG_NUM, TYPE_NUM } = regResult.rows[0];
+    const [REG_NUM, TYPE_NUM] = regResult.rows[0];
+
+    if (!REG_NUM || !TYPE_NUM) {
+      return res.status(400).json({ message: "등록된 REG_NUM 또는 TYPE_NUM이 없습니다." });
+    }
 
     const result = await connection.execute(
       `INSERT INTO SCHEDULE (SCHEDULE_NUM, REG_NUM, TYPE_NUM, NAME, SCH_WORKDATE, SCH_WORKTIME, SCH_RESTTIME, COLOR, MEMO, RESTDATE)
-           VALUES (SCHEDULE_SEQ.NEXTVAL, :regNum, :typeNum, :name, TO_DATE(:sch_workdate, 'YYYY-MM-DD'), TO_TIMESTAMP(:sch_worktime, 'YYYY-MM-DD HH24:MI:SS.FF'), :sch_resttime, :color, :memo, :restdate)`,
+       VALUES (SCHEDULE_SEQ.NEXTVAL, :regNum, :typeNum, :name, TO_DATE(:sch_workdate, 'YYYY-MM-DD'), TO_TIMESTAMP(:sch_worktime, 'YYYY-MM-DD HH24:MI:SS.FF'), :sch_resttime, :color, :memo, :restdate)`,
       {
-        REG_NUM,  // 클라이언트에서 전달된 regNum을 사용
-        typeNum: TYPE_NUM,
+        regNum: REG_NUM,  // 추출된 REG_NUM 사용
+        typeNum: TYPE_NUM,  // 추출된 TYPE_NUM 사용
         name,
         sch_workdate,
         sch_worktime,
@@ -803,6 +889,7 @@ router.post("/schedules", async (req, res) => {
     }
   }
 });
+
 
 // 값 가져오기
 router.get("/work-ids", async (req, res) => {

@@ -29,6 +29,7 @@ export default function ModalCalendar({ onDateChange }) {
           <View style={styles.modalView}>
             <DatePicker
               mode="calendar"
+              locale="ko"
               selected={date || ""}
               onDateChange={handleChange}
             />

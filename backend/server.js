@@ -7,7 +7,7 @@ const session = require('express-session');
 
 const app = express();
 const port = 3000;
-const allowedOrigins = ['http://localhost:8081', 'https://mufxcd4-gusrl45612-8081.exp.direct', 'http://192.168.0.84:8081'];
+const allowedOrigins = ['http://localhost:8081', 'https://mufxcd4-gusrl45612-8081.exp.direct', 'http://192.168.0.84:8081', `http://192.168.50.82:8081`];
 
 
 // 세션 설정

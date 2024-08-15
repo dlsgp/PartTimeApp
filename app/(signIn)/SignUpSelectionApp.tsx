@@ -14,9 +14,9 @@ const SignUpSelectionApp: React.FC = () => {
   return(
 
     <SafeAreaView style={styles.container}>
-      <Text style={styles.title}>PartTime 회원가입을 환영합니다.</Text>
+      <Text style={styles.title}>PartTime</Text>
+      <Text style={styles.title2}>회원가입을 환영합니다.</Text>
 
-      {/* <Link href="PersonalSignUpApp"> */}
       <TouchableOpacity style={styles.card1} onPress={() => router.push('/PersonalSignUpApp')}>
       <Ionicons name="people" size={80} color="black" />
       <Text style={styles.cardText1}>개인회원가입</Text>
@@ -39,8 +39,7 @@ const SignUpSelectionApp: React.FC = () => {
           <Text style={styles.socialText}>카카오</Text>
         </TouchableOpacity>
       </View>
-
-      {/* <Link href="BusinessSignUpApp"> */}
+      
       <TouchableOpacity style={styles.card2} onPress={() => router.push('/BusinessSignUpApp')}>
       <FontAwesome name="building" size={70} color="black" />
       <Text style={styles.cardText2}>사업자회원가입</Text>
@@ -61,8 +60,16 @@ const styles = StyleSheet.create({
   },
   title: {
     fontSize: 30,
+    fontWeight: "bold",
+    marginLeft: 10,
+    marginRight: 10,
+  },
+  title2: {
+    fontSize: 30,
     marginBottom: 60,
     fontWeight: "bold",
+    marginLeft: 10,
+    marginRight: 10,
   },
   card1: {
     width: width * 0.8,

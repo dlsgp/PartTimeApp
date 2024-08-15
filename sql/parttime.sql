@@ -90,46 +90,6 @@ ALTER TABLE employ
 		KEEP INDEX;
 
 /* 회원가입 */
-DROP TABLE register 
-	CASCADE CONSTRAINTS;
-
-/* 직책유형 */
-DROP TABLE positiontype 
-	CASCADE CONSTRAINTS;
-
-/* 출퇴근 */
-DROP TABLE commute 
-	CASCADE CONSTRAINTS;
-
-/* 마이페이지 */
-DROP TABLE myPage 
-	CASCADE CONSTRAINTS;
-
-/* 급여관리 */
-DROP TABLE payManager 
-	CASCADE CONSTRAINTS;
-
-/* 스케줄관리 */
-DROP TABLE schedule 
-	CASCADE CONSTRAINTS;
-
-/* 업주회원가입 */
-DROP TABLE registerCeo 
-	CASCADE CONSTRAINTS;
-
-/* 알바 이력 */
-DROP TABLE resume 
-	CASCADE CONSTRAINTS;
-
-/* 기업 */
-DROP TABLE company 
-	CASCADE CONSTRAINTS;
-
-/* 고용 */
-DROP TABLE employ 
-	CASCADE CONSTRAINTS;
-
-/* 회원가입 */
 CREATE TABLE register (
 	reg_num NUMBER NOT NULL, /* 번호 */
 	type_num NUMBER NOT NULL, /* 분류 */
@@ -206,6 +166,7 @@ ALTER TABLE positiontype
 
 /* 출퇴근 */
 CREATE TABLE commute (
+	commute_num NUMBER NOT NULL, /* 출퇴근번호 */
 	reg_num NUMBER NOT NULL, /* 번호 */
 	type_num NUMBER NOT NULL, /* 분류 */
 	ceo_id VARCHAR2(50) NOT NULL, /* 기업 아이디 */
@@ -234,6 +195,8 @@ CREATE TABLE commute (
 );
 
 COMMENT ON TABLE commute IS '출퇴근';
+
+COMMENT ON COLUMN commute.commute_num IS '출퇴근번호';
 
 COMMENT ON COLUMN commute.reg_num IS '번호';
 
@@ -289,6 +252,7 @@ ALTER TABLE commute
 	ADD
 		CONSTRAINT PK_commute
 		PRIMARY KEY (
+			commute_num,
 			reg_num,
 			type_num,
 			ceo_id,
@@ -415,6 +379,7 @@ CREATE TABLE schedule (
 	name VARCHAR(20), /* 이름 */
 	sch_workDate DATE, /* 근무날짜 */
 	sch_workTime TIMESTAMP, /* 근무시간 */
+	sch_workEndTime TIMESTAMP, /* 근무시간 끝 */
 	sch_restTime VARCHAR2(50), /* 휴게시간 */
 	color VARCHAR(20), /* 일정색상 */
 	memo VARCHAR2(2000), /* 메모 */
@@ -440,6 +405,8 @@ COMMENT ON COLUMN schedule.name IS '이름';
 COMMENT ON COLUMN schedule.sch_workDate IS '근무날짜';
 
 COMMENT ON COLUMN schedule.sch_workTime IS '근무시간';
+
+COMMENT ON COLUMN schedule.sch_workEndTime IS '근무시간 끝';
 
 COMMENT ON COLUMN schedule.sch_restTime IS '휴게시간';
 
@@ -543,7 +510,8 @@ ALTER TABLE resume
 /* 기업 */
 CREATE TABLE company (
 	com_order NUMBER, /* 번호 */
-	ceo_id VARCHAR2(50) NOT NULL /* 기업 아이디 */
+	ceo_id VARCHAR2(50) NOT NULL, /* 기업 아이디 */
+	ceo_qr varchar2(2000) /* QR코드 */
 );
 
 COMMENT ON TABLE company IS '기업';
@@ -551,6 +519,8 @@ COMMENT ON TABLE company IS '기업';
 COMMENT ON COLUMN company.com_order IS '번호';
 
 COMMENT ON COLUMN company.ceo_id IS '기업 아이디';
+
+COMMENT ON COLUMN company.ceo_qr IS 'QR코드';
 
 ALTER TABLE company
 	ADD
@@ -669,7 +639,7 @@ ALTER TABLE resume
 			type_num
 		);
         
-/* exerd 끝 */        
+/* exerd 끝 */       
 
 commit;
 
@@ -716,25 +686,26 @@ insert into employ values(2, 0020, 'adminb', 'fff', TO_DATE('2024-08-12', 'YYYY-
 insert into employ values(3, 0030, 'adminb', 'ggg', TO_DATE('2024-08-12', 'YYYY-MM-DD' ), TO_DATE('2024-08-11', 'YYYY-MM-DD' ), TO_DATE('2024-09-11', 'YYYY-MM-DD' ) );
 insert into employ values(4, 0040, 'adminb', 'hhh', TO_DATE('2024-08-14', 'YYYY-MM-DD' ), TO_DATE('2024-08-11', 'YYYY-MM-DD' ), TO_DATE('2024-09-13', 'YYYY-MM-DD' ) );
 
+select * from register;
 
-insert into commute values(62, 1, 'admina', 'aaa', 1, TO_TIMESTAMP('2024-08-11 09:00:00', 'YYYY-MM-DD HH24:MI:SS'), TO_TIMESTAMP('2024-08-11 14:00:00','YYYY-MM-DD HH24:MI:SS'), --commute insert into
+insert into commute values(commute_seq.NextVal, 2, 1, 'admina', 'aaa', 1, TO_TIMESTAMP('2024-08-11 09:00:00', 'YYYY-MM-DD HH24:MI:SS'), TO_TIMESTAMP('2024-08-11 14:00:00','YYYY-MM-DD HH24:MI:SS'), --commute insert into
 NULL, NULL, NULL, 300, NULL, NULL, NULL, 300, 9860,NULL, 1, 0, NULL, NULL, NULL, NULL, NULL, 49300 ); 
-insert into commute values(63, 1, 'admina', 'bbb', 2, TO_TIMESTAMP('2024-08-11 09:00:00', 'YYYY-MM-DD HH24:MI:SS'), TO_TIMESTAMP('2024-08-11 14:00:00','YYYY-MM-DD HH24:MI:SS'), 
+insert into commute values(commute_seq.NextVal, 3, 1, 'admina', 'bbb', 2, TO_TIMESTAMP('2024-08-11 09:00:00', 'YYYY-MM-DD HH24:MI:SS'), TO_TIMESTAMP('2024-08-11 14:00:00','YYYY-MM-DD HH24:MI:SS'), 
 NULL, NULL, NULL, 300, NULL, NULL, NULL, 300, 9860,NULL, 1, 0, NULL, NULL, NULL, NULL, NULL, 49300 ); 
-insert into commute values(64, 1, 'admina', 'ccc', 3, TO_TIMESTAMP('2024-08-11 14:00:00', 'YYYY-MM-DD HH24:MI:SS'), TO_TIMESTAMP('2024-08-11 22:00:00','YYYY-MM-DD HH24:MI:SS'), 
+insert into commute values(commute_seq.NextVal, 4, 1, 'admina', 'ccc', 3, TO_TIMESTAMP('2024-08-11 14:00:00', 'YYYY-MM-DD HH24:MI:SS'), TO_TIMESTAMP('2024-08-11 22:00:00','YYYY-MM-DD HH24:MI:SS'), 
 TO_TIMESTAMP('2024-08-11 17:00:00','YYYY-MM-DD HH24:MI:SS'),  TO_TIMESTAMP('2024-08-11 17:30:00','YYYY-MM-DD HH24:MI:SS'), 
 NULL, 300, NULL, NULL, NULL, 300, 9860,NULL, 1, 0, NULL, NULL, NULL, NULL, NULL, 49300 ); 
-insert into commute values(65, 1, 'admina', 'ddd',4, TO_TIMESTAMP('2024-08-12 09:00:00', 'YYYY-MM-DD HH24:MI:SS'), TO_TIMESTAMP('2024-08-12 14:00:00','YYYY-MM-DD HH24:MI:SS'), 
+insert into commute values(commute_seq.NextVal, 5, 1, 'admina', 'ddd',4, TO_TIMESTAMP('2024-08-12 09:00:00', 'YYYY-MM-DD HH24:MI:SS'), TO_TIMESTAMP('2024-08-12 14:00:00','YYYY-MM-DD HH24:MI:SS'), 
 NULL, NULL, NULL, 300, NULL, NULL, NULL, 300, 9860,NULL, 1, 0, NULL, NULL, NULL, NULL, NULL, 49300 );
 
-insert into commute values(67, 1, 'adminb', 'eee', 10, TO_TIMESTAMP('2024-08-11 09:00:00', 'YYYY-MM-DD HH24:MI:SS'), TO_TIMESTAMP('2024-08-11 14:00:00','YYYY-MM-DD HH24:MI:SS'), 
+insert into commute values(commute_seq.NextVal, 7, 1, 'adminb', 'eee', 10, TO_TIMESTAMP('2024-08-11 09:00:00', 'YYYY-MM-DD HH24:MI:SS'), TO_TIMESTAMP('2024-08-11 14:00:00','YYYY-MM-DD HH24:MI:SS'), 
 NULL, NULL, NULL, 300, NULL, NULL, NULL, 300, 9860,NULL, 1, 0, NULL, NULL, NULL, NULL, NULL, 49300 ); 
-insert into commute values(68, 1, 'adminb', 'fff', 20,TO_TIMESTAMP('2024-08-12 09:00:00', 'YYYY-MM-DD HH24:MI:SS'), TO_TIMESTAMP('2024-08-12 14:00:00','YYYY-MM-DD HH24:MI:SS'), 
+insert into commute values(commute_seq.NextVal, 8, 1, 'adminb', 'fff', 20,TO_TIMESTAMP('2024-08-12 09:00:00', 'YYYY-MM-DD HH24:MI:SS'), TO_TIMESTAMP('2024-08-12 14:00:00','YYYY-MM-DD HH24:MI:SS'), 
 NULL, NULL, NULL, 300, NULL, NULL, NULL, 300, 9860,NULL, 1, 0, NULL, NULL, NULL, NULL, NULL, 49300 ); 
-insert into commute values(69, 1, 'adminb', 'ggg',30, TO_TIMESTAMP('2024-08-12 14:00:00', 'YYYY-MM-DD HH24:MI:SS'), TO_TIMESTAMP('2024-08-12 22:00:00','YYYY-MM-DD HH24:MI:SS'), 
+insert into commute values(commute_seq.NextVal, 9, 1, 'adminb', 'ggg',30, TO_TIMESTAMP('2024-08-12 14:00:00', 'YYYY-MM-DD HH24:MI:SS'), TO_TIMESTAMP('2024-08-12 22:00:00','YYYY-MM-DD HH24:MI:SS'), 
 TO_TIMESTAMP('2024-08-11 17:00:00','YYYY-MM-DD HH24:MI:SS'),  TO_TIMESTAMP('2024-08-11 17:30:00','YYYY-MM-DD HH24:MI:SS'), 
 NULL, 300, NULL, NULL, NULL, 300, 9860,NULL, 1, 0, NULL, NULL, NULL, NULL, NULL, 49300 ); 
-insert into commute values(70, 1, 'adminb', 'hhh',40, TO_TIMESTAMP('2024-08-14 09:00:00', 'YYYY-MM-DD HH24:MI:SS'), TO_TIMESTAMP('2024-08-14 14:00:00','YYYY-MM-DD HH24:MI:SS'), 
+insert into commute values(commute_seq.NextVal, 10, 1, 'adminb', 'hhh',40, TO_TIMESTAMP('2024-08-14 09:00:00', 'YYYY-MM-DD HH24:MI:SS'), TO_TIMESTAMP('2024-08-14 14:00:00','YYYY-MM-DD HH24:MI:SS'), 
 NULL, NULL, NULL, 300, NULL, NULL, NULL, 300, 9860,NULL, 1, 0, NULL, NULL, NULL, NULL, NULL, 49300 ); 
 /*
 insert into commute values(11, 1, 'admina', 'aaa', TO_TIMESTAMP('2024-08-13 09:00:00', 'YYYY-MM-DD HH24:MI:SS'), TO_TIMESTAMP('2024-08-13 14:00:00','YYYY-MM-DD HH24:MI:SS'), --commute insert into
@@ -748,7 +719,37 @@ NULL, NULL, NULL, 300, 1200, NULL, NULL, 300, 9860,NULL, 1, 0, NULL, NULL, NULL,
 insert into commute values(2, 1, 'admina', 'aaa', TO_TIMESTAMP('2024-08-18 09:00:00', 'YYYY-MM-DD HH24:MI:SS'), TO_TIMESTAMP('2024-08-18 14:00:00','YYYY-MM-DD HH24:MI:SS'), --commute insert into
 NULL, NULL, NULL, 300, 1500, NULL, NULL, 300, 9860,NULL, 1, 0, NULL, NULL, NULL, NULL, NULL, 295800 ); */
 
-insert into company values(company_seq.NEXTVAL, 'admina'); --insert into company
-insert into company values(company_seq.NEXTVAL, 'adminb');
+insert into company values(company_seq.NEXTVAL, 'admina', null); --insert into company
+insert into company values(company_seq.NEXTVAL, 'adminb', null);
+
+
+commit;
+
+
+insert into schedule values(schedule_seq.NEXTVAL, 82, 1, 'admina', 'aaa', 1 , 'aaa' ,TO_DATE('2024-08-13', 'YYYY-MM-DD' ),  TO_TIMESTAMP('2024-08-13 09:00:00', 'YYYY-MM-DD HH24:MI:SS'), 
+    TO_TIMESTAMP('2024-08-13 14:00:00', 'YYYY-MM-DD HH24:MI:SS'),  NULL, 'yellow', NULL, NULL);  --schedule insert into aaa
+
+INSERT INTO resume (history_num, type_num, reg_num, comName, comAdd, todo, past_join_date, past_leaveDate) 
+VALUES (resume_seq.NEXTVAL, 1, 82, '맥도날드', '대구광역시 중구 공평동', '매니저', TO_DATE('2024-01-01', 'YYYY-MM-DD'), TO_DATE('2024-03-01', 'YYYY-MM-DD'));  --resume insert into
+
+update resume set comName='버거킹', todo='점장', past_join_date=('2024-02-01'), past_leaveDate=('2024-05-05') where reg_num=82;      --resume update set
+   
+
+insert into register values(register_seq.NEXTVAL, 1, 'iii', 'iii','iii', NULL, 'aaa@email.com', '010-3392-3432', NULL, --register insert into 직원 iii
+'990318', '990318-1352809', '대구 중구 경상감영길 2', '뒤', TO_DATE('2024-08-10', 'YYYY-MM-DD') );
+insert into register values(register_seq.NEXTVAL, 1, 'jjj', 'jjj','jjj', NULL, 'jjj@email.com', '010-3251-7635', NULL, --register insert into 직원 iii
+'000318', '000318-4725621', '대구 중구 경상감영길 3', '위', TO_DATE('2024-08-10', 'YYYY-MM-DD') );
+insert into employ values(5, 005, 'admina', 'iii', TO_DATE('2024-08-13', 'YYYY-MM-DD' ), TO_DATE('2024-08-13', 'YYYY-MM-DD' ), TO_DATE('2024-11-12', 'YYYY-MM-DD' ) ); --employ insert into 직원 iii
+insert into employ values(6, 006, 'admina', 'jjj', TO_DATE('2024-08-14', 'YYYY-MM-DD' ), TO_DATE('2024-08-14', 'YYYY-MM-DD' ), TO_DATE('2024-11-13', 'YYYY-MM-DD' ) ); --employ insert into 직원 jjj
+
+
+insert into register values(register_seq.NEXTVAL, 1, 'kkk', 'kkk','kkk', NULL, 'kkk@email.com', '010-6434-5629', NULL,
+'990826', '990826-2324644', '경기 부천시 소사구 경인로 8', '위', TO_DATE('2024-08-14', 'YYYY-MM-DD') ); --register insert into 직원 kkk
+insert into employ values(7, 007, 'admina', 'kkk', TO_DATE('2024-08-14', 'YYYY-MM-DD' ), TO_DATE('2024-08-14', 'YYYY-MM-DD' ), TO_DATE('2024-11-13', 'YYYY-MM-DD' ) ); --employ insert into 직원 kkk
+
+commit;
+
+select * from commute;
+delete from commute where reg_num=21;
 
 

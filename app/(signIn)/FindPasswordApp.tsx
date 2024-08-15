@@ -173,7 +173,7 @@ const FindPasswordApp = () => {
           </Text>
           <TouchableOpacity
             style={styles.Button}
-            onPress={() => router.push("/SignInApp")}
+            onPress={() => router.push("/")}
           >
             <Text style={styles.ButtonText}>로그인 화면으로 돌아가기</Text>
           </TouchableOpacity>

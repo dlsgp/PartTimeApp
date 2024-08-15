@@ -21,6 +21,8 @@ import {
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { SafeAreaView } from "react-native-safe-area-context";
 import Postcode from "@actbase/react-daum-postcode";
+import API_BASE_URL from "@/config";
+import axios from "axios";
 
 const { width, height } = Dimensions.get("window");
 
@@ -40,15 +42,31 @@ const Mypage = () => {
   const router = useRouter();
 
   useEffect(() => {
+    // const fetchUserInfo = async () => {
+    //   const userId = await AsyncStorage.getItem("userId");
+    //   console.log("UserId from AsyncStorage:", userId);
+    //   if (userId) {
+    //     try {
+    //       const data = await getUserInfo(userId);
+    //       console.log("Fetched user data:", data);
+    //       setUserInfo(data);
+    //       setOriginalUserInfo(data);
+    //     } catch (error) {
+    //       console.error("Failed to fetch user info:", error);
+    //     }
+    //   }
+    // };
     const fetchUserInfo = async () => {
       const userId = await AsyncStorage.getItem("userId");
       console.log("UserId from AsyncStorage:", userId);
       if (userId) {
         try {
-          const data = await getUserInfo(userId);
-          console.log("Fetched user data:", data);
-          setUserInfo(data);
-          setOriginalUserInfo(data);
+          const response = await axios.get(
+            `${API_BASE_URL}:3000/api/user-and-commute-info/${userId}`
+          );
+          console.log("Fetched user data:", response.data);
+          setUserInfo(response.data);
+          setOriginalUserInfo(response.data);
         } catch (error) {
           console.error("Failed to fetch user info:", error);
         }
@@ -228,28 +246,18 @@ const Mypage = () => {
               <TextInput
                 style={RegFormStyle.formcontainerB}
                 label="사원번호"
-                placeholder="사원번호        0001"
-                onChangeText={(text) => setText(text)}
+                value={
+                  userInfo.staff_number ? userInfo.staff_number.toString() : ""
+                }
                 mode="outlined"
                 disabled
                 theme={{ colors: { background: "white" } }}
               />
 
-              {/* <TextInput
-                style={RegFormStyle.formcontainerB}
-                label="직급"
-                placeholder="직급               알바"
-                onChangeText={(text) => setText(text)}
-                mode="outlined"
-                disabled
-                theme={{ colors: { background: "white" } }}
-              /> */}
-
               <TextInput
                 style={RegFormStyle.formcontainerB}
                 label="시급"
-                placeholder="시급               7900"
-                onChangeText={(text) => setText(text)}
+                value={userInfo.hourwage ? userInfo.hourwage.toString() : ""}
                 mode="outlined"
                 disabled
                 theme={{ colors: { background: "white" } }}
@@ -258,8 +266,13 @@ const Mypage = () => {
               <TextInput
                 style={RegFormStyle.formcontainerB}
                 label="입사일"
-                placeholder="입사일            2024-07-10"
-                onChangeText={(text) => setText(text)}
+                value={
+                  userInfo.employ_date
+                    ? new Date(userInfo.employ_date)
+                        .toISOString()
+                        .substring(0, 10)
+                    : ""
+                }
                 mode="outlined"
                 disabled
                 theme={{ colors: { background: "white" } }}
@@ -268,8 +281,15 @@ const Mypage = () => {
               <TextInput
                 style={RegFormStyle.formcontainerB}
                 label="수습기간"
-                placeholder="수습기간         2024-07-10~2024-10-10"
-                onChangeText={(text) => setText(text)}
+                value={
+                  userInfo.exp_periodstart && userInfo.exp_periodend
+                    ? `${new Date(userInfo.exp_periodstart)
+                        .toISOString()
+                        .substring(0, 10)} ~ ${new Date(userInfo.exp_periodend)
+                        .toISOString()
+                        .substring(0, 10)}`
+                    : ""
+                }
                 mode="outlined"
                 disabled
                 theme={{ colors: { background: "white" } }}
@@ -278,8 +298,7 @@ const Mypage = () => {
               <TextInput
                 style={RegFormStyle.formcontainerB}
                 label="4대보험유무"
-                placeholder="4대보험유무    아니오"
-                onChangeText={(text) => setText(text)}
+                value={userInfo.insurance || ""}
                 mode="outlined"
                 disabled
                 theme={{ colors: { background: "white" } }}

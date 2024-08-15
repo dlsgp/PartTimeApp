@@ -247,7 +247,7 @@ const SignInApp = () => {
 
   return (
     <SafeAreaView style={styles.container}>
-      <Text style={styles.title}>Sign In</Text>
+      <Text style={styles.title}>PartTime</Text>
       <TextInput
         style={styles.input}
         placeholder="ID"

@@ -106,9 +106,9 @@ const PersonalSignUpApp: React.FC = () => {
     if (!confirmPassword) newErrors.confirmPassword = "필수 입력 항목입니다.";
     if (!name) newErrors.name = "필수 입력 항목입니다.";
     if (!birth) newErrors.birth = "필수 입력 항목입니다.";
-    if (!postcode) newErrors.add1 = "필수 입력 항목입니다.";
+    if (!postcode) newErrors.postcode = "필수 입력 항목입니다.";
     if (!add1) newErrors.add1 = "필수 입력 항목입니다.";
-    if (!add2) newErrors.add1 = "필수 입력 항목입니다.";
+    if (!add2) newErrors.add2 = "필수 입력 항목입니다.";
     if (!email) newErrors.email = "필수 입력 항목입니다.";
     if (!tel) newErrors.tel = "필수 입력 항목입니다.";
     if (!checked1) newErrors.checked1 = "필수 체크 항목입니다.";
