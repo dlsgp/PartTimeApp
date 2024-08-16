@@ -1,7 +1,6 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import {
-  Alert,
-  Button,
+  FlatList,
   Image,
   StyleSheet,
   Text,
@@ -9,9 +8,12 @@ import {
   View,
 } from "react-native";
 import FontAwesome from "@expo/vector-icons/FontAwesome";
-import { Checkbox, TextInput } from "react-native-paper";
+import { Checkbox, TextInput, Card } from "react-native-paper";
 import { useNavigation } from "@react-navigation/native";
 import { router } from "expo-router";
+import axios from "axios";
+import AsyncStorage from "@react-native-async-storage/async-storage";
+import API_BASE_URL from "@/config";
 
 function TabBarIcon(props: {
   name: React.ComponentProps<typeof FontAwesome>["name"];
@@ -21,47 +23,137 @@ function TabBarIcon(props: {
 }
 
 function FormBox() {
-  const [text1, setText1] = React.useState<string | undefined>(
-    "24.07.10 수요일 출근"
+  const [employees, setEmployees] = useState([]);
+  const [checkedStates, setCheckedStates] = useState({});
+  const [editingStates, setEditingStates] = useState({});
+
+  const fetchData = async () => {
+    try {
+      const accessToken = await AsyncStorage.getItem("accessToken");
+      const response = await axios.get(`${API_BASE_URL}:3000/api/employees`, {
+        headers: {
+          Authorization: `Bearer ${accessToken}`,
+        },
+        withCredentials: true,
+      });
+      setEmployees(response.data);
+    } catch (error) {
+      console.error("데이터 가져오기 오류:", error);
+    }
+  };
+
+  useEffect(() => {
+    fetchData();
+  }, []);
+
+  const formatDate = (dateString) => {
+    return dateString.substring(0, 10).replace(/-/g, ".");
+  };
+
+  const handleCheckboxPress = (id, index) => {
+    setCheckedStates((prev) => ({
+      ...prev,
+      [id]: !prev[id],
+    }));
+  };
+
+  const handleEditPress = (id) => {
+    setEditingStates((prev) => ({
+      ...prev,
+      [id]: true,
+    }));
+  };
+
+  const handleSavePress = (id) => {
+    setEditingStates((prev) => ({
+      ...prev,
+      [id]: false,
+    }));
+  };
+
+  const renderEmployee = ({ item, index }) => {
+    const isEditing = editingStates[item.work_id];
+    const isChecked = checkedStates[item.work_id];
+
+    return (
+      <View style={FormBoxStyle.subcontainer}>
+        <View style={{ alignItems: "center" }}>
+          <Image
+            style={FormBoxStyle.mobilePhoto}
+            source={require("../../assets/images/profile.jpg")}
+          />
+          <Text style={FormBoxStyle.mobileText}>{item.name}</Text>
+          <Text style={FormBoxStyle.mobileText2}>
+            {formatDate(item.employ_date)} 입사
+          </Text>
+          <Text style={FormBoxStyle.mobileText3}>
+            ~ {formatDate(item.exp_periodend)}
+          </Text>
+        </View>
+
+        <View style={FormBoxStyle.iconText}>
+          {[...Array(3)].map((_, i) => (
+            <View
+              key={`${item.work_id}-${i}`} // key를 work_id와 index를 조합하여 유니크하게 만듦
+              style={{
+                flexDirection: "row",
+                alignItems: "center",
+                marginBottom: i < 2 ? "10%" : "0%",
+              }}
+            >
+              <Checkbox
+                status={isChecked ? "checked" : "unchecked"}
+                onPress={() => handleCheckboxPress(item.work_id, i)}
+              />
+              {isEditing ? (
+                <TextInput
+                  value={`${formatDate(item.employ_date)} 출근`}
+                  mode="flat"
+                  theme={{ colors: { primary: "transparent" } }}
+                  style={{
+                    borderWidth: 0,
+                    backgroundColor: "white",
+                    paddingHorizontal: 0,
+                    paddingVertical: 0,
+                  }}
+                />
+              ) : (
+                <Text>{`${formatDate(item.employ_date)} 출근`}</Text>
+              )}
+              <TouchableOpacity
+                activeOpacity={0.8}
+                style={FormBoxStyle.mobileIconStyle}
+                onPress={() =>
+                  isEditing
+                    ? handleSavePress(item.work_id)
+                    : handleEditPress(item.work_id)
+                }
+              >
+                <FontAwesome
+                  name={isEditing ? "save" : "pencil"}
+                  size={18}
+                  color="#E5E5E5"
+                />
+              </TouchableOpacity>
+            </View>
+          ))}
+        </View>
+      </View>
+    );
+  };
+
+  const renderEmployeeCard = ({ item }) => (
+    <Card style={FormBoxStyle.card}>
+      <Card.Content>
+        <Text style={FormBoxStyle.cardText}>사원번호 : {item.staff_number}</Text>
+        <Text style={FormBoxStyle.cardText}>이름 : {item.name}</Text>
+        <Text style={FormBoxStyle.cardText}>시급 : {item.hourwage} 원</Text>
+        <Text style={FormBoxStyle.cardText}>
+          입사일 : {formatDate(item.employ_date)}
+        </Text>
+      </Card.Content>
+    </Card>
   );
-  const [text2, setText2] = React.useState<string | undefined>(
-    "24.07.11 목요일 출근"
-  );
-  const [text3, setText3] = React.useState<string | undefined>(
-    "24.07.12 금요일 출근"
-  );
-  const [isEditing1, setIsEditing1] = React.useState(false);
-  const [isEditing2, setIsEditing2] = React.useState(false);
-  const [isEditing3, setIsEditing3] = React.useState(false);
-
-  const [checked1, setChecked1] = React.useState(false);
-  const [checked2, setChecked2] = React.useState(false);
-  const [checked3, setChecked3] = React.useState(false);
-  const navigation = useNavigation();
-
-  const handleEditPress1 = () => {
-    setIsEditing1(true);
-  };
-
-  const handleSavePress1 = () => {
-    setIsEditing1(false);
-  };
-
-  const handleEditPress2 = () => {
-    setIsEditing2(true);
-  };
-
-  const handleSavePress2 = () => {
-    setIsEditing2(false);
-  };
-
-  const handleEditPress3 = () => {
-    setIsEditing3(true);
-  };
-
-  const handleSavePress3 = () => {
-    setIsEditing3(false);
-  };
 
   return (
     <View style={FormBoxStyle.mobileContainer}>
@@ -83,195 +175,27 @@ function FormBox() {
           onPress={() => router.push("/StaffForm")}
         >
           <Text style={FormBoxStyle.buttonText}>작성하기</Text>
-          <View>
-            <FontAwesome name="pencil" size={14} color="#fff" />
-          </View>
+          <FontAwesome name="pencil" size={14} color="#fff" />
         </TouchableOpacity>
       </View>
-      <View style={FormBoxStyle.subcontainer}>
-        <View
-          style={{
-            alignItems: "center",
-            display: "flex",
-            justifyContent: "center",
-          }}
-        >
-          <Image
-            style={FormBoxStyle.mobilePhoto}
-            source={require("../../assets/images/profile.jpg")}
-          />
-          <Text style={FormBoxStyle.mobileText}>홍길동</Text>
-          <Text style={FormBoxStyle.mobileText2}>2024.07.10 입사</Text>
-          <Text style={FormBoxStyle.mobileText3}>~ 2024.10.09</Text>
-        </View>
 
-        <View style={FormBoxStyle.iconText}>
-          <View
-            style={{
-              flexDirection: "row",
-              alignItems: "center",
-              marginBottom: "10%",
-            }}
-          >
-            <View style={[FormBoxStyle.mobileCheckbox1]}>
-              <Checkbox
-                status={checked1 ? "checked" : "unchecked"}
-                onPress={() => {
-                  setChecked1(!checked1);
-                }}
-              />
-            </View>
-            {isEditing1 ? (
-              <TextInput
-                value={text1 ?? ""}
-                onChangeText={setText1}
-                mode="flat"
-                theme={{ colors: { primary: "transparent" } }}
-                style={{
-                  borderWidth: 0,
-                  backgroundColor: "white",
-                  paddingHorizontal: 0,
-                  paddingVertical: 0,
-                }}
-              />
-            ) : (
-              <TouchableOpacity
-                onPress={() => {
-                  setChecked1(!checked1);
-                }}
-              >
-                <Text>{text1 ?? ""}</Text>
-              </TouchableOpacity>
-            )}
-            <View style={FormBoxStyle.mobileIconStyle}>
-              {isEditing1 ? (
-                <TouchableOpacity
-                  activeOpacity={0.8}
-                  onPress={handleSavePress1}
-                >
-                  <FontAwesome name="save" size={18} color="#E5E5E5" />
-                </TouchableOpacity>
-              ) : (
-                <TouchableOpacity
-                  activeOpacity={0.8}
-                  onPress={handleEditPress1}
-                >
-                  <FontAwesome name="pencil" size={18} color="#E5E5E5" />
-                </TouchableOpacity>
-              )}
-            </View>
-          </View>
+      <FlatList
+        horizontal
+        data={employees}
+        renderItem={renderEmployee}
+        keyExtractor={(item, index) => `${item.name}-${index}`} // 이름과 인덱스를 조합하여 고유한 key 생성
+        showsHorizontalScrollIndicator={false}
+        style={FormBoxStyle.employeeList}
+      />
 
-          <View
-            style={{
-              flexDirection: "row",
-              alignItems: "center",
-              marginBottom: "10%",
-            }}
-          >
-            <View style={[FormBoxStyle.mobileCheckbox1]}>
-              <Checkbox
-                status={checked2 ? "checked" : "unchecked"}
-                onPress={() => {
-                  setChecked2(!checked2);
-                }}
-              />
-            </View>
-            {isEditing2 ? (
-              <TextInput
-                value={text2 ?? ""}
-                onChangeText={setText2}
-                mode="flat"
-                style={{
-                  borderWidth: 0,
-                  backgroundColor: "white",
-                  paddingHorizontal: 0,
-                  paddingVertical: 0,
-                }}
-              />
-            ) : (
-              <TouchableOpacity
-                onPress={() => {
-                  setChecked2(!checked2);
-                }}
-              >
-                <Text>{text2 ?? ""}</Text>
-              </TouchableOpacity>
-            )}
-            <View style={FormBoxStyle.mobileIconStyle}>
-              {isEditing2 ? (
-                <TouchableOpacity
-                  activeOpacity={0.8}
-                  onPress={handleSavePress2}
-                >
-                  <FontAwesome name="save" size={18} color="#E5E5E5" />
-                </TouchableOpacity>
-              ) : (
-                <TouchableOpacity
-                  activeOpacity={0.8}
-                  onPress={handleEditPress2}
-                >
-                  <FontAwesome name="pencil" size={18} color="#E5E5E5" />
-                </TouchableOpacity>
-              )}
-            </View>
-          </View>
-
-          <View
-            style={{
-              flexDirection: "row",
-              alignItems: "center",
-            }}
-          >
-            <View style={[FormBoxStyle.mobileCheckbox1]}>
-              <Checkbox
-                status={checked3 ? "checked" : "unchecked"}
-                onPress={() => {
-                  setChecked3(!checked3);
-                }}
-              />
-            </View>
-            {isEditing3 ? (
-              <TextInput
-                value={text3 ?? ""}
-                onChangeText={setText3}
-                mode="flat"
-                style={{
-                  borderWidth: 0,
-                  backgroundColor: "white",
-                  paddingHorizontal: 0,
-                  paddingVertical: 0,
-                }}
-              />
-            ) : (
-              <TouchableOpacity
-                onPress={() => {
-                  setChecked3(!checked3);
-                }}
-              >
-                <Text>{text3 ?? ""}</Text>
-              </TouchableOpacity>
-            )}
-            <View style={FormBoxStyle.mobileIconStyle}>
-              {isEditing3 ? (
-                <TouchableOpacity
-                  activeOpacity={0.8}
-                  onPress={handleSavePress3}
-                >
-                  <FontAwesome name="save" size={18} color="#E5E5E5" />
-                </TouchableOpacity>
-              ) : (
-                <TouchableOpacity
-                  activeOpacity={0.8}
-                  onPress={handleEditPress3}
-                >
-                  <FontAwesome name="pencil" size={18} color="#E5E5E5" />
-                </TouchableOpacity>
-              )}
-            </View>
-          </View>
-        </View>
-      </View>
+      <FlatList
+        horizontal
+        data={employees}
+        renderItem={renderEmployeeCard}
+        keyExtractor={(item, index) => `card-${item.work_id}-${index}`}
+        showsHorizontalScrollIndicator={false}
+        style={FormBoxStyle.cardList}
+      />
     </View>
   );
 }
@@ -287,6 +211,7 @@ const FormBoxStyle = StyleSheet.create({
   },
   subcontainer: {
     flex: 1,
+    marginHorizontal: 30, // 칸 
   },
   titleContainer: {
     marginBottom: "8%",
@@ -316,13 +241,6 @@ const FormBoxStyle = StyleSheet.create({
     fontWeight: "700",
     marginRight: "6%",
   },
-
-  mobileCheckbox1: {
-    // marginLeft: "16%",
-    paddingRight: "5%",
-    textAlign: "center",
-    fontSize: 14,
-  },
   mobilePhoto: {
     marginTop: "12%",
     width: 124,
@@ -336,7 +254,7 @@ const FormBoxStyle = StyleSheet.create({
     alignItems: "center",
   },
   mobileText: {
-    fontSize: 18, //-6
+    fontSize: 18,
     textAlign: "center",
     marginTop: "6%",
     paddingHorizontal: "2%",
@@ -353,11 +271,29 @@ const FormBoxStyle = StyleSheet.create({
     fontSize: 12,
     marginTop: "2%",
     textAlign: "center",
-    marginBottom: "16%",
+    marginBottom: "15%",
   },
   mobileIconStyle: {
     paddingLeft: 70,
     fontSize: 18,
+  },
+  employeeList: {
+    marginTop: 20,
+    marginBottom: 20,
+  },
+  cardList: {
+    flexGrow: 0,
+  },
+  card: {
+    margin: 10,
+    padding: 10,
+    borderRadius: 10,
+    backgroundColor: "#f0f0f0",
+    width: 200,
+  },
+  cardText: {
+    fontSize: 16,
+    marginBottom: 5,
   },
 });
 

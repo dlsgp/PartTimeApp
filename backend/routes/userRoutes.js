@@ -616,19 +616,18 @@ router.get("/salary", async (req, res) => {
     connection = await oracledb.getConnection(dbConfig);
 
     const result = await connection.execute(
-      `SELECT 
-        c.reg_num, c.type_num, c.ceo_id, c.work_id, c.workin, c.workout, 
-        c.resttime_start, c.resttime_end, c.worktime1, c.worktime2, c.worktime3, 
-        c.worktime4, c.worktime5, c.worktime, c.hourwage, c.holiday_pay, 
-        c.insurance, c.etc, c.pay1, c.pay2, c.pay3, c.pay4, c.pay5, c.pay,
-        r.name, e.staff_number, e.employ_date
-       FROM COMMUTE c
-       JOIN REGISTER r ON c.work_id = r.id
-       LEFT JOIN EMPLOY e ON c.ceo_id = e.ceo_id AND c.work_id = e.work_id
-       WHERE c.ceo_id = :ceoId`,
+      `SELECT DISTINCT
+          c.reg_num, c.type_num, c.ceo_id, c.work_id, c.workin, c.workout, 
+          c.resttime_start, c.resttime_end, c.worktime1, c.worktime2, c.worktime3, 
+          c.worktime4, c.worktime5, c.worktime, c.hourwage, c.holiday_pay, 
+          c.insurance, c.etc, c.pay1, c.pay2, c.pay3, c.pay4, c.pay5, c.pay,
+          r.name, e.staff_number, e.employ_date
+        FROM COMMUTE c
+        JOIN REGISTER r ON c.work_id = r.id
+        LEFT JOIN EMPLOY e ON c.ceo_id = e.ceo_id AND c.work_id = e.work_id
+        WHERE c.ceo_id = :ceoId`,
       [ceoId]
     );
-
     const formattedResult = result.rows.map((row) => ({
       REG_NUM: row[0],
       TYPE_NUM: row[1],
@@ -923,6 +922,51 @@ router.get("/work-ids", async (req, res) => {
     }
   }
 });
+
+router.get("/employees", async (req, res) => {
+  const ceoId = req.session.userId; // 세션에서 ceoId 가져오기
+  const dbConfig = req.app.get("dbConfig");
+
+  let connection;
+
+  try {
+    connection = await oracledb.getConnection(dbConfig);
+
+    // 데이터베이스에서 중복을 제거하고, 필요한 정보를 가져옵니다.
+    const result = await connection.execute(
+      `SELECT DISTINCT r.name, e.employ_date, e.exp_periodend, e.staff_number, c.hourwage
+       FROM employ e
+       JOIN register r ON e.work_id = r.id
+       JOIN commute c ON e.work_id = c.work_id
+       WHERE e.ceo_id = :ceoId
+       ORDER BY r.name ASC`,  // 이름을 기준으로 오름차순 정렬
+      [ceoId]
+    );
+
+    // 결과를 포맷합니다.
+    const employees = result.rows.map((row) => ({
+      name: row[0],             // register 테이블에서 가져온 이름
+      employ_date: row[1],      // employ 테이블에서 가져온 입사일
+      exp_periodend: row[2],    // employ 테이블에서 가져온 수습기간 종료일
+      staff_number: row[3],     // employ 테이블에서 가져온 사원번호
+      hourwage: row[4],         // commute 테이블에서 가져온 시급
+    }));
+
+    res.status(200).json(employees);
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: "서버 오류" });
+  } finally {
+    if (connection) {
+      try {
+        await connection.close();
+      } catch (error) {
+        console.error(error);
+      }
+    }
+  }
+});
+
 
 // router.get("/work-ids", async (req, res) => {
 //   const ceoId = req.session.userId; // 세션에서 ceoId 가져오기
