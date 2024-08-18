@@ -13,7 +13,7 @@ import { Checkbox } from "react-native-paper";
 import { Image } from "react-native-elements";
 import { useNavigation } from "@react-navigation/native";
 import { useFocusEffect, useRouter } from "expo-router";
-import { login } from "../../components/src/services/apiService";
+import { getAuthToken, login } from "../../components/src/services/apiService";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 
 const { width, height } = Dimensions.get("window");
@@ -80,7 +80,7 @@ const SignInApp = () => {
   // //         console.log("SignInApp.tsx - userId :",id);
   // //         await AsyncStorage.setItem("userType", response.type.toString());
   // //        }
-        
+
   // //       if (response.userType === 1) {
   // //         navigation.navigate("StaffTabs");
   // //       } else if (response.userType === 2) {
@@ -104,7 +104,7 @@ const SignInApp = () => {
   //       await AsyncStorage.setItem("userToken", response.token);
   //       await AsyncStorage.setItem("userId", response.userId);  // 수정된 부분
   //       await AsyncStorage.setItem("userType", response.userType.toString());
-        
+
   //       if (response.userType === 1) {
   //         navigation.navigate("StaffTabs");
   //       } else if (response.userType === 2) {
@@ -121,11 +121,8 @@ const SignInApp = () => {
 
   useEffect(() => {
     const checkLoggedIn = async () => {
-      const token = await AsyncStorage.getItem("userToken");
-      const tokenExpiration = await AsyncStorage.getItem("tokenExpiration");
-      const now = new Date().getTime();
-
-      if (token && (!tokenExpiration || now < parseInt(tokenExpiration, 10))) {
+      const token = await getAuthToken(); // getAuthToken을 호출하여 토큰 유효성을 검사하고 갱신
+      if (token) {
         const userType = await AsyncStorage.getItem("userType");
         if (userType === "1") {
           navigation.navigate("StaffTabs");
@@ -145,7 +142,10 @@ const SignInApp = () => {
         const tokenExpiration = await AsyncStorage.getItem("tokenExpiration");
         const now = new Date().getTime();
 
-        if (token && (!tokenExpiration || now < parseInt(tokenExpiration, 10))) {
+        if (
+          token &&
+          (!tokenExpiration || now < parseInt(tokenExpiration, 10))
+        ) {
           const userType = await AsyncStorage.getItem("userType");
           if (userType === "1") {
             navigation.navigate("StaffTabs");
@@ -199,27 +199,30 @@ const SignInApp = () => {
       const response = await login(id, password);
       if (response.success) {
         console.log("Login successful:", response);
-        
+
         const { accessToken, refreshToken, userId, userType } = response;
         const tokenExpiration = checked
           ? null
           : new Date().getTime() + 24 * 60 * 60 * 1000; // 24 hours from now
-  
+
         if (accessToken && refreshToken) {
-          await AsyncStorage.setItem('accessToken', accessToken);
-          await AsyncStorage.setItem('refreshToken', refreshToken);
+          await AsyncStorage.setItem("accessToken", accessToken);
+          await AsyncStorage.setItem("refreshToken", refreshToken);
         } else {
           console.error("Login API response did not include tokens.");
         }
-  
+
         await AsyncStorage.setItem("userId", userId);
         await AsyncStorage.setItem("userType", userType.toString());
         if (tokenExpiration) {
-          await AsyncStorage.setItem("tokenExpiration", tokenExpiration.toString());
+          await AsyncStorage.setItem(
+            "tokenExpiration",
+            tokenExpiration.toString()
+          );
         } else {
           await AsyncStorage.removeItem("tokenExpiration");
         }
-  
+
         if (userType === 1) {
           navigation.navigate("StaffTabs");
         } else if (userType === 2) {
@@ -234,6 +237,54 @@ const SignInApp = () => {
     }
   };
 
+  // 새로고침이나 라우트 변경 시 호출
+  const checkTokenValidity = async () => {
+    const accessToken = await AsyncStorage.getItem("accessToken");
+    const refreshToken = await AsyncStorage.getItem("refreshToken");
+    const tokenExpiration = await AsyncStorage.getItem("tokenExpiration");
+    const now = new Date().getTime();
+
+    if (!accessToken || now >= parseInt(tokenExpiration, 10)) {
+      // accessToken이 없거나 만료된 경우
+      if (refreshToken) {
+        try {
+          const response = await axios.post(`${API_BASE_URL}/refresh-token`, {
+            refreshToken,
+          });
+
+          if (response.data.accessToken) {
+            const newAccessToken = response.data.accessToken;
+            const newExpiration = new Date().getTime() + 60 * 60 * 1000; // 1시간
+
+            await AsyncStorage.setItem("accessToken", newAccessToken);
+            await AsyncStorage.setItem(
+              "tokenExpiration",
+              newExpiration.toString()
+            );
+          } else {
+            // refreshToken이 유효하지 않음
+            await logout();
+          }
+        } catch (error) {
+          console.error("Failed to refresh token:", error);
+          await logout();
+        }
+      } else {
+        // refreshToken이 없으면 로그아웃 처리
+        await logout();
+      }
+    }
+  };
+
+  const logout = async () => {
+    await AsyncStorage.removeItem("accessToken");
+    await AsyncStorage.removeItem("refreshToken");
+    await AsyncStorage.removeItem("tokenExpiration");
+    await AsyncStorage.removeItem("userId");
+    await AsyncStorage.removeItem("userType");
+    navigation.navigate("/");
+  };
+
   if (loading) {
     return (
       <SafeAreaView style={styles.container}>
@@ -241,9 +292,6 @@ const SignInApp = () => {
       </SafeAreaView>
     );
   }
-
-
-  
 
   return (
     <SafeAreaView style={styles.container}>

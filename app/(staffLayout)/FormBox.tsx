@@ -94,7 +94,7 @@ function FormBox() {
         <View style={FormBoxStyle.iconText}>
           {[...Array(3)].map((_, i) => (
             <View
-              key={`${item.work_id}-${i}`} // key를 work_id와 index를 조합하여 유니크하게 만듦
+              key={`${item.work_id}-${i}`} 
               style={{
                 flexDirection: "row",
                 alignItems: "center",
@@ -183,7 +183,7 @@ function FormBox() {
         horizontal
         data={employees}
         renderItem={renderEmployee}
-        keyExtractor={(item, index) => `${item.name}-${index}`} // 이름과 인덱스를 조합하여 고유한 key 생성
+        keyExtractor={(item, index) => `${item.name}-${index}`} 
         showsHorizontalScrollIndicator={false}
         style={FormBoxStyle.employeeList}
       />

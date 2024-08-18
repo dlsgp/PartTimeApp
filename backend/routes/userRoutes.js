@@ -36,18 +36,22 @@ router.post("/login", async (req, res) => {
 
     if (result.rows.length > 0) {
       const userType = result.rows[0][0];
-
       req.session.userId = id;
       
-      // JWT 토큰 생성
+      // JWT 토큰 생성 (환경변수에서 비밀키를 가져옵니다)
+      const jwtSecret = process.env.JWT_SECRET || "default_secret_key";
+
       const accessToken = jwt.sign(
         { userId: id, userType: userType },
-        "12345", // 비밀키 추후 변경
+        jwtSecret, 
         { expiresIn: "1h" }
       );
-      const refreshToken = jwt.sign({ userId: id }, "12345", { // 비밀키 추후 변경
-        expiresIn: "7d",
-      });
+
+      const refreshToken = jwt.sign(
+        { userId: id },
+        jwtSecret, 
+        { expiresIn: "7d" }
+      );
 
       res.status(200).json({
         success: true,
@@ -58,9 +62,7 @@ router.post("/login", async (req, res) => {
         refreshToken, // refreshToken 추가
       });
     } else {
-      res
-        .status(401)
-        .json({ success: false, message: "잘못된 자격 증명입니다" });
+      res.status(401).json({ success: false, message: "잘못된 자격 증명입니다" });
     }
   } catch (err) {
     console.error(err);
@@ -75,6 +77,25 @@ router.post("/login", async (req, res) => {
     }
   }
 });
+
+
+router.post('/refresh-token', async (req, res) => {
+  const { refreshToken } = req.body;
+
+  try {
+    const decoded = jwt.verify(refreshToken, '12345'); // 비밀키는 실제로는 환경변수로 관리해야 합니다.
+    const userId = decoded.userId;
+
+    // 새로운 accessToken을 발급
+    const newAccessToken = jwt.sign({ userId }, '12345', { expiresIn: '1h' });
+
+    res.status(200).json({ accessToken: newAccessToken });
+  } catch (error) {
+    console.error("Error refreshing token:", error);
+    res.status(401).json({ message: "Invalid refresh token" });
+  }
+});
+
 
 
 
@@ -924,7 +945,7 @@ router.get("/work-ids", async (req, res) => {
 });
 
 router.get("/employees", async (req, res) => {
-  const ceoId = req.session.userId; // 세션에서 ceoId 가져오기
+  const ceoId = req.session.userId; 
   const dbConfig = req.app.get("dbConfig");
 
   let connection;
@@ -932,24 +953,23 @@ router.get("/employees", async (req, res) => {
   try {
     connection = await oracledb.getConnection(dbConfig);
 
-    // 데이터베이스에서 중복을 제거하고, 필요한 정보를 가져옵니다.
     const result = await connection.execute(
       `SELECT DISTINCT r.name, e.employ_date, e.exp_periodend, e.staff_number, c.hourwage
        FROM employ e
        JOIN register r ON e.work_id = r.id
        JOIN commute c ON e.work_id = c.work_id
        WHERE e.ceo_id = :ceoId
-       ORDER BY r.name ASC`,  // 이름을 기준으로 오름차순 정렬
+       ORDER BY r.name ASC`,  
       [ceoId]
     );
 
-    // 결과를 포맷합니다.
+    
     const employees = result.rows.map((row) => ({
-      name: row[0],             // register 테이블에서 가져온 이름
-      employ_date: row[1],      // employ 테이블에서 가져온 입사일
-      exp_periodend: row[2],    // employ 테이블에서 가져온 수습기간 종료일
-      staff_number: row[3],     // employ 테이블에서 가져온 사원번호
-      hourwage: row[4],         // commute 테이블에서 가져온 시급
+      name: row[0],             
+      employ_date: row[1],      
+      exp_periodend: row[2],    
+      staff_number: row[3],    
+      hourwage: row[4],         
     }));
 
     res.status(200).json(employees);
