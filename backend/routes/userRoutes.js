@@ -3,6 +3,7 @@ const router = express.Router();
 const oracledb = require("oracledb");
 const nodemailer = require("nodemailer");
 const crypto = require("crypto");
+const QRCode = require('qrcode');
 
 // 이메일 전송 설정
 const transporter = nodemailer.createTransport({
@@ -987,72 +988,113 @@ router.get("/employees", async (req, res) => {
   }
 });
 
+router.get("/generate-qr", (req, res) => {
+  const { ceo_id } = req.query;
 
-// router.get("/work-ids", async (req, res) => {
-//   const ceoId = req.session.userId; // 세션에서 ceoId 가져오기
-//   const dbConfig = req.app.get("dbConfig");
-//   console.log("ceoId:", ceoId);
-//   let connection;
+  if (!ceo_id) {
+    return res.status(400).json({ success: false, message: "Missing ceo_id" });
+  }
 
-//   try {
-//     connection = await oracledb.getConnection(dbConfig);
+  const qrData = { ceo_id };
 
-//     // commute 테이블에서 ceoId로 검색하여 모든 work_id와 name 가져오기
-//     const result = await connection.execute(
-//       `SELECT c.WORK_ID, r.NAME
-//        FROM COMMUTE c
-//        JOIN REGISTER r ON c.WORK_ID = r.ID
-//        WHERE c.CEO_ID = :ceoId`,
-//       [ceoId]
-//     );
-//     console.log("Database result:", result.rows);
+  QRCode.toDataURL(JSON.stringify(qrData), (err, url) => {
+    if (err) {
+      return res
+        .status(500)
+        .json({ success: false, message: "QR Code generation failed" });
+    }
+    res.json({ success: true, qrCodeUrl: url });
+  });
+});
 
-//     const workIds = result.rows.map((row) => ({
-//       work_id: row[0],
-//       name: row[1],
-//     }));
-
-//     res.json(workIds);
-//   } catch (err) {
-//     console.error(err);
-//     res.status(500).json({ error: "Database error" });
-//   } finally {
-//     if (connection) {
-//       await connection.close();
-//     }
+// router.get("/generate-qr", (req, res) => {
+//   const { userId } = req.query;
+//   if (!userId) {
+//     return res.status(400).json({ success: false, message: "Missing userId" });
 //   }
+
+//   const qrData = {
+//     userId,
+//     uuid: require("crypto").randomUUID(),
+//   };
+
+//   QRCode.toDataURL(JSON.stringify(qrData), (err, url) => {
+//     if (err) {
+//       return res
+//         .status(500)
+//         .json({ success: false, message: "QR Code generation failed" });
+//     }
+//     res.json({ success: true, qrCodeUrl: url });
+//   });
 // });
 
-// router.get('/work-ids', async (req, res) => {
-//     const ceoId = req.session.userId; // 로그인한 사용자의 ID 가져오기
-//     const dbConfig = req.app.get('dbConfig');
-//     let connection;
+// router.get("/generate-qr", (req, res) => {
+//   const { ceo_id } = req.query;
+//   const qrData = {
+//     ceo_id,
+//     uuid: require("crypto").randomUUID(),
+//   };
 
-//     try {
-//         connection = await oracledb.getConnection(dbConfig);
-//         const result = await connection.execute(
-//             `SELECT WORK_ID, NAME FROM COMMUTE WHERE CEO_ID = :ceoId`,
-//             [ceoId]
-//         );
-
-//         if (result.rows.length > 0) {
-//             // 데이터가 있을 때만 응답
-//             const workIds = result.rows.map(row => ({
-//                 work_id: row[0],
-//                 name: row[1]
-//             }));
-//             res.json(workIds);
-//         } else {
-//             res.json([]); // 데이터가 없을 경우 빈 배열 반환
-//         }
-//     } catch (err) {
-//         console.error(err);
-//         res.status(500).json({ error: 'Database error' });
-//     } finally {
-//         if (connection) {
-//             await connection.close();
-//         }
+//   QRCode.toDataURL(JSON.stringify(qrData), (err, url) => {
+//     if (err) {
+//       return res
+//         .status(500)
+//         .json({ success: false, message: "QR Code generation failed" });
 //     }
+//     res.json({ success: true, qrCodeUrl: url });
+//   });
+// });
+
+
+router.post("/attendance-check", async (req, res) => {
+  const { userId, ceo_id } = req.body;
+
+  let connection;
+
+  try {
+    connection = await oracledb.getConnection(dbConfig);
+
+    // EMPLOY 테이블에서 CEO_ID와 WORK_ID가 일치하는지 확인
+    const result = await connection.execute(
+      `SELECT * FROM EMPLOY WHERE CEO_ID = :ceo_id AND WORK_ID = :userId`,
+      [ceo_id, userId]
+    );
+
+    if (result.rows.length > 0) {
+      // 출석 체크 로직 추가 (출근 혹은 퇴근 시간 기록 등)
+      res.status(200).json({ success: true, message: "출석 체크 성공" });
+    } else {
+      res.status(401).json({ success: false, message: "잘못된 사용자입니다." });
+    }
+  } catch (err) {
+    console.error("Error during attendance check:", err);
+    res.status(500).json({ success: false, message: "서버 오류 발생" });
+  } finally {
+    if (connection) {
+      try {
+        await connection.close();
+      } catch (err) {
+        console.error(err);
+      }
+    }
+  }
+});
+
+// router.post("/attendance-check", (req, res) => {
+//   const { userId, ceo_id, uuid } = req.body;
+
+//   // 서버에서 저장된 UUID와 비교
+//   // 이 예시에서는 고유 UUID가 저장되어 있다고 가정하고 비교합니다.
+//   const storedUUID = getStoredUUIDForUser(userId, ceo_id); // 저장된 UUID를 가져오는 함수
+
+//   if (storedUUID === uuid) {
+//     // 출석 체크 성공 로직
+//     // 여기에서 출석 정보를 데이터베이스에 기록하거나 다른 처리를 수행
+//     res.json({ success: true, message: "출석 체크 완료!" });
+//   } else {
+//     // 출석 체크 실패 로직
+//     res.status(400).json({ success: false, message: "출석 체크 실패!" });
+//   }
 // });
 
 module.exports = router;

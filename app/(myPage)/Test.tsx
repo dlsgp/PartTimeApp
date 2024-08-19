@@ -18,6 +18,9 @@ const Test = () => {
       <TouchableOpacity style={styles.button} onPress={() => router.push("/(myPage)/QRCodeScanner")}>
         <Text>QRScanner</Text>
       </TouchableOpacity>
+      <TouchableOpacity style={styles.button} onPress={() => router.push("/(staffLayout)/QRCodeScreen")}>
+        <Text>QRScreen</Text>
+      </TouchableOpacity>
     </View>
   );
 };

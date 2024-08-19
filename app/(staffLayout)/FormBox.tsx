@@ -207,14 +207,14 @@ const FormBoxStyle = StyleSheet.create({
     backgroundColor: "white",
     width: "100%",
     height: "100%",
-    paddingTop: "16%",
+    paddingTop: "10%",
   },
   subcontainer: {
     flex: 1,
     marginHorizontal: 30, // 칸 
   },
   titleContainer: {
-    marginBottom: "8%",
+    marginBottom: "5%",
     alignSelf: "flex-start",
     backgroundColor: "#2E294E",
     padding: "2%",

@@ -2,7 +2,7 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 import axios from "axios";
 
 // Expo 터널 URL을 사용
-const API_URL = "http://192.168.50.82:3000/api";
+const API_URL = "http://192.168.0.84:3000/api";
 
 export const login = async (id, password) => {
   try {
