@@ -3,7 +3,7 @@ const router = express.Router();
 const oracledb = require("oracledb");
 const nodemailer = require("nodemailer");
 const crypto = require("crypto");
-const QRCode = require('qrcode');
+const QRCode = require("qrcode");
 
 // 이메일 전송 설정
 const transporter = nodemailer.createTransport({
@@ -38,21 +38,19 @@ router.post("/login", async (req, res) => {
     if (result.rows.length > 0) {
       const userType = result.rows[0][0];
       req.session.userId = id;
-      
+
       // JWT 토큰 생성 (환경변수에서 비밀키를 가져옵니다)
       const jwtSecret = process.env.JWT_SECRET || "default_secret_key";
 
       const accessToken = jwt.sign(
         { userId: id, userType: userType },
-        jwtSecret, 
+        jwtSecret,
         { expiresIn: "1h" }
       );
 
-      const refreshToken = jwt.sign(
-        { userId: id },
-        jwtSecret, 
-        { expiresIn: "7d" }
-      );
+      const refreshToken = jwt.sign({ userId: id }, jwtSecret, {
+        expiresIn: "7d",
+      });
 
       res.status(200).json({
         success: true,
@@ -63,7 +61,9 @@ router.post("/login", async (req, res) => {
         refreshToken, // refreshToken 추가
       });
     } else {
-      res.status(401).json({ success: false, message: "잘못된 자격 증명입니다" });
+      res
+        .status(401)
+        .json({ success: false, message: "잘못된 자격 증명입니다" });
     }
   } catch (err) {
     console.error(err);
@@ -79,16 +79,15 @@ router.post("/login", async (req, res) => {
   }
 });
 
-
-router.post('/refresh-token', async (req, res) => {
+router.post("/refresh-token", async (req, res) => {
   const { refreshToken } = req.body;
 
   try {
-    const decoded = jwt.verify(refreshToken, '12345'); // 비밀키는 실제로는 환경변수로 관리해야 합니다.
+    const decoded = jwt.verify(refreshToken, "12345"); // 비밀키는 실제로는 환경변수로 관리해야 합니다.
     const userId = decoded.userId;
 
     // 새로운 accessToken을 발급
-    const newAccessToken = jwt.sign({ userId }, '12345', { expiresIn: '1h' });
+    const newAccessToken = jwt.sign({ userId }, "12345", { expiresIn: "1h" });
 
     res.status(200).json({ accessToken: newAccessToken });
   } catch (error) {
@@ -96,9 +95,6 @@ router.post('/refresh-token', async (req, res) => {
     res.status(401).json({ message: "Invalid refresh token" });
   }
 });
-
-
-
 
 // 회원가입 엔드포인트
 router.post("/signup", async (req, res) => {
@@ -373,7 +369,8 @@ router.get("/user-and-commute-info/:userId", async (req, res) => {
 
     console.log("Employ Info:", employResult.rows);
 
-    const commuteInfo = commuteResult.rows.length > 0 ? commuteResult.rows[0] : {};
+    const commuteInfo =
+      commuteResult.rows.length > 0 ? commuteResult.rows[0] : {};
     const employInfo = employResult.rows.length > 0 ? employResult.rows[0] : {};
 
     res.status(200).json({
@@ -387,7 +384,12 @@ router.get("/user-and-commute-info/:userId", async (req, res) => {
       hourwage: commuteInfo[0] || null,
       workin: commuteInfo[1] || null,
       workout: commuteInfo[2] || null,
-      insurance: commuteInfo[3] === '1' ? '예' : commuteInfo[3] === '0' ? '아니오' : null,
+      insurance:
+        commuteInfo[3] === "1"
+          ? "예"
+          : commuteInfo[3] === "0"
+          ? "아니오"
+          : null,
       staff_number: employInfo[0] || null,
       employ_date: employInfo[1] || null,
       exp_periodstart: employInfo[2] || null,
@@ -406,9 +408,6 @@ router.get("/user-and-commute-info/:userId", async (req, res) => {
     }
   }
 });
-
-
-
 
 router.post("/update-user", async (req, res) => {
   const { id, tel, email, add1, add2 } = req.body;
@@ -876,15 +875,17 @@ router.post("/schedules", async (req, res) => {
     const [REG_NUM, TYPE_NUM] = regResult.rows[0];
 
     if (!REG_NUM || !TYPE_NUM) {
-      return res.status(400).json({ message: "등록된 REG_NUM 또는 TYPE_NUM이 없습니다." });
+      return res
+        .status(400)
+        .json({ message: "등록된 REG_NUM 또는 TYPE_NUM이 없습니다." });
     }
 
     const result = await connection.execute(
       `INSERT INTO SCHEDULE (SCHEDULE_NUM, REG_NUM, TYPE_NUM, NAME, SCH_WORKDATE, SCH_WORKTIME, SCH_RESTTIME, COLOR, MEMO, RESTDATE)
        VALUES (SCHEDULE_SEQ.NEXTVAL, :regNum, :typeNum, :name, TO_DATE(:sch_workdate, 'YYYY-MM-DD'), TO_TIMESTAMP(:sch_worktime, 'YYYY-MM-DD HH24:MI:SS.FF'), :sch_resttime, :color, :memo, :restdate)`,
       {
-        regNum: REG_NUM,  // 추출된 REG_NUM 사용
-        typeNum: TYPE_NUM,  // 추출된 TYPE_NUM 사용
+        regNum: REG_NUM, // 추출된 REG_NUM 사용
+        typeNum: TYPE_NUM, // 추출된 TYPE_NUM 사용
         name,
         sch_workdate,
         sch_worktime,
@@ -910,7 +911,6 @@ router.post("/schedules", async (req, res) => {
     }
   }
 });
-
 
 // 값 가져오기
 router.get("/work-ids", async (req, res) => {
@@ -946,7 +946,7 @@ router.get("/work-ids", async (req, res) => {
 });
 
 router.get("/employees", async (req, res) => {
-  const ceoId = req.session.userId; 
+  const ceoId = req.session.userId;
   const dbConfig = req.app.get("dbConfig");
 
   let connection;
@@ -960,17 +960,16 @@ router.get("/employees", async (req, res) => {
        JOIN register r ON e.work_id = r.id
        JOIN commute c ON e.work_id = c.work_id
        WHERE e.ceo_id = :ceoId
-       ORDER BY r.name ASC`,  
+       ORDER BY r.name ASC`,
       [ceoId]
     );
 
-    
     const employees = result.rows.map((row) => ({
-      name: row[0],             
-      employ_date: row[1],      
-      exp_periodend: row[2],    
-      staff_number: row[3],    
-      hourwage: row[4],         
+      name: row[0],
+      employ_date: row[1],
+      exp_periodend: row[2],
+      staff_number: row[3],
+      hourwage: row[4],
     }));
 
     res.status(200).json(employees);
@@ -995,7 +994,7 @@ router.get("/generate-qr", (req, res) => {
     return res.status(400).json({ success: false, message: "Missing ceo_id" });
   }
 
-  const qrData = { ceo_id };
+  const qrData = { ceo_id, uuid: require("crypto").randomUUID() };
 
   QRCode.toDataURL(JSON.stringify(qrData), (err, url) => {
     if (err) {
@@ -1045,9 +1044,9 @@ router.get("/generate-qr", (req, res) => {
 //   });
 // });
 
-
 router.post("/attendance-check", async (req, res) => {
   const { userId, ceo_id } = req.body;
+  const dbConfig = req.app.get("dbConfig");
 
   let connection;
 
@@ -1096,5 +1095,52 @@ router.post("/attendance-check", async (req, res) => {
 //     res.status(400).json({ success: false, message: "출석 체크 실패!" });
 //   }
 // });
+
+router.get("/wage", async (req, res) => {
+  const { work_id } = req.query;
+  const dbConfig = req.app.get("dbConfig");
+
+  if (!work_id) {
+    return res.status(400).send("work_id is required");
+  }
+
+  let connection;
+
+  try {
+    connection = await oracledb.getConnection(dbConfig);
+
+    const result = await connection.execute(
+      `SELECT WORKIN, WORKOUT, WORKTIME, PAY, HOURWAGE, RESTTIME_START, RESTTIME_END
+       FROM COMMUTE
+       WHERE WORK_ID = :work_id`,
+      [work_id]
+    );
+
+    const commuteData = result.rows.map((row) => ({
+      WORKIN: row[0],
+      WORKOUT: row[1],
+      WORKTIME: row[2],
+      PAY: row[3],
+      HOURWAGE: row[4],
+      RESTTIME_START: row[5],
+      RESTTIME_END: row[6],
+    }));
+
+    res.json(commuteData);
+  } catch (err) {
+    console.error("Error fetching wage data:", err);
+    res.status(500).send("Internal Server Error");
+  } finally {
+    if (connection) {
+      try {
+        await connection.close();
+      } catch (err) {
+        console.error("Error closing connection:", err);
+      }
+    }
+  }
+});
+
+module.exports = router;
 
 module.exports = router;

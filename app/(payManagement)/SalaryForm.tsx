@@ -83,14 +83,14 @@ export default function SalaryForm({ selectedCard, onClose }) {
     <View style={styles.container}>
       <StatusBar style={Platform.OS === "ios" ? "light" : "auto"} />
       <View style={styles.subContainer}>
-        <View style={styles.barContainer}>
+        {/* <View style={styles.barContainer}>
           <View style={[styles.icon, { marginTop: "20%" }]}>
             <FontAwesome name="chevron-circle-up" size={32} color="#FFBD00" />
           </View>
           <View style={styles.icon}>
             <FontAwesome name="chevron-circle-down" size={32} color="#FFBD00" />
           </View>
-        </View>
+        </View> */}
 
         <View style={styles.containContainer}>
           <View style={styles.containSub}>
@@ -192,15 +192,15 @@ const styles = StyleSheet.create({
     backgroundColor: "white",
   },
   subContainer: {
-    width: "86%",
-    height: "86%",
+    width: "90%",
+    height: "90%",
     borderTopRightRadius: 30,
     borderBottomEndRadius: 30,
     flexDirection: "row",
   },
   barContainer: {
     backgroundColor: "#2E294E",
-    width: "15%",
+    width: "0%",
     height: "100%",
     flexDirection: "column",
     justifyContent: "flex-start",
@@ -215,12 +215,12 @@ const styles = StyleSheet.create({
     borderTopRightRadius: 30,
     borderBottomEndRadius: 30,
     borderWidth: 1,
-    width: "85%",
-    height: "100%",
+    width: "90%",
+    height: "90%",
     backgroundColor: "white",
   },
   containSub: {
-    margin: "4%",
+    margin: "5%",
   },
   title: {
     fontSize: 18,

@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from "react";
+import * as Font from 'expo-font';
 import {
   SafeAreaView,
   View,
@@ -16,6 +17,8 @@ import { useFocusEffect, useRouter } from "expo-router";
 import { getAuthToken, login } from "../../components/src/services/apiService";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 
+import AppLoading from 'expo-app-loading';
+
 const { width, height } = Dimensions.get("window");
 
 const SignInApp = () => {
@@ -26,6 +29,7 @@ const SignInApp = () => {
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(true); // 로딩 상태 추가
+  const [fontsLoaded, setFontsLoaded] = useState(false);
 
   const HorizonLine = ({ text }) => {
     return (
@@ -36,88 +40,6 @@ const SignInApp = () => {
       </View>
     );
   };
-
-  // useEffect(() => {
-  //   const checkLoggedIn = async () => {
-  //     const token = await AsyncStorage.getItem("userToken");
-  //     if (token) {
-  //       const userType = await AsyncStorage.getItem("userType");
-  //       if (userType === "1") {
-  //         navigation.navigate("StaffTabs");
-  //       } else if (userType === "2") {
-  //         navigation.navigate("AdminTabs");
-  //       }
-  //     }
-  //   };
-  //   checkLoggedIn();
-  // }, []);
-
-  // useFocusEffect(
-  //   React.useCallback(() => {
-  //     const resetLoginState = async () => {
-  //       const token = await AsyncStorage.getItem("userToken");
-  //       if (token) {
-  //         const userType = await AsyncStorage.getItem("userType");
-  //         if (userType === "1") {
-  //           navigation.navigate("StaffTabs");
-  //         } else if (userType === "2") {
-  //           navigation.navigate("AdminTabs");
-  //         }
-  //       }
-  //     };
-  //     resetLoginState();
-  //   }, [])
-  // );
-
-  // // const handleLogin = async () => {
-  // //   try {
-  // //     const response = await login(id, password);
-  // //     if (response.success) {
-  // //       console.log("Login successful:", response);
-  // //        if (checked) {
-  // //         await AsyncStorage.setItem("userToken", response.token);
-  // //         await AsyncStorage.setItem("userId", id);
-  // //         console.log("SignInApp.tsx - userId :",id);
-  // //         await AsyncStorage.setItem("userType", response.type.toString());
-  // //        }
-
-  // //       if (response.userType === 1) {
-  // //         navigation.navigate("StaffTabs");
-  // //       } else if (response.userType === 2) {
-  // //         navigation.navigate("AdminTabs");
-  // //       }
-  // //     } else {
-  // //       setError(response.message || "로그인 실패");
-  // //     }
-  // //   } catch (error) {
-  // //     console.log("Login error:", error);
-  // //     setError("로그인 중 오류가 발생했습니다.");
-  // //   }
-  // // };
-
-  // const handleLogin = async () => {
-  //   try {
-  //     const response = await login(id, password);
-  //     if (response.success) {
-  //       console.log("Login successful:", response);
-  //       // 항상 userId와 userType을 저장
-  //       await AsyncStorage.setItem("userToken", response.token);
-  //       await AsyncStorage.setItem("userId", response.userId);  // 수정된 부분
-  //       await AsyncStorage.setItem("userType", response.userType.toString());
-
-  //       if (response.userType === 1) {
-  //         navigation.navigate("StaffTabs");
-  //       } else if (response.userType === 2) {
-  //         navigation.navigate("AdminTabs");
-  //       }
-  //     } else {
-  //       setError(response.message || "로그인 실패");
-  //     }
-  //   } catch (error) {
-  //     console.log("Login error:", error);
-  //     setError("로그인 중 오류가 발생했습니다.");
-  //   }
-  // };
 
   useEffect(() => {
     const checkLoggedIn = async () => {
@@ -131,9 +53,24 @@ const SignInApp = () => {
         }
       }
       setLoading(false); // 로딩 상태 해제
+      loadFonts();
     };
+
+    const loadFonts = async () => {
+      await Font.loadAsync({
+        'GmarketSansLight': require('../../assets/fonts/GmarketSansTTFLight.ttf'),
+        'GmarketSansBold': require('../../assets/fonts/GmarketSansTTFBold.ttf'),
+        'GmarketSansMedium': require('../../assets/fonts/GmarketSansTTFMedium.ttf'),
+        'MangoDdobak-B': require('../../assets/fonts/MangoDdobak-B(ttf).ttf'),
+        'MangoDdobak-L': require('../../assets/fonts/MangoDdobak-L(ttf).ttf'),
+        'MangoDdobak-R': require('../../assets/fonts/MangoDdobak-R(ttf).ttf'),
+      });
+      setFontsLoaded(true);
+    };
+    loadFonts();
     checkLoggedIn();
   }, []);
+
 
   useFocusEffect(
     React.useCallback(() => {
@@ -163,37 +100,6 @@ const SignInApp = () => {
     }, [])
   );
 
-  // const handleLogin = async () => {
-  //   try {
-  //     const response = await login(id, password);
-  //     if (response.success) {
-  //       console.log("Login successful:", response);
-  //       const tokenExpiration = checked
-  //         ? null
-  //         : new Date().getTime() + 24 * 60 * 60 * 1000; // 24 hours from now
-
-  //       await AsyncStorage.setItem("userToken", response.token);
-  //       await AsyncStorage.setItem("userId", response.userId);
-  //       await AsyncStorage.setItem("userType", response.userType.toString());
-  //       if (tokenExpiration) {
-  //         await AsyncStorage.setItem("tokenExpiration", tokenExpiration.toString());
-  //       } else {
-  //         await AsyncStorage.removeItem("tokenExpiration");
-  //       }
-
-  //       if (response.userType === 1) {
-  //         navigation.navigate("StaffTabs");
-  //       } else if (response.userType === 2) {
-  //         navigation.navigate("AdminTabs");
-  //       }
-  //     } else {
-  //       setError(response.message || "로그인 실패");
-  //     }
-  //   } catch (error) {
-  //     console.log("Login error:", error);
-  //     setError("로그인 중 오류가 발생했습니다.");
-  //   }
-  // };
   const handleLogin = async () => {
     try {
       const response = await login(id, password);
@@ -376,9 +282,11 @@ const styles = StyleSheet.create({
     paddingHorizontal: 20,
   },
   title: {
-    fontWeight: "bold",
+    // fontWeight: "bold",
     fontSize: 55,
     marginBottom: 150,
+    fontFamily: 'GmarketSansBold',
+    // fontFamily: 'MangoDdobak-B',
   },
   input: {
     width: width * 0.8,
@@ -387,6 +295,7 @@ const styles = StyleSheet.create({
     borderBottomWidth: 1,
     marginBottom: 20,
     paddingHorizontal: 10,
+    fontFamily: 'GmarketSansMedium',
   },
   options: {
     width: width * 0.8,
@@ -400,12 +309,16 @@ const styles = StyleSheet.create({
   },
   autoLoginText: {
     marginLeft: 5,
-    marginBottom: 2,
+    marginBottom: 0,
+    marginTop: 5,
     color: "#FFBD00",
+    fontFamily: 'GmarketSansMedium',
   },
   forgotPasswordText: {
     color: "#FFBD00",
     marginBottom: 2,
+    fontFamily: 'GmarketSansMedium',
+    marginTop: 5,
   },
   forgotPasswordTouch: {
     marginTop: 7,
@@ -421,14 +334,18 @@ const styles = StyleSheet.create({
   },
   loginButtonText: {
     color: "#fff",
-    fontWeight: "bold",
+    // fontWeight: "bold",
+    fontFamily: 'GmarketSansBold',
   },
   registerText: {
     color: "#FFBD00",
     marginBottom: 40,
+    fontFamily: 'GmarketSansMedium',
+    marginTop: 10,
   },
   socialLoginText: {
     marginBottom: 20,
+    fontFamily: 'GmarketSansLight',
   },
   socialLoginButtons: {
     flexDirection: "row",

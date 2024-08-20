@@ -5,8 +5,9 @@ import StaffForm from "../(staffLayout)/StaffForm";
 import SalaryForm from "../(payManagement)/SalaryForm";
 import SalaryList from "../(payManagement)/SalaryList";
 import Test from "../(myPage)/Test";
-import { FontAwesome, MaterialIcons, AntDesign } from "@expo/vector-icons";
+import { FontAwesome, MaterialIcons, AntDesign, Ionicons } from "@expo/vector-icons";
 import ScheduleCalendar from "../(scheduleManagement)/ScheduleCalendar";
+import QRCodeScreen from "../(staffLayout)/QRCodeScreen";
 
 const Tab = createBottomTabNavigator();
 
@@ -49,14 +50,20 @@ export default function AdminTabs() {
           tabBarIcon: ({ color }) => <FontAwesome name="list-alt" size={25} color={color} /> 
         }} 
       />
-      <Tab.Screen 
-        name="Test" 
-        component={Test} 
-        options={{ 
-          tabBarLabel: 'Test', 
-          headerShown: false, 
-          tabBarIcon: ({ color }) => <FontAwesome name="code" size={25} color={color} /> 
-        }} 
+      <Tab.Screen
+        name="QRCode"
+        component={QRCodeScreen}
+        options={{
+          tabBarLabel: "QRCode",
+          headerShown: false,
+          tabBarIcon: ({ color }) => (
+            <Ionicons name="qr-code-outline"
+              color={color}
+              size={25}
+              style={{ marginBottom: -3 }}
+            />
+          ),
+        }}
       />
     </Tab.Navigator>
   );

@@ -2,7 +2,10 @@ import React from "react";
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
 import Mypage from "../(myPage)/Mypage";
 import Test from "../(myPage)/Test";
-import { FontAwesome, AntDesign, MaterialIcons } from "@expo/vector-icons";
+import { FontAwesome, AntDesign, MaterialIcons, Ionicons } from "@expo/vector-icons";
+import ScheduleCalendar from "../(scheduleManagement)/ScheduleCalendar";
+import Wage from "../(myPage)/Wage";
+import QRCodeScannerScreen from "../(myPage)/QRCodeScanner";
 
 const Tab = createBottomTabNavigator();
 
@@ -10,7 +13,7 @@ export default function StaffTabs() {
   return (
     <Tab.Navigator initialRouteName="MyPage">
       <Tab.Screen
-        name="MyPage"
+        name="마이페이지"
         component={Mypage}
         options={{
           tabBarLabel: "Mypage",
@@ -26,14 +29,45 @@ export default function StaffTabs() {
         }}
       />
       <Tab.Screen
-        name="Test"
-        component={Test}
+        name="Calendar"
+        component={ScheduleCalendar}
         options={{
-          tabBarLabel: "Test",
+          tabBarLabel: "일정",
+          headerShown: false,
+          tabBarIcon: ({ color }) => (
+            <AntDesign
+              name="calendar"
+              color={color}
+              size={25}
+              style={{ marginBottom: -3 }}
+            />
+          ),
+        }}
+      />
+      <Tab.Screen
+        name="Wage"
+        component={Wage}
+        options={{
+          tabBarLabel: "급여",
           headerShown: false,
           tabBarIcon: ({ color }) => (
             <FontAwesome
-              name="code"
+              name="user-o"
+              color={color}
+              size={25}
+              style={{ marginBottom: -3 }}
+            />
+          ),
+        }}
+      />
+      <Tab.Screen
+        name="QRCode"
+        component={QRCodeScannerScreen}
+        options={{
+          tabBarLabel: "QRCode",
+          headerShown: false,
+          tabBarIcon: ({ color }) => (
+            <Ionicons name="qr-code-outline"
               color={color}
               size={25}
               style={{ marginBottom: -3 }}
@@ -44,3 +78,4 @@ export default function StaffTabs() {
     </Tab.Navigator>
   );
 }
+{/* <Ionicons name="qr-code-outline" size={24} color="black" /> */}

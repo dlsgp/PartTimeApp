@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from "react";
+import * as Font from 'expo-font';
 import {
   FlatList,
   Image,
@@ -14,6 +15,8 @@ import { router } from "expo-router";
 import axios from "axios";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import API_BASE_URL from "@/config";
+import AppLoading from 'expo-app-loading';
+
 
 function TabBarIcon(props: {
   name: React.ComponentProps<typeof FontAwesome>["name"];
@@ -26,6 +29,7 @@ function FormBox() {
   const [employees, setEmployees] = useState([]);
   const [checkedStates, setCheckedStates] = useState({});
   const [editingStates, setEditingStates] = useState({});
+  const [fontsLoaded, setFontsLoaded] = useState(false);
 
   const fetchData = async () => {
     try {
@@ -43,8 +47,24 @@ function FormBox() {
   };
 
   useEffect(() => {
+    const loadFonts = async () => {
+      await Font.loadAsync({
+        'GmarketSansLight': require('../../assets/fonts/GmarketSansTTFLight.ttf'),
+        'GmarketSansBold': require('../../assets/fonts/GmarketSansTTFBold.ttf'),
+        'GmarketSansMedium': require('../../assets/fonts/GmarketSansTTFMedium.ttf'),
+        'MangoDdobak-B': require('../../assets/fonts/MangoDdobak-B(ttf).ttf'),
+        'MangoDdobak-L': require('../../assets/fonts/MangoDdobak-L(ttf).ttf'),
+        'MangoDdobak-R': require('../../assets/fonts/MangoDdobak-R(ttf).ttf'),
+      });
+      setFontsLoaded(true);
+    };
+    loadFonts();
     fetchData();
   }, []);
+
+  if (!fontsLoaded) {
+    return <AppLoading />;
+  };
 
   const formatDate = (dateString) => {
     return dateString.substring(0, 10).replace(/-/g, ".");
@@ -225,6 +245,7 @@ const FormBoxStyle = StyleSheet.create({
     fontWeight: "700",
     marginLeft: "12%",
     color: "white",
+    fontFamily: 'MangoDdobak-B',
   },
   buttonContainer: {
     alignSelf: "flex-end",
@@ -238,8 +259,9 @@ const FormBoxStyle = StyleSheet.create({
   },
   buttonText: {
     color: "#fff",
-    fontWeight: "700",
+    fontWeight: "600",
     marginRight: "6%",
+    fontFamily: 'GmarketSansMedium',
   },
   mobilePhoto: {
     marginTop: "12%",
@@ -252,26 +274,31 @@ const FormBoxStyle = StyleSheet.create({
     justifyContent: "center",
     marginBottom: "11%",
     alignItems: "center",
+    fontFamily: 'GmarketSansMedium',
   },
   mobileText: {
     fontSize: 18,
     textAlign: "center",
     marginTop: "6%",
     paddingHorizontal: "2%",
+    paddingVertical: "2%",
     backgroundColor: "#2E294E",
     color: "white",
+    fontFamily: 'GmarketSansMedium',
   },
   mobileText2: {
     fontSize: 22,
     fontWeight: "700",
     marginTop: "2%",
     textAlign: "center",
+    fontFamily: 'GmarketSansMedium',
   },
   mobileText3: {
     fontSize: 12,
     marginTop: "2%",
     textAlign: "center",
     marginBottom: "15%",
+    fontFamily: 'GmarketSansMedium',
   },
   mobileIconStyle: {
     paddingLeft: 70,
@@ -294,6 +321,7 @@ const FormBoxStyle = StyleSheet.create({
   cardText: {
     fontSize: 16,
     marginBottom: 5,
+    fontFamily: 'GmarketSansMedium',
   },
 });
 

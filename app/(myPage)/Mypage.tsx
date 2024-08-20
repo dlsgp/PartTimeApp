@@ -88,6 +88,13 @@ const Mypage = () => {
     }
   };
 
+  const handleLogout = async () => {
+    await AsyncStorage.removeItem("userToken");
+    await AsyncStorage.removeItem("userType");
+    await AsyncStorage.removeItem("userId");
+    router.push("/"); // 로그인 화면으로 이동
+  };
+
   const handleCancel = () => {
     setUserInfo(originalUserInfo);
     setIsEditing(false);
@@ -304,6 +311,11 @@ const Mypage = () => {
                 theme={{ colors: { background: "white" } }}
               />
             </View>
+            <View style={RegFormStyle.buttonContainer}>
+            <TouchableOpacity onPress={handleLogout} style={RegFormStyle.button2}>
+              <Text style={RegFormStyle.buttonText}>로그아웃</Text>
+            </TouchableOpacity>
+            </View>
           </KeyboardAvoidingView>
         </View>
         <Modal
@@ -337,6 +349,7 @@ const RegFormStyle = StyleSheet.create({
   maincontainer: {
     width: "100%",
     backgroundColor: "#fff",
+    marginTop: "10%",
   },
   container: {
     marginHorizontal: "2%",
