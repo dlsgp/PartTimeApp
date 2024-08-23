@@ -125,7 +125,7 @@ const StaffForm = () => {
           <Text
             style={{
               fontSize: 22,
-              fontFamily: "MangoDdobak-R",
+              // fontFamily: "MangoDdobak-R",
               fontWeight: "bold",
               marginVertical: "6%",
               color: "#2E294E",
@@ -376,7 +376,7 @@ const RegFormStyle = StyleSheet.create({
   },
   checktext: {
     fontSize: 18,
-    fontFamily: "GmarketSansTTFBold",
+    // fontFamily: "GmarketSansTTFBold",
     fontWeight: "700",
     marginVertical: "auto",
   },

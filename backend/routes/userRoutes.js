@@ -847,7 +847,8 @@ router.get("/schedules", async (req, res) => {
 router.post("/schedules", async (req, res) => {
   const {
     name,
-    sch_workdate,
+    sch_startdate,
+    sch_enddate,
     sch_worktime,
     sch_resttime,
     color,
@@ -881,13 +882,14 @@ router.post("/schedules", async (req, res) => {
     }
 
     const result = await connection.execute(
-      `INSERT INTO SCHEDULE (SCHEDULE_NUM, REG_NUM, TYPE_NUM, NAME, SCH_WORKDATE, SCH_WORKTIME, SCH_RESTTIME, COLOR, MEMO, RESTDATE)
-       VALUES (SCHEDULE_SEQ.NEXTVAL, :regNum, :typeNum, :name, TO_DATE(:sch_workdate, 'YYYY-MM-DD'), TO_TIMESTAMP(:sch_worktime, 'YYYY-MM-DD HH24:MI:SS.FF'), :sch_resttime, :color, :memo, :restdate)`,
+      `INSERT INTO SCHEDULE (SCHEDULE_NUM, REG_NUM, TYPE_NUM, NAME, SCH_STARTDATE, SCH_ENDDATE, SCH_WORKTIME, SCH_RESTTIME, COLOR, MEMO, RESTDATE)
+       VALUES (SCHEDULE_SEQ.NEXTVAL, :regNum, :typeNum, :name, TO_DATE(:sch_startdate, 'YYYY-MM-DD'), TO_DATE(:sch_enddate, 'YYYY-MM-DD'), TO_TIMESTAMP(:sch_worktime, 'YYYY-MM-DD HH24:MI:SS.FF'), :sch_resttime, :color, :memo, :restdate)`,
       {
         regNum: REG_NUM, // 추출된 REG_NUM 사용
         typeNum: TYPE_NUM, // 추출된 TYPE_NUM 사용
         name,
-        sch_workdate,
+        sch_startdate,
+        sch_enddate,
         sch_worktime,
         sch_resttime,
         color,
@@ -903,7 +905,7 @@ router.post("/schedules", async (req, res) => {
       res.status(400).json({ message: "일정 추가에 실패했습니다." });
     }
   } catch (err) {
-    console.error(err);
+    console.error("Error adding schedule:", err);
     res.status(500).json({ error: "Database error" });
   } finally {
     if (connection) {
@@ -911,6 +913,67 @@ router.post("/schedules", async (req, res) => {
     }
   }
 });
+
+// 일정 수정
+router.put("/schedules/:scheduleNum", async (req, res) => {
+  const {
+    name,
+    sch_startdate,
+    sch_enddate,
+    sch_worktime,
+    sch_resttime,
+    color,
+    memo,
+    restdate,
+    workId,
+  } = req.body;
+  const { scheduleNum } = req.params;
+  const dbConfig = req.app.get("dbConfig");
+  let connection;
+
+  try {
+    connection = await oracledb.getConnection(dbConfig);
+
+    const result = await connection.execute(
+      `UPDATE SCHEDULE 
+       SET NAME = :name, 
+           SCH_STARTDATE = TO_DATE(:sch_startdate, 'YYYY-MM-DD'),
+           SCH_ENDDATE = TO_DATE(:sch_enddate, 'YYYY-MM-DD'),
+           SCH_WORKTIME = TO_TIMESTAMP(:sch_worktime, 'YYYY-MM-DD HH24:MI:SS.FF'),
+           SCH_RESTTIME = :sch_resttime, 
+           COLOR = :color, 
+           MEMO = :memo, 
+           RESTDATE = :restdate
+       WHERE SCHEDULE_NUM = :scheduleNum`,
+      {
+        name,
+        sch_startdate,
+        sch_enddate,
+        sch_worktime,
+        sch_resttime,
+        color,
+        memo,
+        restdate,
+        scheduleNum,
+      },
+      { autoCommit: true }
+    );
+
+    if (result.rowsAffected > 0) {
+      res.status(200).json({ message: "일정이 수정되었습니다." });
+    } else {
+      res.status(400).json({ message: "일정 수정에 실패했습니다." });
+    }
+  } catch (err) {
+    console.error("Error updating schedule:", err);
+    res.status(500).json({ error: "Database error" });
+  } finally {
+    if (connection) {
+      await connection.close();
+    }
+  }
+});
+
 
 // 값 가져오기
 router.get("/work-ids", async (req, res) => {

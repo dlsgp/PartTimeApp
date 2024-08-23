@@ -349,10 +349,11 @@ const RegFormStyle = StyleSheet.create({
   maincontainer: {
     width: "100%",
     backgroundColor: "#fff",
-    marginTop: "10%",
+
   },
   container: {
     marginHorizontal: "2%",
+    marginTop: "10%",
   },
   titleContainer: {
     flexDirection: "row",

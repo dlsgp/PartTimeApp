@@ -17,8 +17,6 @@ import { useFocusEffect, useRouter } from "expo-router";
 import { getAuthToken, login } from "../../components/src/services/apiService";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 
-import AppLoading from 'expo-app-loading';
-
 const { width, height } = Dimensions.get("window");
 
 const SignInApp = () => {
@@ -53,21 +51,21 @@ const SignInApp = () => {
         }
       }
       setLoading(false); // 로딩 상태 해제
-      loadFonts();
+      // loadFonts();
     };
 
-    const loadFonts = async () => {
-      await Font.loadAsync({
-        'GmarketSansLight': require('../../assets/fonts/GmarketSansTTFLight.ttf'),
-        'GmarketSansBold': require('../../assets/fonts/GmarketSansTTFBold.ttf'),
-        'GmarketSansMedium': require('../../assets/fonts/GmarketSansTTFMedium.ttf'),
-        'MangoDdobak-B': require('../../assets/fonts/MangoDdobak-B(ttf).ttf'),
-        'MangoDdobak-L': require('../../assets/fonts/MangoDdobak-L(ttf).ttf'),
-        'MangoDdobak-R': require('../../assets/fonts/MangoDdobak-R(ttf).ttf'),
-      });
-      setFontsLoaded(true);
-    };
-    loadFonts();
+    // const loadFonts = async () => {
+    //   await Font.loadAsync({
+    //     'GmarketSansLight': require('../../assets/fonts/GmarketSansTTFLight.ttf'),
+    //     'GmarketSansBold': require('../../assets/fonts/GmarketSansTTFBold.ttf'),
+    //     'GmarketSansMedium': require('../../assets/fonts/GmarketSansTTFMedium.ttf'),
+    //     'MangoDdobak-B': require('../../assets/fonts/MangoDdobak-B(ttf).ttf'),
+    //     'MangoDdobak-L': require('../../assets/fonts/MangoDdobak-L(ttf).ttf'),
+    //     'MangoDdobak-R': require('../../assets/fonts/MangoDdobak-R(ttf).ttf'),
+    //   });
+    //   setFontsLoaded(true);
+    // };
+    // loadFonts();
     checkLoggedIn();
   }, []);
 
@@ -282,10 +280,10 @@ const styles = StyleSheet.create({
     paddingHorizontal: 20,
   },
   title: {
-    // fontWeight: "bold",
+    fontWeight: "bold",
     fontSize: 55,
     marginBottom: 150,
-    fontFamily: 'GmarketSansBold',
+    // fontFamily: 'GmarketSansBold',
     // fontFamily: 'MangoDdobak-B',
   },
   input: {
@@ -295,7 +293,7 @@ const styles = StyleSheet.create({
     borderBottomWidth: 1,
     marginBottom: 20,
     paddingHorizontal: 10,
-    fontFamily: 'GmarketSansMedium',
+    // fontFamily: 'GmarketSansMedium',
   },
   options: {
     width: width * 0.8,
@@ -312,12 +310,12 @@ const styles = StyleSheet.create({
     marginBottom: 0,
     marginTop: 5,
     color: "#FFBD00",
-    fontFamily: 'GmarketSansMedium',
+    // fontFamily: 'GmarketSansMedium',
   },
   forgotPasswordText: {
     color: "#FFBD00",
     marginBottom: 2,
-    fontFamily: 'GmarketSansMedium',
+    // fontFamily: 'GmarketSansMedium',
     marginTop: 5,
   },
   forgotPasswordTouch: {
@@ -334,18 +332,18 @@ const styles = StyleSheet.create({
   },
   loginButtonText: {
     color: "#fff",
-    // fontWeight: "bold",
-    fontFamily: 'GmarketSansBold',
+    fontWeight: "bold",
+    // fontFamily: 'GmarketSansBold',
   },
   registerText: {
     color: "#FFBD00",
     marginBottom: 40,
-    fontFamily: 'GmarketSansMedium',
+    // fontFamily: 'GmarketSansMedium',
     marginTop: 10,
   },
   socialLoginText: {
     marginBottom: 20,
-    fontFamily: 'GmarketSansLight',
+    // fontFamily: 'GmarketSansLight',
   },
   socialLoginButtons: {
     flexDirection: "row",

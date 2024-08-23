@@ -43,6 +43,8 @@ const BusinessSignUpApp: React.FC = () => {
   const [currentCheckbox, setCurrentCheckbox] = useState<number | null>(null);
   const [tel, setTel] = useState("");
   const [postcodeModalVisible, setPostcodeModalVisible] = useState(false);
+  const [signupCompleteModalVisible, setSignupCompleteModalVisible] =
+    useState(false);
 
   const handleCheckbox0Press = () => {
     if (checked1 && checked2) {
@@ -262,10 +264,33 @@ const BusinessSignUpApp: React.FC = () => {
     setPostcodeModalVisible(false);
   };
 
+  const handleCloseSignupCompleteModal = () => {
+    setSignupCompleteModalVisible(false);
+    router.push("/"); // 로그인 페이지로 이동
+  };
+
   return (
     <SafeAreaView style={styles.container}>
       <ScrollView showsVerticalScrollIndicator={false}>
         <Text style={styles.title}>사업자회원가입</Text>
+
+        <Modal
+          visible={signupCompleteModalVisible}
+          animationType="slide"
+          transparent={true}
+        >
+          <View style={styles.modalContainer}>
+            <View style={styles.modalContent}>
+              <Text style={styles.modalText}>회원가입이 완료되었습니다!</Text>
+              <TouchableOpacity
+                onPress={handleCloseSignupCompleteModal}
+                style={styles.closeButton}
+              >
+                <Text style={styles.closeButtonText}>확인</Text>
+              </TouchableOpacity>
+            </View>
+          </View>
+        </Modal>
 
         <View style={styles.id}>
           <TextInput
@@ -689,6 +714,11 @@ const styles = StyleSheet.create({
     backgroundColor: "#fff",
     borderRadius: 10,
     padding: 20,
+  },
+  modalText: {
+    fontSize: 18,
+    textAlign: "center",
+    marginTop: "50%",
   },
   closeButton: {
     marginTop: 20,

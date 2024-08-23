@@ -49,6 +49,17 @@ export const logout = async () => {
   // 필요 시 서버에 로그아웃 요청을 보냅니다.
 };
 
+export const signUp = async (userData) => {
+  try {
+    const response = await axios.post(`${API_URL}/signup`, userData);
+    console.log("Signup successful:", response.data);
+    return response.data;
+  } catch (error) {
+    console.error("Signup API call failed:", error);
+    throw error;
+  }
+};
+
 export const bsignup = async (businessData) => {
   try {
     const response = await axios.post(`${API_URL}/bsignup`, businessData);

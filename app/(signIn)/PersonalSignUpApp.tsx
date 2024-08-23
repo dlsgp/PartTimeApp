@@ -42,6 +42,8 @@ const PersonalSignUpApp: React.FC = () => {
   const [currentCheckbox, setCurrentCheckbox] = useState<number | null>(null);
   const [tel, setTel] = useState("");
   const [postcodeModalVisible, setPostcodeModalVisible] = useState(false);
+  const [signupCompleteModalVisible, setSignupCompleteModalVisible] =
+    useState(false);
 
   const handleCheckbox0Press = () => {
     if (checked1 && checked2) {
@@ -134,7 +136,8 @@ const PersonalSignUpApp: React.FC = () => {
         const response = await signUp(userData);
         if (response.success) {
           console.log(response); // 회원가입 성공
-          router.push("/");
+          // router.push("/");
+          setSignupCompleteModalVisible(true);
         } else {
           setErrors({
             ...errors,
@@ -223,10 +226,33 @@ const PersonalSignUpApp: React.FC = () => {
     setPostcodeModalVisible(false);
   };
 
+  const handleCloseSignupCompleteModal = () => {
+    setSignupCompleteModalVisible(false);
+    router.push("/"); // 로그인 페이지로 이동
+  };
+
   return (
     <SafeAreaView style={styles.container}>
       <ScrollView showsVerticalScrollIndicator={false}>
         <Text style={styles.title}>개인회원가입</Text>
+
+        <Modal
+          visible={signupCompleteModalVisible}
+          animationType="slide"
+          transparent={true}
+        >
+          <View style={styles.modalContainer}>
+            <View style={styles.modalContent}>
+              <Text style={styles.modalText}>회원가입이 완료되었습니다!</Text>
+              <TouchableOpacity
+                onPress={handleCloseSignupCompleteModal}
+                style={styles.closeButton}
+              >
+                <Text style={styles.closeButtonText}>확인</Text>
+              </TouchableOpacity>
+            </View>
+          </View>
+        </Modal>
 
         <View style={styles.id}>
           <TextInput
@@ -630,6 +656,11 @@ const styles = StyleSheet.create({
   },
   closeButtonText: {
     color: "#fff",
+  },
+  modalText: {
+    fontSize: 18,
+    textAlign: "center",
+    marginTop: "50%",
   },
   errorText: {
     color: "red",
