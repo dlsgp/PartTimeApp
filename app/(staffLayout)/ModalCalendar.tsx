@@ -7,7 +7,6 @@ import { StyleSheet, View, Text, TouchableOpacity, Modal } from "react-native";
 export default function ModalCalendar({ onDateChange }) {
   const [open, setOpen] = useState(false);
   const [date, setDate] = useState<string | null>(null);
-  const [select, setSelect] = useState(false);
 
   useEffect(() => {
     setOpen(true);
@@ -29,13 +28,13 @@ export default function ModalCalendar({ onDateChange }) {
           <View style={styles.modalView}>
             <DatePicker
               mode="calendar"
-              locale="ko"
+              locale="ko" // 한국어로 설정
               selected={date || ""}
               onDateChange={handleChange}
             />
 
             <TouchableOpacity onPress={handleOnPress}>
-              <Text>Close</Text>
+              <Text>닫기</Text>
             </TouchableOpacity>
           </View>
         </View>

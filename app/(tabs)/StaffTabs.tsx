@@ -1,11 +1,10 @@
 import React from "react";
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
 import Mypage from "../(myPage)/Mypage";
-import Test from "../(myPage)/Test";
 import { FontAwesome, AntDesign, MaterialIcons, Ionicons } from "@expo/vector-icons";
-import ScheduleCalendar from "../(scheduleManagement)/ScheduleCalendar";
 import Wage from "../(myPage)/Wage";
 import QRCodeScannerScreen from "../(myPage)/QRCodeScanner";
+import MyCalendar from "../(myPage)/MyCalendar";
 
 const Tab = createBottomTabNavigator();
 
@@ -30,7 +29,7 @@ export default function StaffTabs() {
       />
       <Tab.Screen
         name="Calendar"
-        component={ScheduleCalendar}
+        component={MyCalendar}
         options={{
           tabBarLabel: "일정",
           headerShown: false,

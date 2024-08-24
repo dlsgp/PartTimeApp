@@ -51,6 +51,7 @@
     "oracledb": "^6.6.0",
     "pod-install": "^0.2.2",
     "react": "18.2.0",
+    "react-datepicker": "^7.3.0",
     "react-dom": "18.2.0",
     "react-native": "0.74.3",
     "react-native-bouncy-checkbox": "^4.0.1",

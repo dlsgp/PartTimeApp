@@ -1,16 +1,18 @@
-import React, { useState, useEffect, useCallback } from "react";
+import React, { useState, useEffect } from "react";
 import {
   StyleSheet,
   View,
   Text,
   TouchableOpacity,
+  FlatList,
   Modal,
   TextInput,
+  Platform,
   Picker,
 } from "react-native";
 import { Calendar } from "react-native-calendars";
-import DateTimePicker from "@react-native-community/datetimepicker";
-import { FontAwesome6 } from "@expo/vector-icons";
+import DatePicker from "../(staffLayout)/ModalCalendar";
+import FontAwesome from "@expo/vector-icons/FontAwesome";
 import axios from "axios";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import API_BASE_URL from "@/config";
@@ -18,14 +20,13 @@ import API_BASE_URL from "@/config";
 const INITIAL_DATE = new Date().toISOString().split("T")[0];
 
 const ScheduleCalendar = () => {
-  const [selectedStartDate, setSelectedStartDate] = useState(null);
-  const [selectedEndDate, setSelectedEndDate] = useState(null);
   const [markedDates, setMarkedDates] = useState({});
+  const [schedules, setSchedules] = useState([]);
   const [modalVisible, setModalVisible] = useState(false);
-  const [showDatePicker, setShowDatePicker] = useState(false);
-  const [currentEditingField, setCurrentEditingField] = useState(null);
-  const [workIds, setWorkIds] = useState([]); // 작업자 ID 목록을 저장하는 상태
-  const [selectedWorkId, setSelectedWorkId] = useState(""); // 선택된 작업자 ID를 저장하는 상태
+  const [showDatePicker1, setShowDatePicker1] = useState(false);
+  const [showDatePicker2, setShowDatePicker2] = useState(false);
+  const [workIds, setWorkIds] = useState([]);
+  const [selectedWorkId, setSelectedWorkId] = useState("");
   const [formData, setFormData] = useState({
     name: "",
     sch_startdate: "",
@@ -38,21 +39,28 @@ const ScheduleCalendar = () => {
 
   useEffect(() => {
     fetchSchedules();
-    fetchWorkIds(); // 작업자 ID 목록을 가져오는 함수 호출
+    fetchWorkIds();
   }, []);
 
   const fetchWorkIds = async () => {
     try {
       const accessToken = await AsyncStorage.getItem("accessToken");
-      const response = await axios.get(`${API_BASE_URL}:3000/api/workids`, {
+      const response = await axios.get(`${API_BASE_URL}:3000/api/work-ids`, {
         headers: {
           Authorization: `Bearer ${accessToken}`,
         },
         withCredentials: true,
       });
-      setWorkIds(response.data);
+
+      const structuredData = response.data.map((item) => ({
+        work_id: item[0],
+        name: item[1],
+      }));
+
+      console.log("Structured Work IDs:", structuredData);
+      setWorkIds(structuredData);
     } catch (error) {
-      console.error("Error fetching work IDs:", error);
+      console.error("Error fetching work ids:", error);
     }
   };
 
@@ -65,33 +73,53 @@ const ScheduleCalendar = () => {
         },
         withCredentials: true,
       });
+
       const fetchedSchedules = response.data;
+      setSchedules(fetchedSchedules);
+
       const newMarkedDates = {};
 
       fetchedSchedules.forEach((schedule) => {
-        const startDate = validateDate(schedule.SCH_STARTDATE);
-        const endDate = validateDate(schedule.SCH_ENDDATE);
+        const startDate = validateDate(schedule[4]); // SCH_STARTDATE
+        const endDate = validateDate(schedule[5]); // SCH_ENDDATE
+        const color = schedule[7] || "#50cebb"; // COLOR, 디폴트 컬러 사용
 
-        if (startDate && endDate) {
-          if (startDate === endDate) {
-            newMarkedDates[startDate] = {
-              selected: true,
-              color: schedule.COLOR,
+        if (!startDate || !endDate) {
+          console.warn(
+            "Skipping schedule due to invalid date range:",
+            schedule
+          );
+          return;
+        }
+
+        // Period Marking for the schedule
+        let date = startDate;
+        while (date <= endDate) {
+          if (!newMarkedDates[date]) {
+            newMarkedDates[date] = {
+              periods: [
+                {
+                  color: color,
+                  startingDay: date === startDate,
+                  endingDay: date === endDate,
+                },
+              ],
+              marked: true,
               textColor: "white",
             };
           } else {
-            let date = startDate;
-            while (date <= endDate) {
-              newMarkedDates[date] = {
-                color: schedule.COLOR,
-                textColor: "white",
-                startingDay: date === startDate,
-                endingDay: date === endDate,
-              };
-              date = incrementDate(date);
-            }
+            // Multi-Period 처리
+            newMarkedDates[date].periods.push({
+              color: color,
+              startingDay: date === startDate,
+              endingDay: date === endDate,
+            });
           }
+
+          date = incrementDate(date);
         }
+
+        console.log("Marked Dates Structure:", newMarkedDates);
       });
 
       setMarkedDates(newMarkedDates);
@@ -101,74 +129,57 @@ const ScheduleCalendar = () => {
   };
 
   const validateDate = (dateString) => {
-    const date = new Date(dateString);
-    if (!isNaN(date.getTime())) {
-      return date.toISOString().split("T")[0];
+    if (!dateString || dateString === "null") {
+      console.error("Invalid date string:", dateString);
+      return null;
     }
-    return null;
+
+    const date = new Date(dateString);
+    if (isNaN(date.getTime())) {
+      console.error("Invalid date object:", dateString);
+      return null;
+    }
+
+    const year = date.getFullYear();
+    const month = String(date.getMonth() + 1).padStart(2, "0");
+    const day = String(date.getDate()).padStart(2, "0");
+
+    return `${year}-${month}-${day}`;
   };
 
   const incrementDate = (dateString) => {
     const date = new Date(dateString);
-    date.setDate(date.getDate() + 1);
+    if (isNaN(date.getTime())) {
+      console.error("Invalid date for incrementing:", dateString);
+      return dateString;
+    }
+
+    date.setUTCDate(date.getUTCDate() + 1);
     return date.toISOString().split("T")[0];
   };
 
-  const onDayPress = useCallback(
-    (day) => {
-      if (!selectedStartDate || (selectedStartDate && selectedEndDate)) {
-        setSelectedStartDate(day.dateString);
-        setSelectedEndDate(null);
-        setMarkedDates({
-          [day.dateString]: {
-            selected: true,
-            startingDay: true,
-            color: "#70d7c7",
-            textColor: "white",
-          },
-        });
-      } else if (!selectedEndDate) {
-        setSelectedEndDate(day.dateString);
-        const newMarkedDates = { ...markedDates };
-        let date = selectedStartDate;
-        while (date <= day.dateString) {
-          newMarkedDates[date] = {
-            color: "#70d7c7",
-            textColor: "white",
-            startingDay: date === selectedStartDate,
-            endingDay: date === day.dateString,
-          };
-          date = incrementDate(date);
-        }
-        setMarkedDates(newMarkedDates);
-      }
-    },
-    [selectedStartDate, selectedEndDate, markedDates]
-  );
-
-  const handleDateChange = (event, selectedDate) => {
-    if (currentEditingField && selectedDate) {
-      const formattedDate = selectedDate.toISOString().split("T")[0];
-      setFormData({ ...formData, [currentEditingField]: formattedDate });
-    }
-    setShowDatePicker(false);
+  const openModal = () => {
+    setModalVisible(true);
   };
 
-  const openModal = () => {
-    if (selectedStartDate && selectedEndDate) {
-      setFormData({
-        ...formData,
-        sch_startdate: selectedStartDate,
-        sch_enddate: selectedEndDate,
-      });
-    } else if (selectedStartDate) {
-      setFormData({
-        ...formData,
-        sch_startdate: selectedStartDate,
-        sch_enddate: selectedStartDate,
-      });
-    }
-    setModalVisible(true);
+  const toggleDatePicker1 = () => {
+    setShowDatePicker1(!showDatePicker1);
+  };
+
+  const toggleDatePicker2 = () => {
+    setShowDatePicker2(!showDatePicker2);
+  };
+
+  const handleChange1 = (selectedDate) => {
+    const formattedDate = validateDate(selectedDate.toISOString());
+    setFormData({ ...formData, sch_startdate: formattedDate });
+    toggleDatePicker1();
+  };
+
+  const handleChange2 = (selectedDate) => {
+    const formattedDate = validateDate(selectedDate.toISOString());
+    setFormData({ ...formData, sch_enddate: formattedDate });
+    toggleDatePicker2();
   };
 
   const handleSave = async () => {
@@ -178,8 +189,8 @@ const ScheduleCalendar = () => {
         `${API_BASE_URL}:3000/api/schedules`,
         {
           ...formData,
-          regNum: selectedWorkId, // REG_NUM을 선택된 Work ID로 설정
-          workId: selectedWorkId, // 선택된 work_id도 함께 전송
+          regNum: selectedWorkId,
+          workId: selectedWorkId,
         },
         {
           headers: {
@@ -189,7 +200,7 @@ const ScheduleCalendar = () => {
       );
       if (response.status === 200) {
         setModalVisible(false);
-        fetchSchedules(); // 일정을 새로고침
+        fetchSchedules();
       }
     } catch (error) {
       console.error("Error saving schedule:", error);
@@ -204,142 +215,175 @@ const ScheduleCalendar = () => {
           onPress={openModal}
           style={styles.button}
         >
-          <FontAwesome6 name="plus" size={18} color="#FFBD00" />
+          <FontAwesome name="plus" size={18} color="#FFBD00" />
         </TouchableOpacity>
         <Calendar
           current={INITIAL_DATE}
           style={styles.calendar}
-          onDayPress={onDayPress}
-          markingType={"period"}
+          markingType={"multi-period"}
           markedDates={markedDates}
-          monthFormat={"yyyy년 M월"} // 한국어로 월 표시
-          dayNames={["일", "월", "화", "수", "목", "금", "토"]} // 요일 표시
+          monthFormat={"yyyy년 M월"}
+          dayNames={["일", "월", "화", "수", "목", "금", "토"]}
+          onDayPress={() => {}} // 날짜 선택 비활성화
+          theme={{
+            "stylesheet.calendar.header": {
+              dayTextAtIndex0: {
+                color: "#D30505",
+              },
+              dayTextAtIndex6: {
+                color: "#7FB3FA",
+              },
+            },
+          }}
         />
       </View>
 
-      <Modal
-        visible={modalVisible}
-        animationType="slide"
-        onRequestClose={() => setModalVisible(false)}
-        transparent={true}
-      >
-        <View style={styles.modalWrapper}>
-          <View style={styles.modalContent}>
-            <Text>일정 추가</Text>
+      <FlatList
+        style={styles.cardlist}
+        data={schedules}
+        keyExtractor={(item) => item[0].toString()}
+        renderItem={({ item }) => (
+          <View style={styles.scheduleCard}>
+            <Text style={styles.cardText}>이름: {item[3]}</Text>
+            <Text style={styles.cardText}>근무 시작 시간: {item[4]}</Text>
+            <Text style={styles.cardText}>근무 종료 시간: {item[5]}</Text>
+            <Text style={styles.cardText}>휴게 시작 시간: {item[6]}</Text>
+            <Text style={styles.cardText}>휴게 종료 시간: {item[7]}</Text>
+          </View>
+        )}
+      />
 
-            <Picker
-              selectedValue={selectedWorkId}
-              onValueChange={(itemValue) => {
-                setSelectedWorkId(itemValue);
-                const selectedName = workIds.find(
-                  (work) => work.work_id === itemValue
-                )?.name;
-                setFormData({ ...formData, name: selectedName });
-              }}
-              style={styles.picker}
-            >
-              {workIds.length > 0 ? (
-                workIds.map((work) => (
-                  <Picker.Item
-                    key={work.work_id}
-                    label={work.name}
-                    value={work.work_id}
-                  />
-                ))
-              ) : (
-                <Picker.Item label="No data available" value="" />
-              )}
-            </Picker>
+      {modalVisible && (
+        <Modal
+          visible={modalVisible}
+          animationType="slide"
+          onRequestClose={() => setModalVisible(false)}
+          transparent={true}
+        >
+          <View style={styles.modalWrapper}>
+            <View style={styles.modalContent}>
+              <Text>일정 추가</Text>
 
-            <TextInput
-              placeholder="이름"
-              value={formData.name}
-              style={styles.input}
-              editable={false}
-            />
-
-            <TouchableOpacity
-              onPress={() => {
-                setCurrentEditingField("sch_startdate");
-                setShowDatePicker(true);
-              }}
-            >
-              <TextInput
-                placeholder="시작일"
-                value={formData.sch_startdate}
-                style={styles.input}
-                editable={false}
-              />
-            </TouchableOpacity>
-
-            <TouchableOpacity
-              onPress={() => {
-                setCurrentEditingField("sch_enddate");
-                setShowDatePicker(true);
-              }}
-            >
-              <TextInput
-                placeholder="종료일"
-                value={formData.sch_enddate}
-                style={styles.input}
-                editable={false}
-              />
-            </TouchableOpacity>
-
-            <TextInput
-              placeholder="근무 시작 시간"
-              value={formData.sch_workstarttime}
-              onChangeText={(text) =>
-                setFormData({ ...formData, sch_workstarttime: text })
-              }
-              style={styles.input}
-            />
-
-            <TextInput
-              placeholder="근무 종료 시간"
-              value={formData.sch_workendtime}
-              onChangeText={(text) =>
-                setFormData({ ...formData, sch_workendtime: text })
-              }
-              style={styles.input}
-            />
-
-            <TextInput
-              placeholder="일정 색상"
-              value={formData.color}
-              onChangeText={(text) => setFormData({ ...formData, color: text })}
-              style={styles.input}
-            />
-
-            <TextInput
-              placeholder="메모"
-              value={formData.memo}
-              onChangeText={(text) => setFormData({ ...formData, memo: text })}
-              style={styles.input}
-            />
-
-            <View style={styles.buttonContainer}>
-              <TouchableOpacity style={styles.button2} onPress={handleSave}>
-                <Text style={styles.buttonText}>저장</Text>
-              </TouchableOpacity>
-              <TouchableOpacity
-                style={styles.button2}
-                onPress={() => setModalVisible(false)}
+              <Picker
+                selectedValue={selectedWorkId}
+                onValueChange={(itemValue) => {
+                  setSelectedWorkId(itemValue);
+                  const selectedName = workIds.find(
+                    (work) => work.work_id === itemValue
+                  )?.name;
+                  setFormData({ ...formData, name: selectedName });
+                }}
+                style={styles.picker}
               >
-                <Text style={styles.buttonText}>취소</Text>
-              </TouchableOpacity>
+                {workIds.length > 0 ? (
+                  workIds.map((work) => (
+                    <Picker.Item
+                      key={work.work_id}
+                      label={work.name}
+                      value={work.work_id}
+                    />
+                  ))
+                ) : (
+                  <Picker.Item label="No data available" value="" />
+                )}
+              </Picker>
+
+              <View style={styles.TextIcon}>
+                <TextInput
+                  style={styles.formcontainerIcon}
+                  placeholder="시작일"
+                  value={formData.sch_startdate}
+                  editable={false}
+                />
+                <TouchableOpacity
+                  activeOpacity={0.8}
+                  onPress={toggleDatePicker1}
+                  style={styles.calendarButton}
+                >
+                  <FontAwesome name="calendar-o" size={20} color="e5e5e5" />
+                </TouchableOpacity>
+                {showDatePicker1 && (
+                  <DatePicker
+                    mode="date"
+                    date={new Date(formData.sch_startdate || INITIAL_DATE)}
+                    onDateChange={handleChange1}
+                  />
+                )}
+              </View>
+
+              <View style={styles.TextIcon}>
+                <TextInput
+                  style={styles.formcontainerIcon}
+                  placeholder="종료일"
+                  value={formData.sch_enddate}
+                  editable={false}
+                />
+                <TouchableOpacity
+                  activeOpacity={0.8}
+                  onPress={toggleDatePicker2}
+                  style={styles.calendarButton}
+                >
+                  <FontAwesome name="calendar-o" size={20} color="e5e5e5" />
+                </TouchableOpacity>
+                {showDatePicker2 && (
+                  <DatePicker
+                    mode="date"
+                    date={new Date(formData.sch_enddate || INITIAL_DATE)}
+                    onDateChange={handleChange2}
+                  />
+                )}
+              </View>
+
+              <TextInput
+                placeholder="근무 시작 시간 (예: 09:00)"
+                value={formData.sch_workstarttime}
+                onChangeText={(text) =>
+                  setFormData({ ...formData, sch_workstarttime: text })
+                }
+                style={styles.input}
+              />
+
+              <TextInput
+                placeholder="근무 종료 시간 (예: 18:00)"
+                value={formData.sch_workendtime}
+                onChangeText={(text) =>
+                  setFormData({ ...formData, sch_workendtime: text })
+                }
+                style={styles.input}
+              />
+
+              <TextInput
+                placeholder="일정 색상"
+                value={formData.color}
+                onChangeText={(text) =>
+                  setFormData({ ...formData, color: text })
+                }
+                style={styles.input}
+              />
+
+              <TextInput
+                placeholder="메모"
+                value={formData.memo}
+                onChangeText={(text) =>
+                  setFormData({ ...formData, memo: text })
+                }
+                style={styles.input}
+              />
+
+              <View style={styles.buttonContainer}>
+                <TouchableOpacity style={styles.button2} onPress={handleSave}>
+                  <Text style={styles.buttonText}>저장</Text>
+                </TouchableOpacity>
+                <TouchableOpacity
+                  style={styles.button2}
+                  onPress={() => setModalVisible(false)}
+                >
+                  <Text style={styles.buttonText}>취소</Text>
+                </TouchableOpacity>
+              </View>
             </View>
           </View>
-        </View>
-      </Modal>
-
-      {showDatePicker && (
-        <DateTimePicker
-          value={new Date()}
-          mode="date"
-          display="default"
-          onChange={handleDateChange}
-        />
+        </Modal>
       )}
     </View>
   );
@@ -358,6 +402,7 @@ const styles = StyleSheet.create({
     overflow: "hidden",
     elevation: 3,
     borderWidth: 0,
+    paddingBottom: "10%",
   },
   calendar: {
     flex: 1,
@@ -371,6 +416,27 @@ const styles = StyleSheet.create({
     padding: 10,
     borderRadius: 5,
     marginRight: "4%",
+  },
+  scheduleCard: {
+    padding: 15,
+    backgroundColor: "#f9f9f9",
+    borderRadius: 10,
+    marginVertical: 5,
+    width: "100%",
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 5,
+    elevation: 5,
+  },
+  cardText: {
+    fontSize: 16,
+    color: "#333",
+    marginBottom: 5,
+  },
+  cardlist: {
+    maxHeight: 300,
+    width: "90%",
   },
   modalWrapper: {
     flex: 1,
@@ -416,6 +482,19 @@ const styles = StyleSheet.create({
     height: 50,
     width: "100%",
     marginBottom: 20,
+  },
+  TextIcon: {
+    flexDirection: "row",
+    alignItems: "center",
+  },
+  formcontainerIcon: {
+    flex: 1,
+    borderBottomWidth: 1,
+    borderColor: "#ccc",
+    padding: 5,
+  },
+  calendarButton: {
+    marginLeft: 10,
   },
 });
 
