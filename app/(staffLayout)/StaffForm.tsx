@@ -179,6 +179,16 @@ const StaffForm = () => {
                 activeOutlineColor="#219BDA"
                 theme={{ colors: { background: "white" } }}
               />
+              {/* <TextInput
+                style={RegFormStyle.formcontainer}
+                label="시급"
+                // value={staffNum}
+                // onChangeText={(text) => setStaffNum(text)}
+                mode="outlined"
+                outlineColor="#E5E5E5"
+                activeOutlineColor="#219BDA"
+                theme={{ colors: { background: "white" } }}
+              /> */}
               <TextInput
                 style={RegFormStyle.formcontainer}
                 label="이름"

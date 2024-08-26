@@ -825,7 +825,7 @@ router.get("/schedules", async (req, res) => {
   try {
     connection = await oracledb.getConnection(dbConfig);
     const result = await connection.execute(
-      `SELECT S.SCHEDULE_NUM, S.REG_NUM, S.TYPE_NUM, S.NAME, S.SCH_STARTDATE, S.SCH_ENDDATE, S.SCH_WORKTIME, S.SCH_RESTTIME, S.COLOR, S.MEMO, S.RESTDATE, C.WORK_ID, R.NAME
+      `SELECT S.SCHEDULE_NUM, S.REG_NUM, S.TYPE_NUM, S.NAME, S.SCH_STARTDATE, S.SCH_ENDDATE, S.SCH_WORKSTARTTIME, S.SCH_WORKENDTIME, S.SCH_RESTTIME, S.COLOR, S.MEMO, S.SCH_RESTSTARTTIME, S.SCH_RESTENDTIME, C.WORK_ID, R.NAME
        FROM SCHEDULE S
        JOIN COMMUTE C ON S.REG_NUM = C.REG_NUM
        JOIN REGISTER R ON C.WORK_ID = R.ID
@@ -843,6 +843,95 @@ router.get("/schedules", async (req, res) => {
   }
 });
 
+// // 일정 조회
+// router.get("/schedules", async (req, res) => {
+//   const ceoId = req.session.userId;
+//   const dbConfig = req.app.get("dbConfig");
+//   let connection;
+
+//   try {
+//     connection = await oracledb.getConnection(dbConfig);
+//     const result = await connection.execute(
+//       `SELECT S.SCHEDULE_NUM, S.REG_NUM, S.TYPE_NUM, S.NAME,
+//               S.SCH_STARTDATE, S.SCH_ENDDATE,
+//               S.SCH_WORKSTARTTIME, S.SCH_WORKENDTIME,
+//               S.SCH_RESTSTARTTIME, S.SCH_RESTENDTIME,
+//               S.COLOR, S.MEMO, S.RESTDATE, C.WORK_ID, R.NAME
+//        FROM SCHEDULE S
+//        JOIN COMMUTE C ON S.REG_NUM = C.REG_NUM
+//        JOIN REGISTER R ON C.WORK_ID = R.ID
+//        WHERE C.CEO_ID = :ceoId AND S.SCH_STARTDATE IS NOT NULL AND S.SCH_ENDDATE IS NOT NULL`,
+//       [ceoId]
+//     );
+//     res.json(result.rows);
+//   } catch (err) {
+//     console.error(err);
+//     res.status(500).json({ error: "Database error" });
+//   } finally {
+//     if (connection) {
+//       await connection.close();
+//     }
+//   }
+// });
+
+// // 일정 추가
+// router.post("/schedules", async (req, res) => {
+//   const {
+//     name,
+//     sch_startdate,
+//     sch_enddate,
+//     sch_workstarttime,
+//     sch_workendtime,
+//     sch_reststarttime,
+//     sch_restendtime,
+//     color,
+//     memo,
+//   } = req.body;
+//   const dbConfig = req.app.get("dbConfig");
+//   let connection;
+
+//   try {
+//     connection = await oracledb.getConnection(dbConfig);
+//     const result = await connection.execute(
+//       `INSERT INTO SCHEDULE
+//          (SCHEDULE_NUM, NAME, SCH_STARTDATE, SCH_ENDDATE,
+//           SCH_WORKSTARTTIME, SCH_WORKENDTIME,
+//           SCH_RESTSTARTTIME, SCH_RESTENDTIME,
+//           COLOR, MEMO)
+//        VALUES
+//          (SCHEDULE_SEQ.NEXTVAL, :name, TO_DATE(:sch_startdate, 'YYYY-MM-DD'), TO_DATE(:sch_enddate, 'YYYY-MM-DD'),
+//           TO_TIMESTAMP(:sch_workstarttime, 'YYYY-MM-DD HH24:MI:SS.FF'), TO_TIMESTAMP(:sch_workendtime, 'YYYY-MM-DD HH24:MI:SS.FF'),
+//           TO_TIMESTAMP(:sch_reststarttime, 'YYYY-MM-DD HH24:MI:SS.FF'), TO_TIMESTAMP(:sch_restendtime, 'YYYY-MM-DD HH24:MI:SS.FF'),
+//           :color, :memo)`,
+//       {
+//         name,
+//         sch_startdate,
+//         sch_enddate,
+//         sch_workstarttime,
+//         sch_workendtime,
+//         sch_reststarttime,
+//         sch_restendtime,
+//         color,
+//         memo,
+//       },
+//       { autoCommit: true }
+//     );
+
+//     if (result.rowsAffected > 0) {
+//       res.status(200).json({ message: "일정이 추가되었습니다." });
+//     } else {
+//       res.status(400).json({ message: "일정 추가에 실패했습니다." });
+//     }
+//   } catch (err) {
+//     console.error("Error adding schedule:", err);
+//     res.status(500).json({ error: "Database error" });
+//   } finally {
+//     if (connection) {
+//       await connection.close();
+//     }
+//   }
+// });
+
 // 일정 추가
 router.post("/schedules", async (req, res) => {
   const {
@@ -857,33 +946,56 @@ router.post("/schedules", async (req, res) => {
     memo,
     workId,
   } = req.body;
+
+  // 날짜 포맷을 슬래시('/')에서 하이픈('-')으로 변경
+  const formattedStartDate = sch_startdate.replace(/\//g, "-");
+  const formattedEndDate = sch_enddate.replace(/\//g, "-");
+
   const dbConfig = req.app.get("dbConfig");
   let connection;
 
   try {
     connection = await oracledb.getConnection(dbConfig);
+
+    // COMMUTE 테이블에서 REG_NUM과 TYPE_NUM 가져오기
+    const commuteResult = await connection.execute(
+      `SELECT REG_NUM, TYPE_NUM FROM SYSTEM.COMMUTE WHERE WORK_ID = :workId`,
+      { workId }
+    );
+
+    if (commuteResult.rows.length === 0) {
+      return res.status(404).json({
+        error: "해당 WORK_ID에 대한 REG_NUM 및 TYPE_NUM을 찾을 수 없습니다.",
+      });
+    }
+
+    const regNum = commuteResult.rows[0][0]; // REG_NUM 가져오기
+    const typeNum = commuteResult.rows[0][1]; // TYPE_NUM 가져오기
+
     const result = await connection.execute(
-      `INSERT INTO SCHEDULE 
-         (SCHEDULE_NUM, NAME, SCH_STARTDATE, SCH_ENDDATE, 
-          SCH_WORKSTARTTIME, SCH_WORKENDTIME, 
-          SCH_RESTSTARTTIME, SCH_RESTENDTIME, 
-          COLOR, MEMO, WORK_ID)
-       VALUES 
-         (SCHEDULE_SEQ.NEXTVAL, :name, TO_DATE(:sch_startdate, 'YYYY-MM-DD'), TO_DATE(:sch_enddate, 'YYYY-MM-DD'), 
-          TO_TIMESTAMP(:sch_workstarttime, 'YYYY-MM-DD HH24:MI:SS.FF'), TO_TIMESTAMP(:sch_workendtime, 'YYYY-MM-DD HH24:MI:SS.FF'), 
-          TO_TIMESTAMP(:sch_reststarttime, 'YYYY-MM-DD HH24:MI:SS.FF'), TO_TIMESTAMP(:sch_restendtime, 'YYYY-MM-DD HH24:MI:SS.FF'), 
-          :color, :memo, :workId)`,
+      `INSERT INTO SCHEDULE
+     (SCHEDULE_NUM, REG_NUM, TYPE_NUM, NAME, SCH_STARTDATE, SCH_ENDDATE,
+      SCH_WORKSTARTTIME, SCH_WORKENDTIME,
+      SCH_RESTSTARTTIME, SCH_RESTENDTIME,
+      COLOR, MEMO)
+      VALUES
+         (SCHEDULE_SEQ.NEXTVAL, :regNum, :typeNum, :name, TO_DATE(:sch_startdate, 'YYYY-MM-DD'), TO_DATE(:sch_enddate, 'YYYY-MM-DD'),
+          :sch_workstarttime, :sch_workendtime,
+          :sch_reststarttime, :sch_restendtime,
+          :color, :memo)`,
       {
+        regNum,
+        typeNum,
         name,
-        sch_startdate,
-        sch_enddate,
+        sch_startdate: formattedStartDate, // 이 변수로 수정
+        sch_enddate: formattedEndDate, // 이 변수로 수정
         sch_workstarttime,
         sch_workendtime,
         sch_reststarttime,
         sch_restendtime,
         color,
         memo,
-        workId,
+        // workId,
       },
       { autoCommit: true }
     );
@@ -903,34 +1015,24 @@ router.post("/schedules", async (req, res) => {
   }
 });
 
-
 // 일정 수정
 router.put("/schedules/:scheduleNum", async (req, res) => {
   const {
     name,
     sch_startdate,
     sch_enddate,
-    sch_worktime,
-    sch_resttime,
+    sch_workstarttime,
+    sch_workendtime,
+    sch_reststarttime,
+    sch_restendtime,
     color,
     memo,
-    restdate,
     workId,
   } = req.body;
 
-  // 날짜 데이터 유효성 검사
-  if (!sch_startdate || !sch_enddate) {
-    return res
-      .status(400)
-      .json({ message: "시작일과 종료일을 입력해야 합니다." });
-  }
-
-  // 날짜 포맷 검사
-  if (isNaN(new Date(sch_startdate)) || isNaN(new Date(sch_enddate))) {
-    return res
-      .status(400)
-      .json({ message: "유효한 날짜 형식을 입력해야 합니다." });
-  }
+  // 날짜 포맷을 슬래시('/')에서 하이픈('-')으로 변경
+  const formattedStartDate = sch_startdate.replace(/\//g, "-");
+  const formattedEndDate = sch_enddate.replace(/\//g, "-");
 
   const { scheduleNum } = req.params;
   const dbConfig = req.app.get("dbConfig");
@@ -939,26 +1041,47 @@ router.put("/schedules/:scheduleNum", async (req, res) => {
   try {
     connection = await oracledb.getConnection(dbConfig);
 
+    // COMMUTE 테이블에서 REG_NUM과 TYPE_NUM 가져오기
+    const commuteResult = await connection.execute(
+      `SELECT REG_NUM, TYPE_NUM FROM SYSTEM.COMMUTE WHERE WORK_ID = :workId`,
+      { workId }
+    );
+
+    if (commuteResult.rows.length === 0) {
+      return res.status(404).json({
+        error: "해당 WORK_ID에 대한 REG_NUM 및 TYPE_NUM을 찾을 수 없습니다.",
+      });
+    }
+
+    const regNum = commuteResult.rows[0][0]; // REG_NUM 가져오기
+    const typeNum = commuteResult.rows[0][1]; // TYPE_NUM 가져오기
+
     const result = await connection.execute(
       `UPDATE SCHEDULE 
-       SET NAME = :name, 
+       SET REG_NUM = :regNum, 
+           TYPE_NUM = :typeNum, 
+           NAME = :name, 
            SCH_STARTDATE = TO_DATE(:sch_startdate, 'YYYY-MM-DD'),
            SCH_ENDDATE = TO_DATE(:sch_enddate, 'YYYY-MM-DD'),
-           SCH_WORKTIME = TO_TIMESTAMP(:sch_worktime, 'YYYY-MM-DD HH24:MI:SS.FF'),
-           SCH_RESTTIME = :sch_resttime, 
+           SCH_WORKSTARTTIME = :sch_workstarttime, 
+           SCH_WORKENDTIME = :sch_workendtime,
+           SCH_RESTSTARTTIME = :sch_reststarttime, 
+           SCH_RESTENDTIME = :sch_restendtime,
            COLOR = :color, 
-           MEMO = :memo, 
-           RESTDATE = :restdate
+           MEMO = :memo
        WHERE SCHEDULE_NUM = :scheduleNum`,
       {
+        regNum,
+        typeNum,
         name,
-        sch_startdate,
-        sch_enddate,
-        sch_worktime,
-        sch_resttime,
+        sch_startdate: formattedStartDate,
+        sch_enddate: formattedEndDate,
+        sch_workstarttime,
+        sch_workendtime,
+        sch_reststarttime,
+        sch_restendtime,
         color,
         memo,
-        restdate,
         scheduleNum,
       },
       { autoCommit: true }
@@ -981,21 +1104,37 @@ router.put("/schedules/:scheduleNum", async (req, res) => {
 
 // 알바생 전용 일정 조회
 router.get("/myschedules", async (req, res) => {
-  const workId = req.session.userId;  // 로그인된 유저의 ID를 기준으로 조회
+  const workId = req.session.userId; // 로그인된 유저의 ID를 기준으로 조회
   const dbConfig = req.app.get("dbConfig");
   let connection;
 
   try {
     connection = await oracledb.getConnection(dbConfig);
+
+    // COMMUTE 테이블에서 REG_NUM과 TYPE_NUM 가져오기
+    const commuteResult = await connection.execute(
+      `SELECT REG_NUM, TYPE_NUM FROM SYSTEM.COMMUTE WHERE WORK_ID = :workId`,
+      { workId }
+    );
+
+    if (commuteResult.rows.length === 0) {
+      return res.status(404).json({ message: "등록된 일정이 없습니다." });
+    }
+
+    const regNum = commuteResult.rows[0][0];
+    const typeNum = commuteResult.rows[0][1];
+
     const result = await connection.execute(
       `SELECT S.SCHEDULE_NUM, S.NAME, S.SCH_STARTDATE, S.SCH_ENDDATE,
               S.SCH_WORKSTARTTIME, S.SCH_WORKENDTIME, 
               S.SCH_RESTSTARTTIME, S.SCH_RESTENDTIME,
               S.COLOR, S.MEMO
        FROM SCHEDULE S
-       WHERE S.WORK_ID = :workId AND S.SCH_STARTDATE IS NOT NULL AND S.SCH_ENDDATE IS NOT NULL`,
-      [workId]
+       WHERE S.REG_NUM = :regNum AND S.TYPE_NUM = :typeNum 
+         AND S.SCH_STARTDATE IS NOT NULL AND S.SCH_ENDDATE IS NOT NULL`,
+      { regNum, typeNum }
     );
+
     res.json(result.rows);
   } catch (err) {
     console.error(err);
@@ -1006,8 +1145,6 @@ router.get("/myschedules", async (req, res) => {
     }
   }
 });
-
-
 
 // 값 가져오기
 router.get("/work-ids", async (req, res) => {
@@ -1238,6 +1375,224 @@ router.get("/wage", async (req, res) => {
   }
 });
 
-module.exports = router;
+// 출근 기록 처리
+router.post("/workin", async (req, res) => {
+  const { ceo_id } = req.body;
+  const work_id = req.session.userId; // work_id는 로그인한 사용자 ID
+
+  if (!work_id) {
+    return res.status(400).json({ error: "work_id가 존재하지 않습니다." });
+  }
+  const dbConfig = req.app.get("dbConfig");
+
+  let connection;
+
+  try {
+    connection = await oracledb.getConnection(dbConfig);
+
+    // 시퀀스를 사용하여 LOG_NUM을 생성
+    const sequenceResult = await connection.execute(
+      `SELECT SYSTEM.WORKLOG_SEQ.NEXTVAL FROM DUAL`
+    );
+    const logNum = sequenceResult.rows[0][0];
+
+    const result = await connection.execute(
+      `INSERT INTO SYSTEM.WORKLOG (LOG_NUM, CEO_ID, WORK_ID, WORKIN) 
+       VALUES (:logNum, :ceo_id, :work_id, SYSTIMESTAMP)`,
+      { logNum, ceo_id, work_id },
+      { autoCommit: true }
+    );
+
+    if (result.rowsAffected > 0) {
+      res.status(200).json({ success: true, message: "출근 기록 완료" });
+    } else {
+      res.status(400).json({ success: false, message: "출근 기록 실패" });
+    }
+  } catch (err) {
+    console.error("Error during workin:", err);
+    res.status(500).json({ success: false, message: "서버 오류 발생" });
+  } finally {
+    if (connection) {
+      try {
+        await connection.close();
+      } catch (err) {
+        console.error(err);
+      }
+    }
+  }
+});
+
+// // 퇴근 기록 처리
+// router.post("/workout", async (req, res) => {
+//   const { ceo_id, workId } = req.body;
+
+//   if (!ceo_id || !workId) {
+//     console.error("Error: ceo_id 또는 work_id가 누락되었습니다.");
+//     return res.status(400).json({ success: false, message: "ceo_id 또는 work_id가 누락되었습니다." });
+//   }
+
+//   console.log("Received ceo_id:", ceo_id);
+//   console.log("Received work_id:", workId);
+
+//   const dbConfig = req.app.get("dbConfig");
+
+//   let connection;
+
+//   try {
+//     connection = await oracledb.getConnection(dbConfig);
+
+//     const result = await connection.execute(
+//       `UPDATE SYSTEM.WORKLOG
+//        SET WORKOUT = SYSTIMESTAMP
+//        WHERE CEO_ID = :ceo_id AND WORK_ID = :workId AND WORKOUT IS NULL`,
+//       { ceo_id, workId },
+//       { autoCommit: true }
+//     );
+
+//     if (result.rowsAffected > 0) {
+//       res.status(200).json({ success: true, message: "퇴근 기록 완료" });
+//     } else {
+//       res.status(400).json({ success: false, message: "퇴근 기록 실패: 출근 기록을 찾을 수 없음" });
+//     }
+//   } catch (err) {
+//     console.error("Error during workout:", err);
+//     res.status(500).json({ success: false, message: "서버 오류 발생" });
+//   } finally {
+//     if (connection) {
+//       try {
+//         await connection.close();
+//       } catch (err) {
+//         console.error(err);
+//       }
+//     }
+//   }
+// });
+
+// 퇴근 기록 처리
+router.post("/workout", async (req, res) => {
+  const { ceo_id, workId } = req.body;
+
+  if (!ceo_id || !workId) {
+    console.error("Error: ceo_id 또는 work_id가 누락되었습니다.");
+    return res
+      .status(400)
+      .json({
+        success: false,
+        message: "ceo_id 또는 work_id가 누락되었습니다.",
+      });
+  }
+
+  console.log("Received ceo_id:", ceo_id);
+  console.log("Received work_id:", workId);
+
+  const dbConfig = req.app.get("dbConfig");
+
+  let connection;
+
+  try {
+    connection = await oracledb.getConnection(dbConfig);
+
+    // 가장 최근의 workin 기록을 가진 log_num을 가져옵니다.
+    const logNumResult = await connection.execute(
+      `SELECT LOG_NUM FROM (
+         SELECT LOG_NUM FROM SYSTEM.WORKLOG 
+         WHERE CEO_ID = :ceo_id AND WORK_ID = :workId AND WORKOUT IS NULL 
+         ORDER BY WORKIN DESC
+       ) WHERE ROWNUM = 1`,
+      { ceo_id, workId }
+    );
+
+    if (logNumResult.rows.length === 0) {
+      return res
+        .status(400)
+        .json({
+          success: false,
+          message: "퇴근 기록 실패: 출근 기록을 찾을 수 없음",
+        });
+    }
+
+    const logNum = logNumResult.rows[0][0];
+
+    // 해당 log_num에 대한 workout 업데이트
+    const result = await connection.execute(
+      `UPDATE SYSTEM.WORKLOG 
+       SET WORKOUT = SYSTIMESTAMP 
+       WHERE LOG_NUM = :logNum`,
+      { logNum },
+      { autoCommit: true }
+    );
+
+    if (result.rowsAffected > 0) {
+      res.status(200).json({ success: true, message: "퇴근 기록 완료" });
+    } else {
+      res
+        .status(400)
+        .json({
+          success: false,
+          message: "퇴근 기록 실패: 출근 기록을 찾을 수 없음",
+        });
+    }
+  } catch (err) {
+    console.error("Error during workout:", err);
+    res.status(500).json({ success: false, message: "서버 오류 발생" });
+  } finally {
+    if (connection) {
+      try {
+        await connection.close();
+      } catch (err) {
+        console.error(err);
+      }
+    }
+  }
+});
+
+// 현재 사용자의 체크인 상태 확인
+router.get("/check-status", async (req, res) => {
+  const work_id = req.session.userId;
+  const ceo_id = req.query.ceo_id;
+
+  if (!work_id || !ceo_id) {
+    return res
+      .status(400)
+      .json({
+        checkedIn: false,
+        message: "work_id 또는 ceo_id가 존재하지 않습니다.",
+      });
+  }
+
+  const dbConfig = req.app.get("dbConfig");
+
+  let connection;
+
+  try {
+    connection = await oracledb.getConnection(dbConfig);
+
+    // 현재 사용자의 최근 기록 중 workout이 없는 경우를 찾음
+    const result = await connection.execute(
+      `SELECT COUNT(*) FROM SYSTEM.WORKLOG 
+       WHERE WORK_ID = :work_id AND CEO_ID = :ceo_id AND WORKOUT IS NULL`,
+      { work_id, ceo_id }
+    );
+
+    const count = result.rows[0][0];
+
+    if (count > 0) {
+      res.status(200).json({ checkedIn: true });
+    } else {
+      res.status(200).json({ checkedIn: false });
+    }
+  } catch (err) {
+    console.error("Error checking status:", err);
+    res.status(500).json({ checkedIn: false, message: "서버 오류 발생" });
+  } finally {
+    if (connection) {
+      try {
+        await connection.close();
+      } catch (err) {
+        console.error(err);
+      }
+    }
+  }
+});
 
 module.exports = router;

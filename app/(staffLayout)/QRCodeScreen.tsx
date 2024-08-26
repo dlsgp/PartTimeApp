@@ -102,9 +102,9 @@ const QRCodeScreen = () => {
         )
       ) : null}
 
-      <TouchableOpacity onPress={handleLogout} style={styles.button}>
+      {/* <TouchableOpacity onPress={handleLogout} style={styles.button}>
         <Text>로그아웃</Text>
-      </TouchableOpacity>
+      </TouchableOpacity> */}
     </View>
   );
 };

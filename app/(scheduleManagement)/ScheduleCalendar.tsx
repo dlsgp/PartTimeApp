@@ -7,7 +7,6 @@ import {
   FlatList,
   Modal,
   TextInput,
-  Platform,
   Picker,
 } from "react-native";
 import { Calendar } from "react-native-calendars";
@@ -27,12 +26,17 @@ const ScheduleCalendar = () => {
   const [showDatePicker2, setShowDatePicker2] = useState(false);
   const [workIds, setWorkIds] = useState([]);
   const [selectedWorkId, setSelectedWorkId] = useState("");
+  const [sortCriteria, setSortCriteria] = useState("name");
+  const [sortOrder, setSortOrder] = useState("asc"); // 오름차순이 기본값
   const [formData, setFormData] = useState({
+    scheduleNum: "",
     name: "",
     sch_startdate: "",
     sch_enddate: "",
     sch_workstarttime: "",
     sch_workendtime: "",
+    sch_reststarttime: "",
+    sch_restendtime: "",
     color: "",
     memo: "",
   });
@@ -57,7 +61,6 @@ const ScheduleCalendar = () => {
         name: item[1],
       }));
 
-      console.log("Structured Work IDs:", structuredData);
       setWorkIds(structuredData);
     } catch (error) {
       console.error("Error fetching work ids:", error);
@@ -82,7 +85,7 @@ const ScheduleCalendar = () => {
       fetchedSchedules.forEach((schedule) => {
         const startDate = validateDate(schedule[4]); // SCH_STARTDATE
         const endDate = validateDate(schedule[5]); // SCH_ENDDATE
-        const color = schedule[7] || "#50cebb"; // COLOR, 디폴트 컬러 사용
+        const color = schedule[9] || "#50cebb"; // COLOR, 디폴트 컬러 사용
 
         if (!startDate || !endDate) {
           console.warn(
@@ -92,9 +95,8 @@ const ScheduleCalendar = () => {
           return;
         }
 
-        // Period Marking for the schedule
         let date = startDate;
-        while (date <= endDate) {
+        while (new Date(date) <= new Date(endDate)) {
           if (!newMarkedDates[date]) {
             newMarkedDates[date] = {
               periods: [
@@ -108,7 +110,6 @@ const ScheduleCalendar = () => {
               textColor: "white",
             };
           } else {
-            // Multi-Period 처리
             newMarkedDates[date].periods.push({
               color: color,
               startingDay: date === startDate,
@@ -118,8 +119,6 @@ const ScheduleCalendar = () => {
 
           date = incrementDate(date);
         }
-
-        console.log("Marked Dates Structure:", newMarkedDates);
       });
 
       setMarkedDates(newMarkedDates);
@@ -130,13 +129,11 @@ const ScheduleCalendar = () => {
 
   const validateDate = (dateString) => {
     if (!dateString || dateString === "null") {
-      console.error("Invalid date string:", dateString);
       return null;
     }
 
     const date = new Date(dateString);
     if (isNaN(date.getTime())) {
-      console.error("Invalid date object:", dateString);
       return null;
     }
 
@@ -150,7 +147,6 @@ const ScheduleCalendar = () => {
   const incrementDate = (dateString) => {
     const date = new Date(dateString);
     if (isNaN(date.getTime())) {
-      console.error("Invalid date for incrementing:", dateString);
       return dateString;
     }
 
@@ -159,6 +155,19 @@ const ScheduleCalendar = () => {
   };
 
   const openModal = () => {
+    setFormData({
+      name: "",
+      sch_startdate: "",
+      sch_enddate: "",
+      sch_workstarttime: "",
+      sch_workendtime: "",
+      sch_reststarttime: "",
+      sch_restendtime: "",
+      color: "",
+      memo: "",
+      scheduleNum: "",
+    });
+    setSelectedWorkId("");
     setModalVisible(true);
   };
 
@@ -171,24 +180,29 @@ const ScheduleCalendar = () => {
   };
 
   const handleChange1 = (selectedDate) => {
-    const formattedDate = validateDate(selectedDate.toISOString());
+    const formattedDate = formatDateToInput(selectedDate);
     setFormData({ ...formData, sch_startdate: formattedDate });
     toggleDatePicker1();
   };
 
   const handleChange2 = (selectedDate) => {
-    const formattedDate = validateDate(selectedDate.toISOString());
+    const formattedDate = formatDateToInput(selectedDate);
     setFormData({ ...formData, sch_enddate: formattedDate });
     toggleDatePicker2();
   };
 
-  const handleSave = async () => {
+  const handleSave1 = async () => {
     try {
+      const formattedStartDate = formData.sch_startdate.replace(/\//g, "-");
+      const formattedEndDate = formData.sch_enddate.replace(/\//g, "-");
+
       const accessToken = await AsyncStorage.getItem("accessToken");
       const response = await axios.post(
         `${API_BASE_URL}:3000/api/schedules`,
         {
           ...formData,
+          sch_startdate: formattedStartDate,
+          sch_enddate: formattedEndDate,
           regNum: selectedWorkId,
           workId: selectedWorkId,
         },
@@ -207,6 +221,105 @@ const ScheduleCalendar = () => {
     }
   };
 
+  const handleSave2 = async () => {
+    try {
+      const accessToken = await AsyncStorage.getItem("accessToken");
+
+      const response = await axios.put(
+        `${API_BASE_URL}:3000/api/schedules/${formData.scheduleNum}`,
+        {
+          ...formData,
+          sch_startdate: formData.sch_startdate.replace(/\//g, "-"),
+          sch_enddate: formData.sch_enddate.replace(/\//g, "-"),
+          workId: selectedWorkId,
+        },
+        {
+          headers: {
+            Authorization: `Bearer ${accessToken}`,
+          },
+        }
+      );
+
+      if (response.status === 200) {
+        setModalVisible(false);
+        fetchSchedules();
+      }
+    } catch (error) {
+      console.error("Error updating schedule:", error);
+    }
+  };
+
+  const handleSave = () => {
+    if (formData.scheduleNum) {
+      handleSave2();
+    } else {
+      handleSave1();
+    }
+  };
+
+  const openEditModal = (item) => {
+    setFormData({
+      scheduleNum: item[0],
+      name: item[3],
+      sch_startdate: formatDateToInput(item[4]),
+      sch_enddate: formatDateToInput(item[5]),
+      sch_workstarttime: item[6],
+      sch_workendtime: item[7],
+      sch_reststarttime: item[11],
+      sch_restendtime: item[12],
+      color: item[9],
+      memo: item[10],
+    });
+    setSelectedWorkId(item[13]);
+    setModalVisible(true);
+  };
+
+  const getModalTitle = () => {
+    return formData.scheduleNum ? "일정 수정" : "일정 추가";
+  };
+
+  const formatDateToInput = (dateString) => {
+    if (!dateString) return "";
+
+    const date = new Date(dateString);
+    const year = date.getFullYear();
+    const month = String(date.getMonth() + 1).padStart(2, "0");
+    const day = String(date.getDate()).padStart(2, "0");
+
+    return `${year}-${month}-${day}`;
+  };
+
+  const toggleSortCriteria = (criteria) => {
+    if (sortCriteria === criteria) {
+      // 동일한 기준을 다시 누르면 정렬 방향을 토글
+      setSortOrder(sortOrder === "asc" ? "desc" : "asc");
+    } else {
+      // 새로운 기준을 누르면 오름차순으로 시작
+      setSortCriteria(criteria);
+      setSortOrder("asc");
+    }
+  };
+
+  const sortedSchedules = [...schedules].sort((a, b) => {
+    let valueA, valueB;
+
+    if (sortCriteria === "name") {
+      valueA = a[3].toLowerCase();
+      valueB = b[3].toLowerCase();
+    } else if (sortCriteria === "date") {
+      valueA = new Date(a[4]);
+      valueB = new Date(b[4]);
+    }
+
+    if (valueA < valueB) {
+      return sortOrder === "asc" ? -1 : 1;
+    }
+    if (valueA > valueB) {
+      return sortOrder === "asc" ? 1 : -1;
+    }
+    return 0;
+  });
+
   return (
     <View style={styles.container}>
       <View style={styles.calendarContainer}>
@@ -224,7 +337,7 @@ const ScheduleCalendar = () => {
           markedDates={markedDates}
           monthFormat={"yyyy년 M월"}
           dayNames={["일", "월", "화", "수", "목", "금", "토"]}
-          onDayPress={() => {}} // 날짜 선택 비활성화
+          onDayPress={() => {}}
           theme={{
             "stylesheet.calendar.header": {
               dayTextAtIndex0: {
@@ -238,19 +351,58 @@ const ScheduleCalendar = () => {
         />
       </View>
 
+      <View style={styles.sortContainer}>
+        <TouchableOpacity
+          style={styles.sortButton}
+          onPress={() => toggleSortCriteria("name")}
+        >
+          <Text style={styles.sortButtonText}>
+            이름별 {sortCriteria === "name" && sortOrder === "asc" ? "▲" : "▼"}
+          </Text>
+        </TouchableOpacity>
+        <TouchableOpacity
+          style={styles.sortButton}
+          onPress={() => toggleSortCriteria("date")}
+        >
+          <Text style={styles.sortButtonText}>
+            날짜별 {sortCriteria === "date" && sortOrder === "asc" ? "▲" : "▼"}
+          </Text>
+        </TouchableOpacity>
+      </View>
+
       <FlatList
         style={styles.cardlist}
-        data={schedules}
+        data={sortedSchedules}
+        showsVerticalScrollIndicator={false}
         keyExtractor={(item) => item[0].toString()}
-        renderItem={({ item }) => (
-          <View style={styles.scheduleCard}>
-            <Text style={styles.cardText}>이름: {item[3]}</Text>
-            <Text style={styles.cardText}>근무 시작 시간: {item[4]}</Text>
-            <Text style={styles.cardText}>근무 종료 시간: {item[5]}</Text>
-            <Text style={styles.cardText}>휴게 시작 시간: {item[6]}</Text>
-            <Text style={styles.cardText}>휴게 종료 시간: {item[7]}</Text>
-          </View>
-        )}
+        renderItem={({ item }) => {
+          const workStartDate = new Date(item[4]);
+          workStartDate.setDate(workStartDate.getDate() + 1);
+          const workStartDateString = workStartDate.toISOString().split("T")[0];
+
+          const workEndDate = new Date(item[5]);
+          workEndDate.setDate(workEndDate.getDate() + 1);
+          const workEndDateString = workEndDate.toISOString().split("T")[0];
+
+          return (
+            <TouchableOpacity
+              onPress={() => openEditModal(item)}
+              style={[styles.scheduleCard, { borderColor: item[9] }]}
+            >
+              <Text style={styles.cardText}>이름: {item[3]}</Text>
+              <Text style={styles.cardText}>
+                근무 날짜: {workStartDateString} ~ {workEndDateString}
+              </Text>
+              <Text style={styles.cardText}>
+                근무 시간: {item[6]} - {item[7]}
+              </Text>
+              <Text style={styles.cardText}>
+                휴게 시간: {item[11]} - {item[12]}
+              </Text>
+              <Text style={styles.cardText}>메모: {item[10]}</Text>
+            </TouchableOpacity>
+          );
+        }}
       />
 
       {modalVisible && (
@@ -262,7 +414,7 @@ const ScheduleCalendar = () => {
         >
           <View style={styles.modalWrapper}>
             <View style={styles.modalContent}>
-              <Text>일정 추가</Text>
+              <Text style={styles.modaltitle}>{getModalTitle()}</Text>
 
               <Picker
                 selectedValue={selectedWorkId}
@@ -291,7 +443,7 @@ const ScheduleCalendar = () => {
               <View style={styles.TextIcon}>
                 <TextInput
                   style={styles.formcontainerIcon}
-                  placeholder="시작일"
+                  placeholder="근무 시작일"
                   value={formData.sch_startdate}
                   editable={false}
                 />
@@ -314,7 +466,7 @@ const ScheduleCalendar = () => {
               <View style={styles.TextIcon}>
                 <TextInput
                   style={styles.formcontainerIcon}
-                  placeholder="종료일"
+                  placeholder="근무 종료일"
                   value={formData.sch_enddate}
                   editable={false}
                 />
@@ -353,13 +505,37 @@ const ScheduleCalendar = () => {
               />
 
               <TextInput
-                placeholder="일정 색상"
-                value={formData.color}
+                placeholder="휴게 시작 시간 (예: 12:00)"
+                value={formData.sch_reststarttime}
                 onChangeText={(text) =>
-                  setFormData({ ...formData, color: text })
+                  setFormData({ ...formData, sch_reststarttime: text })
                 }
                 style={styles.input}
               />
+
+              <TextInput
+                placeholder="휴게 종료 시간 (예: 12:30)"
+                value={formData.sch_restendtime}
+                onChangeText={(text) =>
+                  setFormData({ ...formData, sch_restendtime: text })
+                }
+                style={styles.input}
+              />
+
+              <Text style={styles.color}>일정 색상</Text>
+              <Picker
+                selectedValue={formData.color}
+                onValueChange={(color) => setFormData({ ...formData, color })}
+                style={styles.picker}
+              >
+                <Picker.Item label="빨간색" value="#EF9A9A" />
+                <Picker.Item label="파란색" value="#90CAF9" />
+                <Picker.Item label="초록색" value="#A5D6A7" />
+                <Picker.Item label="노란색" value="#FFF59D" />
+                <Picker.Item label="보라색" value="#CE93D8" />
+                <Picker.Item label="주황색" value="#FFCC80" />
+                <Picker.Item label="남색" value="#9FA8DA" />
+              </Picker>
 
               <TextInput
                 placeholder="메모"
@@ -417,6 +593,26 @@ const styles = StyleSheet.create({
     borderRadius: 5,
     marginRight: "4%",
   },
+  sortContainer: {
+    flexDirection: "row",
+    justifyContent: "space-around",
+    width: "80%",
+    // marginTop: 10,
+    marginBottom: 10,
+  },
+  sortButton: {
+    paddingVertical: 10,
+    paddingHorizontal: 20,
+    backgroundColor: "#FFBD00",
+    borderRadius: 5,
+    height: 30,
+    justifyContent: 'center',
+  },
+  sortButtonText: {
+    fontSize: 16,
+    fontWeight: "bold",
+    color: "#fff",
+  },
   scheduleCard: {
     padding: 15,
     backgroundColor: "#f9f9f9",
@@ -428,6 +624,7 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.1,
     shadowRadius: 5,
     elevation: 5,
+    borderWidth: 1,
   },
   cardText: {
     fontSize: 16,
@@ -479,22 +676,39 @@ const styles = StyleSheet.create({
     fontWeight: "700",
   },
   picker: {
-    height: 50,
+    height: 35,
     width: "100%",
     marginBottom: 20,
+    marginTop: 5,
+  },
+  color: {
+    alignSelf: "flex-start",
+    marginLeft: 5,
+    marginVertical: 10,
+  },
+  modaltitle: {
+    fontWeight: "bold",
+    marginBottom: 15,
   },
   TextIcon: {
     flexDirection: "row",
-    alignItems: "center",
+    width: "100%",
+    marginVertical: 5,
   },
   formcontainerIcon: {
     flex: 1,
     borderBottomWidth: 1,
     borderColor: "#ccc",
     padding: 5,
+    marginRight: -10,
+    width: "90%",
   },
   calendarButton: {
     marginLeft: 10,
+    borderBottomWidth: 1,
+    borderColor: "#ccc",
+    padding: 5,
+    width: 40,
   },
 });
 
