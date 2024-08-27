@@ -1,8 +1,9 @@
 import React, { useEffect, useState } from "react";
-import * as Font from 'expo-font';
+import * as Font from "expo-font";
 import {
   FlatList,
   Image,
+  Platform,
   StyleSheet,
   Text,
   TouchableOpacity,
@@ -112,7 +113,7 @@ function FormBox() {
         <View style={FormBoxStyle.iconText}>
           {[...Array(3)].map((_, i) => (
             <View
-              key={`${item.work_id}-${i}`} 
+              key={`${item.work_id}-${i}`}
               style={{
                 flexDirection: "row",
                 alignItems: "center",
@@ -163,7 +164,9 @@ function FormBox() {
   const renderEmployeeCard = ({ item }) => (
     <Card style={FormBoxStyle.card}>
       <Card.Content>
-        <Text style={FormBoxStyle.cardText}>사원번호 : {item.staff_number}</Text>
+        <Text style={FormBoxStyle.cardText}>
+          사원번호 : {item.staff_number}
+        </Text>
         <Text style={FormBoxStyle.cardText}>이름 : {item.name}</Text>
         <Text style={FormBoxStyle.cardText}>시급 : {item.hourwage} 원</Text>
         <Text style={FormBoxStyle.cardText}>
@@ -201,7 +204,7 @@ function FormBox() {
         horizontal
         data={employees}
         renderItem={renderEmployee}
-        keyExtractor={(item, index) => `${item.name}-${index}`} 
+        keyExtractor={(item, index) => `${item.name}-${index}`}
         showsHorizontalScrollIndicator={false}
         style={FormBoxStyle.employeeList}
       />
@@ -229,7 +232,7 @@ const FormBoxStyle = StyleSheet.create({
   },
   subcontainer: {
     flex: 1,
-    marginHorizontal: 30, // 칸 
+    marginHorizontal: 30, // 칸
   },
   titleContainer: {
     marginBottom: "5%",
@@ -304,17 +307,30 @@ const FormBoxStyle = StyleSheet.create({
   },
   employeeList: {
     marginTop: 20,
-    marginBottom: 20,
+    // marginBottom: 20,
   },
   cardList: {
     flexGrow: 0,
   },
   card: {
-    margin: 10,
-    padding: 10,
-    borderRadius: 10,
-    backgroundColor: "#f0f0f0",
-    width: 200,
+    ...Platform.select({
+      android: {
+        margin: 10,
+        // padding: 10,
+        borderRadius: 10,
+        backgroundColor: "#f0f0f0",
+        width: 200,
+        height: 140,
+        marginBottom: "50%",
+      },
+      web: {
+        margin: 10,
+        padding: 10,
+        borderRadius: 10,
+        backgroundColor: "#f0f0f0",
+        width: 200,
+      },
+    }),
   },
   cardText: {
     fontSize: 16,

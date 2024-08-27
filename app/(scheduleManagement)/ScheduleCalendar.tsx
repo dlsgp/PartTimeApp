@@ -7,7 +7,8 @@ import {
   FlatList,
   Modal,
   TextInput,
-  Picker,
+  Platform,
+  // Picker,
 } from "react-native";
 import { Calendar } from "react-native-calendars";
 import DatePicker from "../(staffLayout)/ModalCalendar";
@@ -15,6 +16,7 @@ import FontAwesome from "@expo/vector-icons/FontAwesome";
 import axios from "axios";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import API_BASE_URL from "@/config";
+import { Picker } from "@react-native-picker/picker";
 
 const INITIAL_DATE = new Date().toISOString().split("T")[0];
 
@@ -278,10 +280,10 @@ const ScheduleCalendar = () => {
     return formData.scheduleNum ? "일정 수정" : "일정 추가";
   };
 
-  const formatDateToInput = (dateString) => {
-    if (!dateString) return "";
+  const formatDateToInput = (date) => {
+    if (!date || isNaN(date)) return "Invalid date";
 
-    const date = new Date(dateString);
+    // const date = new Date(dateString);
     const year = date.getFullYear();
     const month = String(date.getMonth() + 1).padStart(2, "0");
     const day = String(date.getDate()).padStart(2, "0");
@@ -457,7 +459,7 @@ const ScheduleCalendar = () => {
                 {showDatePicker1 && (
                   <DatePicker
                     mode="date"
-                    date={new Date(formData.sch_startdate || INITIAL_DATE)}
+                    date={formData.sch_startdate ? new Date(formData.sch_startdate) : new Date()}
                     onDateChange={handleChange1}
                   />
                 )}
@@ -573,40 +575,98 @@ const styles = StyleSheet.create({
     backgroundColor: "#fff",
   },
   calendarContainer: {
-    width: "100%",
-    borderRadius: 10,
-    overflow: "hidden",
-    elevation: 3,
-    borderWidth: 0,
-    paddingBottom: "10%",
+    ...Platform.select({
+      android: {
+        height: "60%",
+        width: undefined,
+        marginTop: "10%",
+      },
+      web: {
+        height: undefined, // 웹에서는 height를 설정하지 않음
+        width: "100%",
+        borderRadius: 10,
+        overflow: "hidden",
+        elevation: 3,
+        borderWidth: 0,
+        paddingBottom: "10%",
+      },
+    }),
   },
   calendar: {
-    flex: 1,
-    alignSelf: "center",
-    marginTop: 10,
-    width: "100%",
-    height: "100%",
+    // flex: 1,
+    // alignSelf: "center",
+    // marginTop: 10,
+    // width: "100%",
+    // height: "100%",
+    ...Platform.select({
+      android: {
+        flex: 1,
+        alignSelf: "center",
+        height: "100%",
+        width: "140%",
+      },
+      web: {
+        flex: 1,
+        alignSelf: "center",
+        marginTop: 10,
+        width: "100%",
+        height: "100%",
+      },
+    }),
   },
   button: {
-    alignSelf: "flex-end",
-    padding: 10,
-    borderRadius: 5,
-    marginRight: "4%",
+    ...Platform.select({
+      android: {
+        alignSelf: "flex-end",
+        padding: 10,
+        borderRadius: 5,
+        marginRight: "-10%",
+      },
+      web: {
+        alignSelf: "flex-end",
+        padding: 10,
+        borderRadius: 5,
+        marginRight: "4%",
+      },
+    }),
   },
   sortContainer: {
-    flexDirection: "row",
-    justifyContent: "space-around",
-    width: "80%",
-    // marginTop: 10,
-    marginBottom: 10,
+    ...Platform.select({
+      android: {
+        flexDirection: "row",
+        justifyContent: "space-around",
+        width: "80%",
+        marginTop: -30,
+        marginBottom: 10,
+      },
+      web: {
+        flexDirection: "row",
+        justifyContent: "space-around",
+        width: "80%",
+        marginTop: -10,
+        marginBottom: 10,
+      },
+    }),
   },
   sortButton: {
-    paddingVertical: 10,
-    paddingHorizontal: 20,
-    backgroundColor: "#FFBD00",
-    borderRadius: 5,
-    height: 30,
-    justifyContent: 'center',
+    ...Platform.select({
+      android: {
+        // paddingVertical: 0,
+        paddingHorizontal: 20,
+        backgroundColor: "#FFBD00",
+        borderRadius: 5,
+        height: 30,
+        justifyContent: "center",
+      },
+      web: {
+        paddingVertical: 10,
+        paddingHorizontal: 20,
+        backgroundColor: "#FFBD00",
+        borderRadius: 5,
+        height: 30,
+        justifyContent: "center",
+      },
+    }),
   },
   sortButtonText: {
     fontSize: 16,
@@ -619,11 +679,11 @@ const styles = StyleSheet.create({
     borderRadius: 10,
     marginVertical: 5,
     width: "100%",
-    shadowColor: "#000",
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.1,
-    shadowRadius: 5,
-    elevation: 5,
+    // shadowColor: "#000",
+    // shadowOffset: { width: 0, height: 2 },
+    // shadowOpacity: 0.1,
+    // shadowRadius: 5,
+    // elevation: 5,
     borderWidth: 1,
   },
   cardText: {
@@ -634,6 +694,16 @@ const styles = StyleSheet.create({
   cardlist: {
     maxHeight: 300,
     width: "90%",
+    ...Platform.select({
+      android: {
+        maxHeight: 250,
+        width: "90%",
+      },
+      web: {
+        maxHeight: 350,
+        width: "90%",
+      },
+    }),
   },
   modalWrapper: {
     flex: 1,
@@ -658,18 +728,35 @@ const styles = StyleSheet.create({
   buttonContainer: {
     flexDirection: "row",
     justifyContent: "center",
+    marginBottom: 50,
   },
   button2: {
-    marginLeft: "20%",
-    marginRight: "20%",
-    width: 110,
-    height: 34,
-    borderRadius: 30,
-    backgroundColor: "#2E294E",
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "center",
-    marginTop: "10%",
+    ...Platform.select({
+      android: {
+        marginLeft: "5%",
+        marginRight: "5%",
+        width: 80,
+        height: 34,
+        borderRadius: 30,
+        backgroundColor: "#2E294E",
+        flexDirection: "row",
+        alignItems: "center",
+        justifyContent: "center",
+        marginTop: "10%",
+      },
+      web: {
+        marginLeft: "20%",
+        marginRight: "20%",
+        width: 110,
+        height: 34,
+        borderRadius: 30,
+        backgroundColor: "#2E294E",
+        flexDirection: "row",
+        alignItems: "center",
+        justifyContent: "center",
+        marginTop: "10%",
+      },
+    }),
   },
   buttonText: {
     color: "#fff",
